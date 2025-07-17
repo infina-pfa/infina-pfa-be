@@ -1,5 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseEntity, BaseProps } from '../entities/base.entity';
+import { FindManyOptions } from '../types/query.types';
+import { Props } from '../utils/type';
 
 export type TableNames =
   | 'budgets'
@@ -110,5 +112,37 @@ export abstract class SupabaseRepository<Entity extends BaseEntity<BaseProps>> {
       .eq('user_id', userId);
     if (error) throw new Error(error.message);
     return this.toEntity(data[0]);
+  }
+
+  async findMany(
+    props: Props<Entity>,
+    options?: FindManyOptions,
+  ): Promise<Entity[]> {
+    let query = this.supabase
+      .from(this.tableName)
+      .select(options?.select ? options.select.join(',') : '*');
+
+    for (const [key, value] of Object.entries(props)) {
+      if (value) {
+        query = query.eq(key, value);
+      }
+    }
+
+    if (options?.pagination) {
+      const offset = (options.pagination.page - 1) * options.pagination.limit;
+      query = query.range(offset, offset + options.pagination.limit - 1);
+    }
+
+    if (options?.sort) {
+      for (const sortParam of options.sort) {
+        query = query.order(sortParam.field, {
+          ascending: sortParam.direction === 'asc',
+        });
+      }
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    return data?.map((item) => this.toEntity(item)) || [];
   }
 }

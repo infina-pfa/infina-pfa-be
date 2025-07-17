@@ -1,4 +1,6 @@
 import { BaseEntity, BaseProps } from '../entities/base.entity';
+import { FindManyOptions } from '../types/query.types';
+import { Props } from '../utils/type';
 
 export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
   abstract create(entity: E): Promise<E>;
@@ -14,4 +16,6 @@ export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
   abstract createMany(entities: E[]): Promise<E[]>;
 
   abstract findByIdAndUserId(id: string, userId: string): Promise<E | null>;
+
+  abstract findMany(props: Props<E>, options?: FindManyOptions): Promise<E[]>;
 }
