@@ -7,19 +7,30 @@ export interface BaseProps {
 
 export abstract class BaseEntity<Props extends BaseProps> {
   private readonly _id: string;
-  protected _props?: Props;
+  protected _props: Props;
 
-  constructor(props?: Props, id?: string) {
+  constructor(
+    props?: Omit<Props, 'id' | 'createdAt' | 'updatedAt'>,
+    id?: string,
+  ) {
     this._id = id ?? uuid();
-    this._props = props;
+    this._props = {
+      ...props,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Props;
   }
 
   public get id(): string {
     return this._id;
   }
 
-  public get props(): Readonly<Props> | null {
-    return this._props ? Object.freeze(this._props) : null;
+  public get props(): Readonly<Props> {
+    return Object.freeze(this._props);
+  }
+
+  public updated() {
+    this._props.updatedAt = new Date();
   }
 
   public equals(other?: BaseEntity<Props>): boolean {

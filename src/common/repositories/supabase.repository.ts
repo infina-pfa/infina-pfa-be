@@ -2,39 +2,25 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseEntity, BaseProps } from '../entities/base.entity';
 import { FindManyOptions } from '../types/query.types';
 import { Props } from '../utils/type';
+import { BaseRepository } from './base.repository';
 
 export type TableNames =
   | 'budgets'
-  | 'expenses'
-  | 'incomes'
-  | 'profiles'
-  | 'quick_expense_presets'
-  | 'worlds'
-  | 'milestones'
-  | 'personal_types'
-  | 'tasks'
+  | 'budget_transactions'
+  | 'goals'
+  | 'goal_transactions'
   | 'users'
-  | 'user_progress'
-  | 'user_quiz_answers'
-  | 'quizzes'
-  | 'quiz_questions'
-  | 'quiz_answers'
-  | 'user_personal_types'
-  | 'videos'
-  | 'user_conversations'
-  | 'user_messages'
-  | 'user_tasks_conversations'
-  | 'user_milestones'
-  | 'user_goals';
+  | 'conversations'
+  | 'messages'
+  | 'debt_transactions'
+  | 'onboarding_profiles'
+  | 'onboarding_chat'
+  | 'transactions';
 
-export abstract class SupabaseRepository<Entity extends BaseEntity<BaseProps>> {
-  constructor(private readonly _client: SupabaseClient) {
-    this._client = _client;
-  }
-
-  public get supabase() {
-    return this._client;
-  }
+export abstract class SupabaseRepository<Entity extends BaseEntity<BaseProps>>
+  implements BaseRepository<Entity>
+{
+  constructor(protected readonly supabase: SupabaseClient) {}
 
   public abstract get tableName(): TableNames;
 
