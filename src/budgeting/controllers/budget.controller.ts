@@ -21,6 +21,8 @@ export class BudgetController {
 
   @Get()
   async getBudgets(@CurrentUser() user: AuthUser) {
-    return this.getBudgetsUseCase.execute({ userId: user.id });
+    return (await this.getBudgetsUseCase.execute({ userId: user.id })).map(
+      (budget) => budget.toObject(),
+    );
   }
 }

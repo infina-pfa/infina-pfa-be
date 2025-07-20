@@ -11,7 +11,7 @@ import { Response as ExpressResponse } from 'express';
 export interface Response<T> {
   data: T;
   status: number;
-  message: string;
+  code: string;
   timestamp: string;
 }
 
@@ -28,7 +28,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
       map((data: T) => ({
         data,
         status: response.statusCode,
-        message: 'Success',
+        code: 'success',
         timestamp: now.toISOString(),
       })),
     );

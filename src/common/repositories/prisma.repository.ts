@@ -56,8 +56,8 @@ export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
     const budgets = await this.prisma.findMany({
       where: camelCaseToSnakeCase(props),
       skip:
-        (options?.pagination?.page ?? 1) * (options?.pagination?.limit ?? 10),
-      take: options?.pagination?.limit ?? 10,
+        (options?.pagination?.page ?? 0) * (options?.pagination?.limit ?? 10),
+      take: options?.pagination?.limit,
       orderBy: options?.sort?.map((sort) => ({
         [sort.field]: sort.direction,
       })),
