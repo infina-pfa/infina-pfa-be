@@ -2,10 +2,10 @@ export * from './dto/base.dto';
 
 export * from './interceptors';
 
-export * from './repositories/supabase-client';
-export * from './module/supabase.module';
+export * from './prisma/prisma-client';
+export * from './prisma/prisma.module';
 export * from './repositories/base.repository';
-export * from './repositories/supabase.repository';
+export * from './repositories/user-prisma.repository';
 
 export * from './value-objects';
 

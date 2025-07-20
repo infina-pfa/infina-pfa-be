@@ -5,8 +5,3 @@ export type Props<T> = {
 export type RequiredProps<T, K extends keyof T> = T & {
   [P in K]-?: T[P];
 };
-
-export type FindManyOptions = {
-  skip: number;
-  take: number;
-};

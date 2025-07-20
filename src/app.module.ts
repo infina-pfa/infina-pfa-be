@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SupabaseModule } from './common';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
-import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from './common';
+import { UserModule } from './user';
 
 @Module({
   imports: [
@@ -11,8 +12,9 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    SupabaseModule,
+    PrismaModule,
     BudgetingModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

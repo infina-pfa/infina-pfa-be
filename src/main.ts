@@ -14,21 +14,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Apply global interceptors
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new ResponseInterceptor(),
-  );
+  // app.useGlobalInterceptors(
+  //   new LoggingInterceptor(),
+  //   new ResponseInterceptor(),
+  // );
 
-  // Apply global filters - order matters, more specific (HttpExceptionFilter) first
-  app.useGlobalFilters(new HttpExceptionFilter(), new AllExceptionsFilter());
+  // // Apply global filters - order matters, more specific (HttpExceptionFilter) first
+  // app.useGlobalFilters(new HttpExceptionFilter(), new AllExceptionsFilter());
 
-  const config = new DocumentBuilder()
-    .setTitle('Infina Financial Hub APIs')
-    .setDescription('API documentation for Infina Financial Hub')
-    .setVersion('1.0')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  // const config = new DocumentBuilder()
+  //   .setTitle('Infina Financial Hub APIs')
+  //   .setDescription('API documentation for Infina Financial Hub')
+  //   .setVersion('1.0')
+  //   .build();
+  // const documentFactory = () => SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }

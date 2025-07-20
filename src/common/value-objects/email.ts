@@ -1,4 +1,4 @@
-import { BaseValueObject } from '@/common';
+import { BaseValueObject } from '@/common/value-objects/base.value-object';
 import { z } from 'zod';
 
 const EmailSchema = z.string().email().min(1, 'Email cannot be empty');

@@ -1,4 +1,4 @@
-import { BaseEntity, BaseProps } from '@/common';
+import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
 
 export enum BudgetCategory {
   FIXED = 'fixed',
@@ -18,7 +18,7 @@ export interface BudgetEntityProps extends BaseProps {
 
 export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
   public static create(
-    props: Omit<BudgetEntityProps, 'id' | 'createdAt' | 'updatedAt'>,
+    props: Omit<BudgetEntityProps, 'id'>,
     id?: string,
   ): BudgetEntity {
     return new BudgetEntity(

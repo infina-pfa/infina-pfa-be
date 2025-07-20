@@ -20,6 +20,8 @@ export class CreateBudgetUseCase {
   async execute(input: CreateBudgetUseCaseInput): Promise<BudgetEntity> {
     const budget = BudgetEntity.create({
       ...input,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
     return this.budgetRepository.create(budget);
   }
