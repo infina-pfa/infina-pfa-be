@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { PrismaModule } from './common';
 import { UserModule } from './user';
+import { APP_GUARD } from '@nestjs/core';
+import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 
 @Module({
   imports: [
@@ -17,6 +19,12 @@ import { UserModule } from './user';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: SupabaseAuthGuard,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

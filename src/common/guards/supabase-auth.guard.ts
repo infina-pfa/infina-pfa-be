@@ -4,8 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { Request } from 'express';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 // Extend the Request interface to include the user property
 interface AuthenticatedRequest extends Request {
@@ -16,7 +18,7 @@ interface AuthenticatedRequest extends Request {
 export class SupabaseAuthGuard implements CanActivate {
   private supabase: SupabaseClient;
 
-  constructor() {
+  constructor(private reflector: Reflector) {
     this.supabase = createClient<unknown>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!,
@@ -24,6 +26,15 @@ export class SupabaseAuthGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = this.extractTokenFromHeader(request);
 

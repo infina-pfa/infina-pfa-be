@@ -20,7 +20,6 @@
     "paths": {
       "@/common/*": ["src/common/*"],
       "@/budgeting/*": ["src/budgeting/*"],
-      "@/guards/*": ["src/guards/*"],
       "@/*": ["src/*"]
     }
   }
