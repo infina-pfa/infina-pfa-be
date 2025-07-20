@@ -18,8 +18,19 @@ export class BaseValueObject<T> {
   }
 
   public toObject(): Record<string, unknown> {
-    return {
-      value: this._value,
-    };
+    const result: Record<string, unknown> = {};
+    if (Array.isArray(this._value)) {
+      result.value = this._value.map((item: unknown) => {
+        if (item instanceof BaseValueObject) {
+          return item.toObject();
+        }
+        return item;
+      });
+    } else if (this._value instanceof BaseValueObject) {
+      result.value = this._value.toObject();
+    } else {
+      result.value = this._value;
+    }
+    return result;
   }
 }

@@ -13,7 +13,7 @@ export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
   abstract createMany(entities: E[]): Promise<E[]>;
 
   abstract findMany(
-    props: Partial<BaseProps>,
+    props: Partial<E['props']>,
     options?: FindManyOptions,
   ): Promise<E[]>;
 }

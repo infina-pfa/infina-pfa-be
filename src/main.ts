@@ -26,8 +26,8 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter(), new AllExceptionsFilter());
 
   const config = new DocumentBuilder()
-    .setTitle('Infina Financial Hub APIs')
-    .setDescription('API documentation for Infina Financial Hub')
+    .setTitle('Infina Personal Finance Advisor APIs')
+    .setDescription('API documentation for Infina Personal Finance Advisor')
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);

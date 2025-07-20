@@ -13,3 +13,5 @@ export * from './entities/base.entity';
 
 export * from './types/database';
 export * from './types/supabase';
+
+export * from './types/auth-user';

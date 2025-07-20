@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { BaseValueObject } from '../value-objects/base.value-object';
 
 export interface BaseProps {
   createdAt: Date;
@@ -44,5 +45,28 @@ export abstract class BaseEntity<Props extends BaseProps> {
       return false;
     }
     return this._id === other._id;
+  }
+
+  public toObject(): any {
+    const result: Record<string, unknown> = {};
+    result.id = this.id;
+    Object.keys(this.props).forEach((key) => {
+      if (Array.isArray(this.props[key])) {
+        result[key] = this.props[key].map((item: unknown) => {
+          if (item instanceof BaseValueObject) {
+            return item.toObject();
+          }
+          return item;
+        });
+      } else if (
+        this.props[key] instanceof BaseValueObject ||
+        this.props[key] instanceof BaseEntity
+      ) {
+        result[key] = this.props[key].toObject();
+      } else {
+        result[key] = this.props[key];
+      }
+    });
+    return result;
   }
 }
