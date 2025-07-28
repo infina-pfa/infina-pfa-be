@@ -42,7 +42,7 @@ export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
     return budget ? this.toEntity(budget) : null;
   }
 
-  public async findOne(props: Partial<BaseProps>): Promise<E | null> {
+  public async findOne(props: Partial<E['props']>): Promise<E | null> {
     const budget = await this.prisma.findFirst({
       where: camelCaseToSnakeCase(props),
     });
@@ -50,7 +50,7 @@ export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
   }
 
   public async findMany(
-    props: Partial<BaseProps>,
+    props: Partial<E['props']>,
     options?: FindManyOptions,
   ): Promise<E[]> {
     const budgets = await this.prisma.findMany({
@@ -65,10 +65,10 @@ export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
     return budgets.map((budget) => this.toEntity(budget));
   }
 
-  public async createMany(entities: E[]): Promise<E[]> {
+  public async createMany(entities: E[]): Promise<number> {
     await this.prisma.createMany({
       data: entities.map((entity) => this.toORM(entity)),
     });
-    return entities;
+    return entities.length;
   }
 }

@@ -1,19 +1,16 @@
-import {
-  BudgetCategory,
-  BudgetEntity,
-  BudgetRepository,
-} from '@/budgeting/domain';
+import { BudgetCategory, BudgetEntity } from '@/budgeting/domain';
 import { PrismaClient } from '@/common/prisma/prisma-client';
 import { PrismaRepository } from '@/common/repositories/prisma.repository';
 import { PrismaDelegate } from '@/common/types/prisma';
 import { Injectable } from '@nestjs/common';
-import { budgets as BudgetORM } from '../../../generated/prisma';
 import { Decimal } from 'generated/prisma/runtime/library';
+import { budgets as BudgetORM } from '../../../generated/prisma';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class BudgetPrismaRepository
   extends PrismaRepository<BudgetEntity>
-  implements BudgetRepository
+  implements BaseRepository<BudgetEntity>
 {
   constructor(prismaClient: PrismaClient) {
     super(prismaClient.budgets as PrismaDelegate<BudgetORM>);

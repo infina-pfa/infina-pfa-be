@@ -2,6 +2,10 @@ import { BaseEntity, BaseProps } from '../entities/base.entity';
 import { FindManyOptions } from '../types/query.types';
 
 export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
+  abstract toEntity(data: unknown): E;
+
+  abstract toORM(entity: E): unknown;
+
   abstract create(entity: E): Promise<E>;
 
   abstract update(entity: E): Promise<E>;
@@ -10,7 +14,9 @@ export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
 
   abstract findById(id: string): Promise<E | null>;
 
-  abstract createMany(entities: E[]): Promise<E[]>;
+  abstract findOne(props: Partial<E['props']>): Promise<E | null>;
+
+  abstract createMany(entities: E[]): Promise<number>;
 
   abstract findMany(
     props: Partial<E['props']>,
