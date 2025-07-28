@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import {
   CreateBudgetUseCase,
   CreateBudgetUseCaseInput,
 } from '../use-cases/create-budget.use-case';
 import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
+import { GetBudgetsWithSpendingUseCase } from '../use-cases/get-budgets-with-spending.use-case';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { AuthUser } from '@/common/index';
 import {
@@ -11,8 +12,28 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
-import { BudgetResponseDto } from './dto/budget.dto';
+import {
+  BudgetResponseDto,
+  BudgetWithSpendingResponseDto,
+} from './dto/budget.dto';
+import { IsOptional, IsNumber, Min, Max } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class GetBudgetsWithSpendingQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @Max(12)
+  month?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  year?: number;
+}
 
 @ApiTags('budgets')
 @ApiBearerAuth()
@@ -21,6 +42,7 @@ export class BudgetController {
   constructor(
     private readonly createBudgetUseCase: CreateBudgetUseCase,
     private readonly getBudgetsUseCase: GetBudgetsUseCase,
+    private readonly getBudgetsWithSpendingUseCase: GetBudgetsWithSpendingUseCase,
   ) {}
 
   @Post()
@@ -48,5 +70,49 @@ export class BudgetController {
     return (await this.getBudgetsUseCase.execute({ userId: user.id })).map(
       (budget) => budget.toObject(),
     );
+  }
+
+  @Get('with-spending')
+  @ApiOperation({
+    summary: 'Get budgets with spending analytics for the current user',
+    description:
+      'Retrieves budgets enriched with spending data including total spent, transaction count, remaining amount, and spending percentage',
+  })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    description: 'Month (1-12). Defaults to current month',
+    example: 7,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    description: 'Year. Defaults to current year',
+    example: 2023,
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of budgets with spending analytics',
+    type: [BudgetWithSpendingResponseDto],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid month or year',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getBudgetsWithSpending(
+    @CurrentUser() user: AuthUser,
+    @Query() query: GetBudgetsWithSpendingQueryDto,
+  ) {
+    const budgetsWithSpending =
+      await this.getBudgetsWithSpendingUseCase.execute({
+        userId: user.id,
+        month: query.month,
+        year: query.year,
+      });
+
+    return budgetsWithSpending.map((projection) => projection.toObject());
   }
 }

@@ -187,3 +187,33 @@ export class BudgetResponseDto {
   })
   updatedAt: Date;
 }
+
+export class BudgetWithSpendingResponseDto extends BudgetResponseDto {
+  @ApiProperty({
+    description: 'Total amount spent from this budget',
+    example: 275.5,
+    type: 'number',
+  })
+  totalSpent: number;
+
+  @ApiProperty({
+    description: 'Number of transactions associated with this budget',
+    example: 12,
+    type: 'integer',
+  })
+  transactionCount: number;
+
+  @ApiProperty({
+    description: 'Remaining amount in the budget',
+    example: 224.5,
+    type: 'number',
+  })
+  remainingAmount: number;
+
+  @ApiProperty({
+    description: 'Percentage of budget spent (0-100)',
+    example: 55.1,
+    type: 'number',
+  })
+  spentPercentage: number;
+}
