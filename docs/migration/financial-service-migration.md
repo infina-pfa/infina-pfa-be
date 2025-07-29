@@ -3,8 +3,8 @@
 > **Version**: 1.0  
 > **Date**: 2025-07-29  
 > **Status**: Planning Phase  
-> **Estimated Timeline**: 2-3 weeks (120 hours)  
-> **Scope**: Web Frontend + Financial Service Only
+> **Estimated Timeline**:  
+> **Scope**: Financial Service Only (EST: 26 APIs)
 
 ## 📋 Executive Summary
 
@@ -13,7 +13,7 @@ This document outlines the focused plan to extract the financial service from th
 1. **Financial Service** (NestJS + DDD + Clean Architecture + PrismaORM + PostgreSQL)
 2. **Web Frontend Updates** (Next.js client integration)
 
-The migration focuses on speed and core functionality preservation, with AI service planning deferred to a later phase.
+The migration focuses on speed and core functionality preservation.
 
 ---
 
@@ -41,10 +41,8 @@ Next.js 15 (App Router)
 
 ### **Migration Scope**
 
-- **Financial APIs**: 23 endpoints (budgets, goals, income, transactions, users)
-- **Service Layers**: 7 financial services in `/lib/services/`
+- **Financial APIs**: 35+ endpoints (budgets, goals, income, users)
 - **Database Tables**: 6 core financial tables
-- **Frontend Integration**: SWR hooks and API clients
 
 ---
 
@@ -58,7 +56,7 @@ Next.js 15 (App Router)
 - **Database**: PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth
 - **Validation**: class-validator + class-transformer
-- **Testing**: Jest + Supertest
+- **Testing**: Jest
 
 **Current DDD Domain Structure:**
 
@@ -106,7 +104,7 @@ src/
 
 ### **🏗️ Foundation Features (Required First)**
 
-**Infrastructure Setup** - _Estimated: 8 hours_
+**Infrastructure Setup**
 
 - NestJS 11 + TypeScript 5.7 project setup
 - DDD + Clean Architecture folder structure
@@ -128,12 +126,14 @@ src/
 - F3: Budget Management
 - F4: Goal Management
 - F5: Income Tracking
+- F6: Integrate with AI service - onboarding
+- F7: Integrate with AI service - daily chat
 
 ---
 
 ## **Foundation Features**
 
-### **F1: Project Setup & Infrastructure** ⏱️ **6 hours**
+### **F1: Project Setup & Infrastructure**
 
 **🎯 Delivery Value**: Scalable development foundation ready for all features
 
@@ -166,7 +166,7 @@ GET /api/health           # Health check endpoint
 
 ---
 
-### **F2: User Authentication & Management** ⏱️ **8 hours**
+### **F2: User Authentication & Management**
 
 **🎯 Delivery Value**: Users can register, login, and manage their accounts
 
@@ -175,7 +175,6 @@ GET /api/health           # Health check endpoint
 - User registration with email validation
 - User login with JWT tokens
 - Basic user profile management
-- Password reset functionality
 
 **Technical Implementation:**
 
@@ -183,15 +182,11 @@ GET /api/health           # Health check endpoint
 - Implement UserController with auth endpoints
 - Setup SupabaseAuthGuard with @CurrentUser() decorator
 - Create user DTOs with validation
-- Setup Email and Password value objects
 - Implement user profile use cases
 
 **API Endpoints:**
 
 ```
-POST /api/auth/register       # User registration
-POST /api/auth/login          # User login
-POST /api/auth/reset-password # Password reset
 GET  /api/users/profile       # Get user profile
 PUT  /api/users/profile       # Update user profile
 ```
@@ -202,16 +197,17 @@ PUT  /api/users/profile       # Update user profile
 
 ## **Core Financial Features**
 
-### **F3: Budget Management** ⏱️ **8 hours**
+### **F3: Budget Management**
 
 **🎯 Delivery Value**: Users can create and manage monthly budgets
 
 **Feature Scope:**
 
 - Create monthly budgets with categories
-- View budget list and details
+- View budget list with spending and details in month
 - Basic budget validation and rules
-- Budget CRUD operations
+- Budget create, update, archive
+- Add, update, delete spending for a budget
 
 **Technical Implementation:**
 
@@ -230,6 +226,10 @@ GET  /api/budgets             # List user budgets
 GET  /api/budgets/:id         # Get budget details
 PUT  /api/budgets/:id         # Update budget
 DELETE /api/budgets/:id       # Delete budget
+GET /api/budgets/spendings              # Get all spending of all budgets in month
+POST /api/budgets/:id/spending          # Add a spending
+PUT /api/budgets/:id/spending/:id       # Update a spending
+DELETE /api/budgets/:id/spending/:id    # Delete a spending
 ```
 
 **Dependencies**: F1, F2
@@ -237,24 +237,24 @@ DELETE /api/budgets/:id       # Delete budget
 
 ---
 
-### **F4: Goal Management** ⏱️ **8 hours**
+### **F4: Goal Management**
 
 **🎯 Delivery Value**: Users can set and track financial goals
 
 **Feature Scope:**
 
 - Create financial goals (emergency fund, etc.)
-- Goal progress tracking with percentages
-- Goal deadline management
-- Goal completion celebrations
+- Get list of financial goals
+- Get list of transaction of all goals in month
 
 **Technical Implementation:**
 
 - Create Goal domain (entity, repository, use cases)
-- Implement GoalController with CRUD endpoints
+- Implement GoalController with CRU, archive endpoints
 - Goal progress calculation service
 - Goal DTOs with validation and progress tracking
 - Database schema for goals table
+- Get list of transactions for all goals
 
 **API Endpoints:**
 
@@ -262,9 +262,9 @@ DELETE /api/budgets/:id       # Delete budget
 POST /api/goals               # Create new goal
 GET  /api/goals               # List user goals
 GET  /api/goals/:id           # Get goal with progress
-PUT  /api/goals/:id           # Update goal
-PUT  /api/goals/:id/progress  # Update goal progress
-DELETE /api/goals/:id         # Delete goal
+POST /api/goals/              # Update goal
+POST /api/goals/archive       # Archive goal
+GET  /api/goals/transactions  # Get all transactions of all goals in month
 ```
 
 **Dependencies**: F1, F2
@@ -272,41 +272,7 @@ DELETE /api/goals/:id         # Delete goal
 
 ---
 
-### **F5: Transaction Management** ⏱️ **8 hours**
-
-**🎯 Delivery Value**: Users can record all financial transactions
-
-**Feature Scope:**
-
-- Record income and expense transactions
-- Transaction categorization and tagging
-- Transaction history with filtering
-- Integration with budgets and goals
-
-**Technical Implementation:**
-
-- Create Transaction domain (entity, repository, use cases)
-- Implement TransactionController with CRUD endpoints
-- Transaction categorization service
-- Transaction DTOs with validation
-- Integration with budget spending calculations
-
-**API Endpoints:**
-
-```
-POST /api/transactions        # Create transaction
-GET  /api/transactions        # List transactions with filters
-GET  /api/transactions/:id    # Get transaction details
-PUT  /api/transactions/:id    # Update transaction
-DELETE /api/transactions/:id  # Delete transaction
-```
-
-**Dependencies**: F1, F2, F3 (for budget integration)
-**✅ Ship When**: Users can record and manage all transactions
-
----
-
-### **F6: Income Tracking** ⏱️ **8 hours**
+### **F5: Income Tracking**
 
 **🎯 Delivery Value**: Users can manage multiple income sources
 
@@ -314,26 +280,19 @@ DELETE /api/transactions/:id  # Delete transaction
 
 - Add multiple income sources (salary, freelance, etc.)
 - Monthly income tracking and projections
-- Income vs expense analysis
-- Income source categorization
 
 **Technical Implementation:**
 
 - Create Income domain (entity, repository, use cases)
 - Implement IncomeController with CRUD endpoints
-- Income categorization and tracking service
-- Income DTOs with source management
-- Integration with financial overview calculations
 
 **API Endpoints:**
 
 ```
 POST /api/incomes             # Create income source
 GET  /api/incomes             # List income sources
-GET  /api/incomes/:id         # Get income details
 PUT  /api/incomes/:id         # Update income
 DELETE /api/incomes/:id       # Delete income
-GET  /api/incomes/summary     # Income summary and projections
 ```
 
 **Dependencies**: F1, F2
@@ -341,73 +300,58 @@ GET  /api/incomes/summary     # Income summary and projections
 
 ---
 
-## **Analytics Features**
+### **F6: Integrate with AI service - onboarding**
 
-### **F7: Budget Analytics** ⏱️ **8 hours**
-
-**🎯 Delivery Value**: Users can track spending against their budgets
+**🎯 Delivery Value**: User can chat with AI advisor in onboarding.
 
 **Feature Scope:**
 
-- Budget vs actual spending comparison
-- Spending percentage calculations
-- Budget remaining amounts
-- Basic spending analytics
+- Onboarding conversation management
+- Chat with AI advisor in onboarding flow
+- Streaming the message from AI service
 
 **Technical Implementation:**
 
-- Create BudgetAnalyticsService for calculations
-- Implement budget projections and analytics
-- Create BudgetWithSpendingProjection for complex queries
-- Enhanced budget use cases with analytics
-- Advanced budget DTOs with spending data
+- API endpoints listed below
+- Integrate with AI service
 
 **API Endpoints:**
 
 ```
-GET /api/budgets/with-spending    # Budgets with spending analytics
-GET /api/budgets/:id/analytics    # Detailed budget analysis
-GET /api/budgets/summary          # Budget overview summary
+GET  /api/onboarding/messages          # Get all onboarding message
+POST /api/onboarding/messages          # Send message to ai advisor
+POST /api/onboarding/complete         # Complete onboarding flow
 ```
 
-**Dependencies**: F3, F5
-**✅ Ship When**: Users get insights into budget performance
+**Dependencies**: F3, F4, F5
+**✅ Ship When**: Users can complete onboarding flow
 
 ---
 
-### **F8: Goal Progress & Milestones** ⏱️ **8 hours**
+### **F7: Integrate with AI service - daily chat**
 
-**🎯 Delivery Value**: Users get enhanced goal tracking with milestones
+**🎯 Delivery Value**: User can chat with AI advisor
 
 **Feature Scope:**
 
-- Goal milestones and checkpoints
-- Goal progress notifications
-- Goal achievement celebrations
-- Goal sharing and social features
-- Smart goal recommendations
+- Create new conversations
+- Chat with AI advisor after onboarding
+- Streaming the message from AI service
 
 **Technical Implementation:**
 
-- Enhanced Goal domain with milestones
-- Goal notification service
-- Achievement tracking system
-- Goal recommendation algorithms
-- Social sharing DTOs and endpoints
+- API endpoints listed below
+- Integrate with AI service
 
 **API Endpoints:**
 
 ```
-POST /api/goals/:id/milestones    # Create goal milestones
-GET  /api/goals/:id/milestones    # List goal milestones
-PUT  /api/goals/:id/milestones/:milestoneId # Update milestone
-GET  /api/goals/achievements      # List achievements
-POST /api/goals/:id/share         # Share goal progress
-GET  /api/goals/recommendations   # Get goal recommendations
+POST /api/conversations               # Create a conversation
+POST /api/conversations/messages      # Send message to ai advisor
 ```
 
-**Dependencies**: F4
-**✅ Ship When**: Enhanced goal tracking is complete
+**Dependencies**: F3, F4, F5
+**✅ Ship When**: Users can chat with AI advisor
 
 ---
 
@@ -419,17 +363,14 @@ GET  /api/goals/recommendations   # Get goal recommendations
 
 **For Each Backend Feature**:
 
-1. **Domain Development** (4-5 hours): Entities, repositories, use cases
-2. **API Implementation** (2-3 hours): Controllers, DTOs, validation
-3. **Testing** (1-2 hours): Unit tests, integration tests
-4. **Documentation** (30 minutes): API docs and technical documentation
-
-**Total Backend Commitment**: **6-8 hours per complete backend feature**
+1. **Domain Development**: Entities, repositories, use cases
+2. **API Implementation**: Controllers, DTOs, validation
+3. **Testing**: Unit tests, integration tests
+4. **Documentation**: API docs and technical documentation
 
 ### **Frontend Integration**
 
-Frontend development is handled separately and documented in:
-📋 **[Frontend Migration Plan](./frontend-migration.md)**
+Frontend development is handled separately and documented in: 📋 **[Frontend Migration Plan](./frontend-migration.md)**
 
 The frontend features are designed to integrate with the backend APIs as they become available, following the same feature-based shipping approach.
 
@@ -452,50 +393,6 @@ The frontend features are designed to integrate with the backend APIs as they be
 - **Integration Tests**: Repository and database integration
 - **API Tests**: Endpoint testing with Supertest
 - **Contract Tests**: API contract validation for frontend integration
-
----
-
-## 📊 Success Metrics & Timeline
-
-### **Daily Success Metrics**
-
-**Technical Metrics:**
-
-- ✅ Feature completion within 6-8 hours
-- ✅ All tests passing (>95% coverage)
-- ✅ API response time <200ms
-- ✅ Zero critical bugs in production
-
-**User Value Metrics:**
-
-- ✅ Feature immediately usable by users
-- ✅ No regression in existing functionality
-- ✅ Improved user workflow completion rates
-- ✅ Positive user feedback on new features
-
-### **Backend Feature Development Summary**
-
-| Feature | Category       | Estimated Hours | Dependencies   | API Value                  |
-| ------- | -------------- | --------------- | -------------- | -------------------------- |
-| F1      | Foundation     | 6h + setup     | None           | ✅ Development foundation  |
-| F2      | Foundation     | 8h backend      | F1             | ✅ User accounts & auth    |
-| F3      | Core Financial | 8h backend      | F1, F2         | ✅ Budget management APIs  |
-| F4      | Core Financial | 8h backend      | F1, F2         | ✅ Goal setting & tracking APIs |
-| F5      | Core Financial | 8h backend      | F1, F2, F3     | ✅ Transaction recording APIs   |
-| F6      | Core Financial | 8h backend      | F1, F2         | ✅ Income tracking APIs         |
-| F7      | Analytics      | 8h backend      | F3, F5         | ✅ Budget analytics APIs        |
-| F8      | Analytics      | 8h backend      | F4             | ✅ Goal milestones APIs         |
-
-**Total Backend Development**: **8 core features** with **62 hours** estimated
-**Average Feature Time**: **6-8 hours per backend feature**
-**Approach**: **Ship backend features as completed, frontend integrates as available**
-
-### **Frontend Integration**
-
-Frontend features are documented separately in **[Frontend Migration Plan](./frontend-migration.md)** with:
-- **16 frontend features** (FF1-FF16) 
-- **114 hours** estimated frontend development
-- **Feature-based shipping** aligned with backend API availability
 
 ---
 
