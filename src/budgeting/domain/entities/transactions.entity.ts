@@ -2,7 +2,7 @@ import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
 
 export enum TransactionType {
   INCOME = 'income',
-  EXPENSE = 'expense',
+  OUTCOME = 'outcome',
   TRANSFER = 'transfer',
 }
 

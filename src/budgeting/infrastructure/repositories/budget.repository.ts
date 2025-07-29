@@ -1,4 +1,8 @@
-import { BudgetEntity, BudgetRepository, BudgetWithSpendingData } from '@/budgeting/domain';
+import {
+  BudgetEntity,
+  BudgetRepository,
+  BudgetWithSpendingData,
+} from '@/budgeting/domain';
 import { PrismaClient } from '@/common';
 import { BudgetPrismaRepository } from '@/common/repositories';
 import { Injectable } from '@nestjs/common';
@@ -65,7 +69,7 @@ export class BudgetRepositoryImpl
 
     return budgetsWithSpending.map((budgetData) => {
       const budget = this.toEntity(budgetData);
-      
+
       // Calculate spending metrics
       let totalSpent = 0;
       let transactionCount = 0;

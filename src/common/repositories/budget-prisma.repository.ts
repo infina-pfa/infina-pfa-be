@@ -3,7 +3,7 @@ import { PrismaClient } from '@/common/prisma/prisma-client';
 import { PrismaRepository } from '@/common/repositories/prisma.repository';
 import { PrismaDelegate } from '@/common/types/prisma';
 import { Injectable } from '@nestjs/common';
-import { Decimal } from 'generated/prisma/runtime/library';
+import { Decimal } from '../../../generated/prisma/runtime/library';
 import { budgets as BudgetORM } from '../../../generated/prisma';
 import { BaseRepository } from './base.repository';
 
