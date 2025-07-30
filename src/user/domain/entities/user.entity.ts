@@ -1,15 +1,24 @@
 import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
+import { Currency, Language } from '@/common/types/user';
 
 export enum BudgetingStyle {
   DETAIL_TRACKER = 'detail_tracker',
   GOAL_FOCUSED = 'goal_focused',
 }
 
+export enum FinancialStage {
+  DEBT = 'debt',
+  START_SAVING = 'start_saving',
+  START_INVESTING = 'start_investing',
+}
+
 export interface UserEntityProps extends BaseProps {
   name: string;
   userId: string;
-  financialStage: string | null;
+  financialStage: FinancialStage | null;
   onboardingCompletedAt: Date | null;
+  currency: Currency;
+  language: Language;
 }
 
 export class UserEntity extends BaseEntity<UserEntityProps> {
@@ -25,14 +34,29 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
     );
   }
 
-  public setFinancialStage(stage: string): void {
+  public updateName(name: string): void {
+    this._props.name = name;
+    this.updated();
+  }
+
+  public setFinancialStage(stage: FinancialStage): void {
     this._props.financialStage = stage;
-    this._props.updatedAt = new Date();
+    this.updated();
   }
 
   public completeOnboarding(): void {
     this._props.onboardingCompletedAt = new Date();
-    this._props.updatedAt = new Date();
+    this.updated();
+  }
+
+  public updateCurrency(currency: Currency): void {
+    this._props.currency = currency;
+    this.updated();
+  }
+
+  public updateLanguage(language: Language): void {
+    this._props.language = language;
+    this.updated();
   }
 
   public isOnboardingCompleted(): boolean {
@@ -53,5 +77,13 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
 
   get onboardingCompletedAt(): Date | null | undefined {
     return this.props.onboardingCompletedAt;
+  }
+
+  get currency(): string {
+    return this.props.currency;
+  }
+
+  get language(): string {
+    return this.props.language;
   }
 }

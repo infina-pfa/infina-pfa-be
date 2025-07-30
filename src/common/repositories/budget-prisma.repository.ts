@@ -1,4 +1,8 @@
-import { BudgetCategory, BudgetEntity } from '@/budgeting/domain';
+import {
+  BudgetCategory,
+  BudgetEntity,
+  BudgetEntityProps,
+} from '@/budgeting/domain';
 import { PrismaClient } from '@/common/prisma/prisma-client';
 import { PrismaRepository } from '@/common/repositories/prisma.repository';
 import { PrismaDelegate } from '@/common/types/prisma';
@@ -6,6 +10,7 @@ import { Injectable } from '@nestjs/common';
 import { Decimal } from '../../../generated/prisma/runtime/library';
 import { budgets as BudgetORM } from '../../../generated/prisma';
 import { BaseRepository } from './base.repository';
+import { FindManyOptions } from '../types/query.types';
 
 @Injectable()
 export class BudgetPrismaRepository
@@ -30,6 +35,7 @@ export class BudgetPrismaRepository
       icon: props.icon,
       created_at: props.createdAt,
       updated_at: props.updatedAt,
+      archived_at: props.archivedAt || null,
     };
   }
 
@@ -46,8 +52,22 @@ export class BudgetPrismaRepository
         icon: data.icon,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
+        archivedAt: data.archived_at || null,
       },
       data.id,
     );
+  }
+
+  public override async findOne(
+    props: Partial<Readonly<BudgetEntityProps>>,
+  ): Promise<BudgetEntity | null> {
+    return super.findOne({ ...props, archivedAt: null });
+  }
+
+  public override async findMany(
+    props: Partial<Readonly<BudgetEntityProps>>,
+    options?: FindManyOptions,
+  ): Promise<BudgetEntity[]> {
+    return super.findMany({ ...props, archivedAt: null }, options);
   }
 }

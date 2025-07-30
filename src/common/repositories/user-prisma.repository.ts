@@ -1,10 +1,11 @@
-import { UserEntity } from '@/user/domain';
+import { FinancialStage, UserEntity } from '@/user/domain';
 import { Injectable } from '@nestjs/common';
 import { public_users as UserORM } from '../../../generated/prisma';
 import { PrismaClient } from '../prisma/prisma-client';
 import { PrismaDelegate } from '../types/prisma';
 import { BaseRepository } from './base.repository';
 import { PrismaRepository } from './prisma.repository';
+import { Currency, Language } from '../types/user';
 
 @Injectable()
 export class UserPrismaRepository
@@ -27,6 +28,8 @@ export class UserPrismaRepository
         : null,
       created_at: new Date(props.createdAt),
       updated_at: new Date(props.updatedAt),
+      currency: props.currency,
+      language: props.language,
     };
   }
 
@@ -35,10 +38,12 @@ export class UserPrismaRepository
       {
         name: data.name,
         userId: data.user_id,
-        financialStage: data.financial_stage,
+        financialStage: data.financial_stage as FinancialStage,
         onboardingCompletedAt: data.onboarding_completed_at
           ? new Date(data.onboarding_completed_at)
           : null,
+        currency: data.currency as Currency,
+        language: data.language as Language,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
       },
