@@ -6,6 +6,7 @@ import {
 import { PrismaClient } from '@/common';
 import { BudgetPrismaRepository } from '@/common/repositories';
 import { Injectable } from '@nestjs/common';
+import { CurrencyVO } from '@/common/value-objects';
 
 @Injectable()
 export class BudgetRepositoryImpl
@@ -85,7 +86,7 @@ export class BudgetRepositoryImpl
 
       return {
         budget,
-        totalSpent,
+        totalSpent: new CurrencyVO(totalSpent),
         transactionCount,
       };
     });

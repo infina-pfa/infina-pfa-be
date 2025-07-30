@@ -1,4 +1,5 @@
 import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
+import { CurrencyVO } from '@/common/value-objects';
 
 export enum BudgetCategory {
   FIXED = 'fixed',
@@ -7,7 +8,7 @@ export enum BudgetCategory {
 
 export interface BudgetEntityProps extends BaseProps {
   name: string;
-  amount: number;
+  amount: CurrencyVO;
   userId: string;
   category: BudgetCategory;
   color: string;
@@ -23,7 +24,7 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     id?: string,
   ): BudgetEntity {
     // Business rule: Amount must be greater than 0
-    if (props.amount <= 0) {
+    if (props.amount.value <= 0) {
       throw new Error('Budget amount must be greater than 0');
     }
 

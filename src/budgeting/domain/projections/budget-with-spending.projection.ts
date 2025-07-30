@@ -1,18 +1,19 @@
 import { BudgetEntity } from '../entities/budget.entity';
+import { CurrencyVO } from '@/common/value-objects';
 
 export interface BudgetWithSpendingProjectionProps {
   budget: BudgetEntity;
-  totalSpent: number;
+  totalSpent: CurrencyVO;
   transactionCount: number;
-  remainingAmount: number;
+  remainingAmount: CurrencyVO;
   spentPercentage: number;
 }
 
 export class BudgetWithSpendingProjection {
   public readonly budget: BudgetEntity;
-  public readonly totalSpent: number;
+  public readonly totalSpent: CurrencyVO;
   public readonly transactionCount: number;
-  public readonly remainingAmount: number;
+  public readonly remainingAmount: CurrencyVO;
   public readonly spentPercentage: number;
 
   constructor(props: BudgetWithSpendingProjectionProps) {
@@ -25,13 +26,15 @@ export class BudgetWithSpendingProjection {
 
   public static create(
     budget: BudgetEntity,
-    totalSpent: number,
+    totalSpent: CurrencyVO,
     transactionCount: number,
   ): BudgetWithSpendingProjection {
     const budgetAmount = budget.props.amount;
-    const remainingAmount = budgetAmount - totalSpent;
+    const remainingAmount = budgetAmount.subtract(totalSpent);
     const spentPercentage =
-      budgetAmount > 0 ? (totalSpent / budgetAmount) * 100 : 0;
+      budgetAmount.value > 0
+        ? (totalSpent.value / budgetAmount.value) * 100
+        : 0;
 
     return new BudgetWithSpendingProjection({
       budget,
@@ -45,9 +48,9 @@ export class BudgetWithSpendingProjection {
   public toObject(): any {
     return {
       ...this.budget.toObject(),
-      totalSpent: this.totalSpent,
+      totalSpent: this.totalSpent.value,
       transactionCount: this.transactionCount,
-      remainingAmount: this.remainingAmount,
+      remainingAmount: this.remainingAmount.value,
       spentPercentage: this.spentPercentage,
     };
   }

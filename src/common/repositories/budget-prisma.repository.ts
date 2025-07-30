@@ -11,6 +11,7 @@ import { Decimal } from '../../../generated/prisma/runtime/library';
 import { budgets as BudgetORM } from '../../../generated/prisma';
 import { BaseRepository } from './base.repository';
 import { FindManyOptions } from '../types/query.types';
+import { CurrencyVO } from '@/common/value-objects';
 
 @Injectable()
 export class BudgetPrismaRepository
@@ -29,7 +30,7 @@ export class BudgetPrismaRepository
       month: props.month,
       year: props.year,
       user_id: props.userId,
-      amount: new Decimal(props.amount),
+      amount: new Decimal(props.amount.value),
       category: props.category,
       color: props.color,
       icon: props.icon,
@@ -46,7 +47,7 @@ export class BudgetPrismaRepository
         month: data.month,
         year: data.year,
         userId: data.user_id,
-        amount: data.amount.toNumber() || 0,
+        amount: new CurrencyVO(data.amount.toNumber()),
         category: data.category as BudgetCategory,
         color: data.color,
         icon: data.icon,

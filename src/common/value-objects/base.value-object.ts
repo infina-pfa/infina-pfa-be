@@ -5,7 +5,7 @@ export class BaseValueObject<T> {
     this._value = value;
   }
 
-  public get value(): T {
+  public get data(): T {
     return this._value;
   }
 

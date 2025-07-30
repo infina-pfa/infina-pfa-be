@@ -1,9 +1,10 @@
 import { BaseRepository } from '@/common';
 import { BudgetEntity } from '../entities/budget.entity';
+import { CurrencyVO } from '@/common/value-objects';
 
 export interface BudgetWithSpendingData {
   budget: BudgetEntity;
-  totalSpent: number;
+  totalSpent: CurrencyVO;
   transactionCount: number;
 }
 
