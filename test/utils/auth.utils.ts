@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { testConfig } from '../setup/test-environment';
 import * as jwt from 'jsonwebtoken';
 import { PrismaClient } from '../../generated/prisma';
 import { SupabaseAuthGuard } from '../../src/common/guards/supabase-auth.guard';
-import { v4 as uuid } from 'uuid';
+import { testConfig } from '../setup/test-environment';
 
 /**
  * Mock user data for testing
@@ -22,26 +21,26 @@ export interface TestUser {
  */
 export const TEST_USERS: Record<string, TestUser> = {
   JOHN_DOE: {
-    id: uuid(),
+    id: '99999999-9999-9999-9999-999999999999',
     email: 'john.doe@test.com',
     name: 'John Doe',
     aud: 'authenticated',
     role: 'authenticated',
   },
-  // JANE_SMITH: {
-  //   id: uuid(),
-  //   email: 'jane.smith@test.com',
-  //   name: 'Jane Smith',
-  //   aud: 'authenticated',
-  //   role: 'authenticated',
-  // },
-  // ADMIN_USER: {
-  //   id: uuid(),
-  //   email: 'admin@test.com',
-  //   name: 'Admin User',
-  //   aud: 'authenticated',
-  //   role: 'authenticated',
-  // },
+  JANE_SMITH: {
+    id: '88888888-8888-8888-8888-888888888888',
+    email: 'jane.smith@test.com',
+    name: 'Jane Smith',
+    aud: 'authenticated',
+    role: 'authenticated',
+  },
+  ADMIN_USER: {
+    id: '77777777-7777-7777-7777-777777777777',
+    email: 'admin@test.com',
+    name: 'Admin User',
+    aud: 'authenticated',
+    role: 'authenticated',
+  },
 };
 
 /**
@@ -93,9 +92,8 @@ export class AuthTestUtils {
    * Create authorization header for API requests
    */
   static createAuthHeader(user: TestUser): { Authorization: string } {
-    const token = this.createMockJwtToken(user);
     return {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${user.id}`,
     };
   }
 
@@ -148,7 +146,6 @@ export class AuthTestUtils {
     testUser: TestUser,
   ): Promise<void> {
     try {
-      testUser.id = uuid();
       testUser.email = `test-${testUser.id.slice(0, 8)}@random.com`;
       await prisma.auth_users.create({
         data: {
@@ -179,8 +176,6 @@ export class AuthTestUtils {
           updated_at: new Date(),
         },
       });
-
-      console.log(`Test user created: ${testUser.email} (${testUser.id})`);
     } catch (error) {
       console.error('Error creating test user:', error);
       throw error;

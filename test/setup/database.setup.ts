@@ -54,6 +54,7 @@ export class TestDatabaseManager {
       await this.prisma.budgets.deleteMany();
       await this.prisma.goals.deleteMany();
       await this.prisma.public_users.deleteMany();
+      await this.prisma.auth_users.deleteMany();
 
       // Note: We don't clean auth.users as they might be managed by Supabase Auth
       // In a real test environment, you might want to clean those too or use test-specific users

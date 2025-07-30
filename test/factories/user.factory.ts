@@ -1,4 +1,5 @@
 import { UserEntity } from '../../src/user/domain/entities/user.entity';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Factory for creating consistent user test data
@@ -19,8 +20,8 @@ export class UserFactory {
     }> = {},
   ): UserEntity {
     const defaults = {
-      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      userId: 'test-user-john-doe-uuid',
+      id: uuid(),
+      userId: uuid(),
       name: 'Test User',
       onboardingCompletedAt: new Date(),
       financialStage: 'start_saving',
@@ -32,10 +33,10 @@ export class UserFactory {
 
     return UserEntity.create(
       {
-        user_id: userData.userId,
+        userId: userData.userId,
         name: userData.name,
-        financial_stage: userData.financialStage,
-        onboarding_completed_at: userData.onboardingCompletedAt,
+        financialStage: userData.financialStage,
+        onboardingCompletedAt: userData.onboardingCompletedAt,
         createdAt: userData.createdAt,
         updatedAt: userData.updatedAt,
       },
@@ -58,8 +59,8 @@ export class UserFactory {
     }> = {},
   ) {
     const defaults = {
-      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      user_id: 'test-user-john-doe-uuid',
+      id: uuid(),
+      user_id: uuid(),
       name: 'Test User',
       onboarding_completed_at: new Date(),
       financial_stage: 'building_foundation',
@@ -88,7 +89,7 @@ export class UserFactory {
     }> = {},
   ) {
     const defaults = {
-      id: 'test-user-john-doe-uuid',
+      id: uuid(),
       email: 'john.doe@test.com',
       aud: 'authenticated',
       role: 'authenticated',
@@ -197,8 +198,8 @@ export class UserFactory {
     }> = {},
   ) {
     const defaults = {
-      id: `onboarding-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      user_id: 'test-user-john-doe-uuid',
+      id: uuid(),
+      user_id: uuid(),
       profile_data: {
         age: 28,
         occupation: 'Software Developer',
