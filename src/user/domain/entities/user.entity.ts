@@ -7,9 +7,9 @@ export enum BudgetingStyle {
 
 export interface UserEntityProps extends BaseProps {
   name: string;
-  user_id: string;
-  financial_stage: string | null;
-  onboarding_completed_at?: Date | null;
+  userId: string;
+  financialStage: string | null;
+  onboardingCompletedAt: Date | null;
 }
 
 export class UserEntity extends BaseEntity<UserEntityProps> {
@@ -26,17 +26,17 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
   }
 
   public setFinancialStage(stage: string): void {
-    this._props.financial_stage = stage;
+    this._props.financialStage = stage;
     this._props.updatedAt = new Date();
   }
 
   public completeOnboarding(): void {
-    this._props.onboarding_completed_at = new Date();
+    this._props.onboardingCompletedAt = new Date();
     this._props.updatedAt = new Date();
   }
 
   public isOnboardingCompleted(): boolean {
-    return !!this.props.onboarding_completed_at;
+    return !!this.props.onboardingCompletedAt;
   }
 
   get name(): string {
@@ -44,14 +44,14 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
   }
 
   get userId(): string {
-    return this.props.user_id;
+    return this.props.userId;
   }
 
   get financialStage(): string | null | undefined {
-    return this.props.financial_stage;
+    return this.props.financialStage;
   }
 
   get onboardingCompletedAt(): Date | null | undefined {
-    return this.props.onboarding_completed_at;
+    return this.props.onboardingCompletedAt;
   }
 }

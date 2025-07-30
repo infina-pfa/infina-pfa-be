@@ -20,10 +20,10 @@ export class UserPrismaRepository
     return {
       id: entity.id,
       name: props.name,
-      user_id: props.user_id,
-      financial_stage: props.financial_stage,
-      onboarding_completed_at: props.onboarding_completed_at
-        ? new Date(props.onboarding_completed_at)
+      user_id: props.userId,
+      financial_stage: props.financialStage,
+      onboarding_completed_at: props.onboardingCompletedAt
+        ? new Date(props.onboardingCompletedAt)
         : null,
       created_at: new Date(props.createdAt),
       updated_at: new Date(props.updatedAt),
@@ -34,9 +34,9 @@ export class UserPrismaRepository
     return UserEntity.create(
       {
         name: data.name,
-        user_id: data.user_id,
-        financial_stage: data.financial_stage,
-        onboarding_completed_at: data.onboarding_completed_at
+        userId: data.user_id,
+        financialStage: data.financial_stage,
+        onboardingCompletedAt: data.onboarding_completed_at
           ? new Date(data.onboarding_completed_at)
           : null,
         createdAt: new Date(data.created_at),

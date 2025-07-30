@@ -22,8 +22,9 @@ import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: SupabaseAuthGuard,
+      useExisting: SupabaseAuthGuard,
     },
+    SupabaseAuthGuard,
     AppService,
   ],
 })
