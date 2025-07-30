@@ -70,7 +70,7 @@ When implementing new APIs, follow this established 8-step pattern:
 - **Documentation**: Every endpoint needs comprehensive Swagger documentation
 - **Repository Pattern**: Always use abstract repositories in use cases
 - **Type Safety**: Maintain strict TypeScript types throughout all layers
-- **Testing**: Follow existing patterns in `*.spec.ts` files
+- **Testing**: Follow existing patterns in `*.spec.ts` files. For E2E tests, see comprehensive guidelines in `docs/testing/e2e-testing-guidelines.md`
 - Extend base classes from `common/entities` for new domain entities
 - Prisma client generates to `generated/prisma` directory
 - Use path aliases: `@/common/*`, `@/budgeting/*`, `@/*`
