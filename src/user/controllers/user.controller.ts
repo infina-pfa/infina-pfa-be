@@ -8,9 +8,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserProfileResponseDto } from '../dto/user-profile.dto';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { GetUserProfileUseCase } from '../use-cases/get-user-profile.use-case';
 import { UpdateUserProfileUseCase } from '../use-cases/update-user-profile.use-case';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @ApiTags('Users')
 @Controller('users')

@@ -3,10 +3,12 @@ import { Currency, Language } from '@/common/types/user';
 import { FinancialStage } from '@/user/domain/entities/user.entity';
 import {
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
+  Matches,
 } from 'class-validator';
 
 export class UpdateUserProfileDto {
@@ -17,18 +19,19 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
+  @IsNotEmpty({ message: 'Name cannot be empty' })
   @MinLength(2, { message: 'Name must be at least 2 characters long' })
   @MaxLength(100, { message: 'Name must not exceed 100 characters' })
+  @Matches(/.*\S.*/, { message: 'Name cannot contain only whitespace' })
   name?: string;
 
   @ApiProperty({
     example: 'building_wealth',
     description: 'Current financial stage of the user',
     enum: [
-      'getting_started',
-      'building_wealth',
-      'preserving_wealth',
-      'retirement_planning',
+      FinancialStage.DEBT,
+      FinancialStage.START_SAVING,
+      FinancialStage.START_INVESTING,
     ],
     required: false,
   })
@@ -54,7 +57,6 @@ export class UpdateUserProfileDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   @IsEnum(Currency, {
     message: 'Currency must be one of: vnd, usd, eur',
   })
@@ -67,7 +69,6 @@ export class UpdateUserProfileDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   @IsEnum(Language, {
     message: 'Language must be one of: vi, en',
   })

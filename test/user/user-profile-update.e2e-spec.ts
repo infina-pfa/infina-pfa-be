@@ -1,49 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import {
-  CanActivate,
-  ExecutionContext,
-  INestApplication,
-} from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { TestDatabaseManager } from '../setup/database.setup';
 import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-// cSpell:ignore Supabase
 import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { User } from '@supabase/supabase-js';
-import { Request } from 'express';
+import { MockGuard } from '../mocks/guard.mock';
 import { PrismaClient } from '../../generated/prisma';
-import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
-import { UpdateUserProfileDto } from '../../src/user/controllers/dto/update-user-profile.dto';
 import { Currency, Language } from '../../src/common/types/user';
+import { UpdateUserProfileDto } from '../../src/user/controllers/dto/update-user-profile.dto';
 import { FinancialStage } from '../../src/user/domain/entities/user.entity';
+import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
 
-class MockGuard implements CanActivate {
-  canActivate(context: ExecutionContext) {
-    const request: Request & { user?: User } = context
-      .switchToHttp()
-      .getRequest();
-    const authHeader = request.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return false;
-    }
-
-    const token = authHeader.split(' ')[1];
-    const mockUsers = Object.values(TEST_USERS);
-    const user = mockUsers.find((u) => token.includes(u.id ?? ''));
-
-    if (user) {
-      request.user = AuthTestUtils.createMockSupabaseUser(user);
-      return true;
-    }
-
-    return false;
-  }
-}
-
-describe('User Controller (e2e)', () => {
+describe('User Profile UPDATE Endpoints (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
@@ -61,6 +30,13 @@ describe('User Controller (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
     await app.init();
 
     // Setup test authentication
@@ -83,141 +59,6 @@ describe('User Controller (e2e)', () => {
     for (const testUser of Object.values(TEST_USERS)) {
       await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
     }
-  });
-
-  describe('GET /users/profile', () => {
-    it('should return current user profile', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/users/profile')
-        .set(authHeaders.JOHN_DOE)
-        .expect(200);
-
-      const body = response.body as UserProfileResponseDto;
-
-      expect(body.id).toBeDefined();
-      expect(body.name).toBeDefined();
-      expect(body.createdAt).toBeDefined();
-      expect(body.updatedAt).toBeDefined();
-
-      // Financial stage and onboarding can be null for new users
-      expect(body.financialStage).toBeDefined();
-      expect(body.onboardingCompletedAt).toBeDefined();
-    });
-
-    it('should return 403 when not authenticated', async () => {
-      await request(app.getHttpServer()).get('/users/profile').expect(403);
-    });
-
-    it('should return 403 with invalid authentication token', async () => {
-      await request(app.getHttpServer())
-        .get('/users/profile')
-        .set('Authorization', 'Bearer invalid-token')
-        .expect(403);
-    });
-
-    it('should return correct user data structure', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/users/profile')
-        .set(authHeaders.JOHN_DOE)
-        .expect(200);
-
-      const body = response.body as UserProfileResponseDto;
-
-      // Verify all required fields are present
-      expect(body).toHaveProperty('id');
-      expect(body).toHaveProperty('name');
-      expect(body).toHaveProperty('financialStage');
-      expect(body).toHaveProperty('onboardingCompletedAt');
-      expect(body).toHaveProperty('createdAt');
-      expect(body).toHaveProperty('updatedAt');
-
-      // Verify data types
-      expect(typeof body.id).toBe('string');
-      expect(typeof body.name).toBe('string');
-
-      // Financial stage can be string or null
-      expect(
-        body.financialStage === null || typeof body.financialStage === 'string',
-      ).toBe(true);
-
-      // Dates should be valid date strings
-      expect(new Date(body.createdAt)).toBeInstanceOf(Date);
-      expect(new Date(body.updatedAt)).toBeInstanceOf(Date);
-
-      if (body.onboardingCompletedAt) {
-        expect(new Date(body.onboardingCompletedAt)).toBeInstanceOf(Date);
-      }
-    });
-  });
-
-  describe('Profile endpoint behavior', () => {
-    it('should handle user with completed onboarding', async () => {
-      // Update user to have completed onboarding
-      await prisma.public_users.update({
-        where: { user_id: TEST_USERS.JOHN_DOE.id },
-        data: {
-          onboarding_completed_at: new Date(),
-          financial_stage: 'start_investing',
-        },
-      });
-
-      const response = await request(app.getHttpServer())
-        .get('/users/profile')
-        .set(authHeaders.JOHN_DOE)
-        .expect(200);
-
-      const body = response.body as UserProfileResponseDto;
-      expect(body.financialStage).toBe('start_investing');
-      expect(body.onboardingCompletedAt).toBeTruthy();
-    });
-
-    it('should handle user without completed onboarding', async () => {
-      // Ensure user has no onboarding completion
-      await prisma.public_users.update({
-        where: { user_id: TEST_USERS.JOHN_DOE.id },
-        data: {
-          onboarding_completed_at: null,
-          financial_stage: null,
-        },
-      });
-
-      const response = await request(app.getHttpServer())
-        .get('/users/profile')
-        .set(authHeaders.JOHN_DOE)
-        .expect(200);
-
-      const body = response.body as UserProfileResponseDto;
-      expect(body.financialStage).toBeNull();
-      expect(body.onboardingCompletedAt).toBeNull();
-    });
-
-    it('should return 404 if user profile not found in database', async () => {
-      // Delete the user from public_users table but keep auth
-      await prisma.public_users.delete({
-        where: { user_id: TEST_USERS.JOHN_DOE.id },
-      });
-
-      await request(app.getHttpServer())
-        .get('/users/profile')
-        .set(authHeaders.JOHN_DOE)
-        .expect(404);
-    });
-  });
-
-  describe('Performance', () => {
-    it('should respond within reasonable time', async () => {
-      const startTime = Date.now();
-
-      await request(app.getHttpServer())
-        .get('/users/profile')
-        .set(authHeaders.JOHN_DOE)
-        .expect(200);
-
-      const endTime = Date.now();
-      const responseTime = endTime - startTime;
-
-      expect(responseTime).toBeLessThan(500); // Should respond within 1 second
-    });
   });
 
   describe('PUT /users/profile', () => {
@@ -417,7 +258,10 @@ describe('User Controller (e2e)', () => {
         // Verify data types
         expect(typeof body.id).toBe('string');
         expect(typeof body.name).toBe('string');
-        expect(body.financialStage === null || typeof body.financialStage === 'string').toBe(true);
+        expect(
+          body.financialStage === null ||
+            typeof body.financialStage === 'string',
+        ).toBe(true);
 
         // Verify updated values
         expect(body.name).toBe('Structure Test');
@@ -605,50 +449,35 @@ describe('User Controller (e2e)', () => {
     });
 
     describe('Error Handling', () => {
-      it('should return 400 for name too short', async () => {
+      it('should return 400 if name is too short', async () => {
         const updateData: UpdateUserProfileDto = {
-          name: 'A', // Less than 2 characters
+          name: 'A', // Single character - gets accepted without validation
         };
 
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        // Note: Single character names may be acceptable in some systems
-        // This test verifies API behavior - could be either 200 (accepted) or 400 (rejected)
-        expect([200, 400]).toContain(response.status);
-        
-        if (response.status === 400) {
-          expect(response.body.message).toContain('Name must be at least 2 characters long');
-        } else {
-          // If 200, verify the name was updated
-          expect(response.body.name).toBe('A');
-        }
+        expect(response.body).toHaveProperty('message');
       });
 
-      it('should return 400 for name too long', async () => {
+      it('should return 400 if name is too long', async () => {
         const updateData: UpdateUserProfileDto = {
-          name: 'A'.repeat(101), // More than 100 characters
+          name: 'A'.repeat(101), // More than 100 characters - gets accepted without validation
         };
 
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        // Long names should be handled - either truncated (200) or rejected (400)
-        expect([200, 400]).toContain(response.status);
-        
-        if (response.status === 400) {
-          expect(response.body.message).toContain('Name must not exceed 100 characters');
-        } else {
-          // If 200, verify the name was either truncated or accepted
-          expect(response.body.name).toBeDefined();
-        }
+        expect(response.body).toHaveProperty('message');
       });
 
-      it('should return 400 for invalid financial stage', async () => {
+      it('should return 400 if financial stage is invalid', async () => {
         const updateData = {
           financialStage: 'invalid_stage',
         };
@@ -656,20 +485,13 @@ describe('User Controller (e2e)', () => {
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        // Invalid enum values should be handled - either ignored (200) or rejected (400)
-        expect([200, 400]).toContain(response.status);
-        
-        if (response.status === 400) {
-          expect(response.body.message).toContain('Financial stage must be one of');
-        } else {
-          // If 200, the invalid value may have been ignored or handled gracefully
-          expect(response.body).toBeDefined();
-        }
+        expect(response.body).toHaveProperty('message');
       });
 
-      it('should return 400 or 500 for invalid currency', async () => {
+      it('should return 400 if currency is invalid', async () => {
         const updateData = {
           currency: 'invalid_currency',
         };
@@ -677,13 +499,13 @@ describe('User Controller (e2e)', () => {
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        expect([400, 500]).toContain(response.status);
-        expect(response.body.message).toBeDefined();
+        expect(response.body).toHaveProperty('message');
       });
 
-      it('should return 400 or 500 for invalid language', async () => {
+      it('should return 400 for invalid language (no validation pipe configured)', async () => {
         const updateData = {
           language: 'invalid_language',
         };
@@ -691,13 +513,13 @@ describe('User Controller (e2e)', () => {
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        expect([400, 500]).toContain(response.status);
-        expect(response.body.message).toBeDefined();
+        expect(response.body).toHaveProperty('message');
       });
 
-      it('should return 400 or 500 for non-string name', async () => {
+      it('should return 400 if name is not a string', async () => {
         const updateData = {
           name: 123, // Should be string
         };
@@ -705,15 +527,15 @@ describe('User Controller (e2e)', () => {
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        expect([400, 500]).toContain(response.status);
-        expect(response.body.message).toBeDefined();
+        expect(response.body).toHaveProperty('message');
       });
 
-      it('should return 400 for multiple validation errors', async () => {
+      it('should return 400 if multiple validation errors occur', async () => {
         const updateData = {
-          name: 'A', // Too short
+          name: 123, // Invalid type
           financialStage: 'invalid_stage', // Invalid enum
           currency: 'invalid_currency', // Invalid enum
           language: 'invalid_language', // Invalid enum
@@ -722,10 +544,10 @@ describe('User Controller (e2e)', () => {
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        expect([400, 500]).toContain(response.status);
-        expect(response.body.message).toBeDefined();
+        expect(response.body).toHaveProperty('message');
       });
 
       it('should return 404 if user profile not found in database', async () => {
@@ -754,22 +576,18 @@ describe('User Controller (e2e)', () => {
           .expect(400);
       });
 
-      it('should handle empty string name after trimming', async () => {
+      it('should return 400 if name is only whitespace', async () => {
         const updateData: UpdateUserProfileDto = {
-          name: ' ', // Only one space - less than 2 characters
+          name: '   ', // Only whitespace - gets accepted without validation
         };
 
         const response = await request(app.getHttpServer())
           .put('/users/profile')
           .set(authHeaders.JOHN_DOE)
-          .send(updateData);
+          .send(updateData)
+          .expect(400);
 
-        // Should either validate at application level (400) or update with trimmed value (200)
-        expect([200, 400]).toContain(response.status);
-        
-        if (response.status === 400) {
-          expect(response.body.message).toContain('Name must be at least 2 characters long');
-        }
+        expect(response.body).toHaveProperty('message');
       });
     });
 
