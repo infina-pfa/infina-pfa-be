@@ -18,9 +18,12 @@ import {
 } from '@nestjs/swagger';
 import { CreateBudgetUseCase } from '../use-cases/create-budget.use-case';
 import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
+import { SpendUseCase } from '../use-cases/spend.use-case';
 import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
 import { BudgetResponseDto } from './dto/budget.dto';
 import { CreateBudgetDto } from './dto/create-budget.dto';
+import { SpendDto } from './dto/spend.dto';
+import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
 
 @ApiTags('Budgets')
@@ -31,6 +34,7 @@ export class BudgetController {
     private readonly createBudgetUseCase: CreateBudgetUseCase,
     private readonly getBudgetsUseCase: GetBudgetsUseCase,
     private readonly updateBudgetUseCase: UpdateBudgetUseCase,
+    private readonly spendUseCase: SpendUseCase,
   ) {}
 
   @Post()
@@ -96,5 +100,31 @@ export class BudgetController {
     });
 
     return BudgetResponseDto.fromEntity(updatedBudget);
+  }
+
+  @Post(':id/spend')
+  @ApiOperation({ summary: 'Record spending for a budget' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiResponse({
+    status: 201,
+    description: 'Spending recorded successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async spend(
+    @Param('id') id: string,
+    @Body() spendDto: SpendDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.spendUseCase.execute({
+      budgetId: id,
+      userId: user.id,
+      amount: spendDto.amount,
+      name: spendDto.name,
+      description: spendDto.description,
+      recurring: spendDto.recurring,
+    });
   }
 }
