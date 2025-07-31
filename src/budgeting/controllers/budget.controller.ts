@@ -46,6 +46,10 @@ export class BudgetController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 409,
+    description: 'Budget with same name already exists for this month',
+  })
   async createBudget(
     @Body() createBudgetDto: CreateBudgetDto,
   ): Promise<BudgetResponseDto> {

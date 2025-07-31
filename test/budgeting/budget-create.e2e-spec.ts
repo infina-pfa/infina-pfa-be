@@ -105,7 +105,7 @@ describe('Budget CREATE Endpoints (e2e)', () => {
 
         expect(budgetInDb).toBeTruthy();
         expect(budgetInDb?.name).toBe('Groceries');
-        expect(budgetInDb?.amount).toBe(500);
+        expect(Number(budgetInDb?.amount)).toBe(500);
         expect(budgetInDb?.category).toBe(BudgetCategory.FIXED);
         expect(budgetInDb?.color).toBe('#FF5733');
         expect(budgetInDb?.icon).toBe('shopping-cart');
@@ -829,7 +829,7 @@ describe('Budget CREATE Endpoints (e2e)', () => {
         });
 
         expect(body.name).toBe(budgetInDb?.name);
-        expect(body.amount).toBe(budgetInDb?.amount);
+        expect(body.amount).toBe(Number(budgetInDb?.amount));
         expect(body.userId).toBe(budgetInDb?.user_id);
         expect(body.category).toBe(budgetInDb?.category);
         expect(body.color).toBe(budgetInDb?.color);

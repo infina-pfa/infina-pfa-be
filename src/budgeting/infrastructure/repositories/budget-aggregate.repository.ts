@@ -131,8 +131,17 @@ export class BudgetAggregateRepositoryImpl
   ): Promise<BudgetAggregate | null> {
     const budgetORM = await this.prismaClient.budgets.findFirst({
       where: {
-        ...props,
+        user_id: props.userId,
         amount: props.amount?.value,
+        archived_at: props.archivedAt,
+        created_at: props.createdAt,
+        updated_at: props.updatedAt,
+        name: props.name,
+        month: props.month,
+        year: props.year,
+        category: props.category,
+        color: props.color,
+        icon: props.icon,
       },
       include: {
         budget_transactions: { include: { transactions: true } },
@@ -156,8 +165,17 @@ export class BudgetAggregateRepositoryImpl
   ): Promise<BudgetAggregate[]> {
     const budgetORMs = await this.prismaClient.budgets.findMany({
       where: {
-        ...props,
+        name: props.name,
+        user_id: props.userId,
+        month: props.month,
+        year: props.year,
+        category: props.category,
+        color: props.color,
+        icon: props.icon,
         amount: props.amount?.value,
+        archived_at: props.archivedAt,
+        created_at: props.createdAt,
+        updated_at: props.updatedAt,
       },
       include: {
         budget_transactions: { include: { transactions: true } },
