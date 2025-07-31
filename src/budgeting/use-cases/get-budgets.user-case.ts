@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { BudgetEntity, BudgetRepository } from '../domain';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
+import { Injectable } from '@nestjs/common';
+import { BudgetAggregate, BudgetAggregateRepository } from '../domain';
 
 @Injectable()
 export class GetBudgetsUseCase extends BaseUseCase<
   { userId: string; month: number; year: number },
-  BudgetEntity[]
+  BudgetAggregate[]
 > {
-  constructor(private readonly budgetRepository: BudgetRepository) {
+  constructor(
+    private readonly budgetAggregateRepository: BudgetAggregateRepository,
+  ) {
     super();
   }
 
@@ -15,8 +17,8 @@ export class GetBudgetsUseCase extends BaseUseCase<
     userId: string;
     month: number;
     year: number;
-  }): Promise<BudgetEntity[]> {
-    const budgets = await this.budgetRepository.findMany({
+  }): Promise<BudgetAggregate[]> {
+    const budgets = await this.budgetAggregateRepository.findMany({
       userId: input.userId,
       month: input.month,
       year: input.year,

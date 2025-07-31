@@ -34,8 +34,6 @@ export class BudgetAggregateRepositoryImpl
             this.transactionRepository.toEntity(transaction),
           ),
         ),
-        createdAt: data.budget.created_at,
-        updatedAt: data.budget.updated_at,
       },
       data.id,
     );
@@ -58,10 +56,13 @@ export class BudgetAggregateRepositoryImpl
     const budgetORM = this.toORM(entity);
 
     return this.prismaClient.$transaction(async (tx) => {
-      // 1. Update budget
-      await tx.budgets.update({
+      // 1. Upsert budget
+      await tx.budgets.upsert({
         where: { id: entity.id },
-        data: {
+        create: {
+          ...budgetORM.budget,
+        },
+        update: {
           ...budgetORM.budget,
           updated_at: new Date(),
         },

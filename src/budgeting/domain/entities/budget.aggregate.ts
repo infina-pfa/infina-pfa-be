@@ -1,19 +1,28 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
-import { TransactionEntity, TransactionType } from './transactions.entity';
-import { BudgetEntity } from './budget.entity';
 import { TransactionsWatchList } from '../watch-list/transactions.watch-list';
+import { BudgetEntity } from './budget.entity';
+import { TransactionEntity, TransactionType } from './transactions.entity';
 
-export interface BudgetAggregateProps extends BaseProps {
+export interface BudgetAggregateProps {
   budget: BudgetEntity;
   spending: TransactionsWatchList;
 }
 
-export class BudgetAggregate extends BaseEntity<BudgetAggregateProps> {
+export class BudgetAggregate extends BaseEntity<
+  BudgetAggregateProps & BaseProps
+> {
   public static create(
-    props: Omit<BudgetAggregateProps, 'id'>,
+    props: BudgetAggregateProps,
     id?: string,
   ): BudgetAggregate {
-    return new BudgetAggregate(props, id);
+    return new BudgetAggregate(
+      {
+        ...props,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      id,
+    );
   }
 
   public get userId(): string {

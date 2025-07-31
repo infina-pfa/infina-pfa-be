@@ -1,4 +1,5 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
+import { OptionalProps } from '@/common/utils';
 
 export enum BudgetCategory {
   FIXED = 'fixed',
@@ -19,10 +20,12 @@ export interface BudgetEntityProps extends BaseProps {
 
 export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
   public static create(
-    props: Omit<BudgetEntityProps, 'id'>,
+    props: OptionalProps<
+      Omit<BudgetEntityProps, 'id'>,
+      'createdAt' | 'updatedAt' | 'archivedAt'
+    >,
     id?: string,
   ): BudgetEntity {
-    // Business rule: Amount must be greater than 0
     if (props.amount.value <= 0) {
       throw new Error('Budget amount must be greater than 0');
     }
@@ -30,6 +33,9 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     return new BudgetEntity(
       {
         ...props,
+        archivedAt: props.archivedAt ?? null,
+        createdAt: props.createdAt ?? new Date(),
+        updatedAt: props.updatedAt ?? new Date(),
       },
       id,
     );
@@ -47,13 +53,21 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     return this.props.name;
   }
 
-  public archive(): void {
-    this._props.archivedAt = new Date();
+  public update(
+    props: Omit<
+      Partial<BudgetEntityProps>,
+      'createdAt' | 'updatedAt' | 'userId' | 'amount'
+    >,
+  ): void {
+    this._props = {
+      ...this._props,
+      ...props,
+    };
     this.updated();
   }
 
-  public unarchive(): void {
-    this._props.archivedAt = null;
+  public archive(): void {
+    this._props.archivedAt = new Date();
     this.updated();
   }
 
