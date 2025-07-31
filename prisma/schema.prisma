@@ -281,41 +281,41 @@ model sso_providers {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model auth_users {
-  instance_id                 String?                @db.Uuid
-  id                          String                 @id @db.Uuid
-  aud                         String?                @db.VarChar(255)
-  role                        String?                @db.VarChar(255)
-  email                       String?                @db.VarChar(255)
-  encrypted_password          String?                @db.VarChar(255)
-  email_confirmed_at          DateTime?              @db.Timestamptz(6)
-  invited_at                  DateTime?              @db.Timestamptz(6)
-  confirmation_token          String?                @db.VarChar(255)
-  confirmation_sent_at        DateTime?              @db.Timestamptz(6)
-  recovery_token              String?                @db.VarChar(255)
-  recovery_sent_at            DateTime?              @db.Timestamptz(6)
-  email_change_token_new      String?                @db.VarChar(255)
-  email_change                String?                @db.VarChar(255)
-  email_change_sent_at        DateTime?              @db.Timestamptz(6)
-  last_sign_in_at             DateTime?              @db.Timestamptz(6)
+  instance_id                 String?               @db.Uuid
+  id                          String                @id @db.Uuid
+  aud                         String?               @db.VarChar(255)
+  role                        String?               @db.VarChar(255)
+  email                       String?               @db.VarChar(255)
+  encrypted_password          String?               @db.VarChar(255)
+  email_confirmed_at          DateTime?             @db.Timestamptz(6)
+  invited_at                  DateTime?             @db.Timestamptz(6)
+  confirmation_token          String?               @db.VarChar(255)
+  confirmation_sent_at        DateTime?             @db.Timestamptz(6)
+  recovery_token              String?               @db.VarChar(255)
+  recovery_sent_at            DateTime?             @db.Timestamptz(6)
+  email_change_token_new      String?               @db.VarChar(255)
+  email_change                String?               @db.VarChar(255)
+  email_change_sent_at        DateTime?             @db.Timestamptz(6)
+  last_sign_in_at             DateTime?             @db.Timestamptz(6)
   raw_app_meta_data           Json?
   raw_user_meta_data          Json?
   is_super_admin              Boolean?
-  created_at                  DateTime?              @db.Timestamptz(6)
-  updated_at                  DateTime?              @db.Timestamptz(6)
-  phone                       String?                @unique
-  phone_confirmed_at          DateTime?              @db.Timestamptz(6)
-  phone_change                String?                @default("")
-  phone_change_token          String?                @default("") @db.VarChar(255)
-  phone_change_sent_at        DateTime?              @db.Timestamptz(6)
-  confirmed_at                DateTime?              @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
-  email_change_token_current  String?                @default("") @db.VarChar(255)
-  email_change_confirm_status Int?                   @default(0) @db.SmallInt
-  banned_until                DateTime?              @db.Timestamptz(6)
-  reauthentication_token      String?                @default("") @db.VarChar(255)
-  reauthentication_sent_at    DateTime?              @db.Timestamptz(6)
-  is_sso_user                 Boolean                @default(false)
-  deleted_at                  DateTime?              @db.Timestamptz(6)
-  is_anonymous                Boolean                @default(false)
+  created_at                  DateTime?             @db.Timestamptz(6)
+  updated_at                  DateTime?             @db.Timestamptz(6)
+  phone                       String?               @unique
+  phone_confirmed_at          DateTime?             @db.Timestamptz(6)
+  phone_change                String?               @default("")
+  phone_change_token          String?               @default("") @db.VarChar(255)
+  phone_change_sent_at        DateTime?             @db.Timestamptz(6)
+  confirmed_at                DateTime?             @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
+  email_change_token_current  String?               @default("") @db.VarChar(255)
+  email_change_confirm_status Int?                  @default(0) @db.SmallInt
+  banned_until                DateTime?             @db.Timestamptz(6)
+  reauthentication_token      String?               @default("") @db.VarChar(255)
+  reauthentication_sent_at    DateTime?             @db.Timestamptz(6)
+  is_sso_user                 Boolean               @default(false)
+  deleted_at                  DateTime?             @db.Timestamptz(6)
+  is_anonymous                Boolean               @default(false)
   identities                  identities[]
   mfa_factors                 mfa_factors[]
   one_time_tokens             one_time_tokens[]
@@ -323,14 +323,11 @@ model auth_users {
   budget_transactions         budget_transactions[]
   budgets                     budgets[]
   conversations               conversations[]
-  debt_transactions           debt_transactions[]
-  debts                       debts[]
   goal_transactions           goal_transactions[]
   goals                       goals[]
   messages                    messages[]
-  onboarding_chat             onboarding_chat[]
+  onboarding_messages         onboarding_messages[]
   onboarding_profiles         onboarding_profiles?
-  onboarding_responses        onboarding_responses[]
   transactions                transactions[]
   users                       public_users?
 
@@ -374,6 +371,7 @@ model budgets {
   icon                String                @default("other")
   category            String                @default("fixed")
   amount              Decimal               @default(0) @db.Decimal
+  archived_at         DateTime?             @db.Timestamptz(6)
   budget_transactions budget_transactions[]
   users               auth_users            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -385,57 +383,15 @@ model budgets {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model conversations {
-  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at      DateTime          @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime          @default(now()) @db.Timestamptz(6)
-  user_id         String            @db.Uuid
-  name            String
-  users           auth_users        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  messages        messages[]
-  onboarding_chat onboarding_chat[]
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at DateTime   @default(now()) @db.Timestamptz(6)
+  user_id    String     @db.Uuid
+  name       String
+  users      auth_users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  messages   messages[]
 
   @@index([user_id], map: "idx_conversations_user_id")
-  @@schema("public")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model debt_transactions {
-  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at     DateTime     @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime     @default(now()) @db.Timestamptz(6)
-  user_id        String       @db.Uuid
-  debt_id        String       @db.Uuid
-  transaction_id String       @db.Uuid
-  debts          debts        @relation(fields: [debt_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  transactions   transactions @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users          auth_users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([debt_id, created_at(sort: Desc)], map: "idx_debt_transactions_debt_created")
-  @@index([debt_id], map: "idx_debt_transactions_debt_id")
-  @@index([transaction_id], map: "idx_debt_transactions_transaction_id")
-  @@index([user_id], map: "idx_debt_transactions_user_id")
-  @@schema("public")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model debts {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at        DateTime            @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime            @db.Timestamptz(6)
-  user_id           String              @db.Uuid
-  name              String
-  description       String?
-  due_date          DateTime            @db.Timestamptz(6)
-  amount            Decimal             @db.Decimal
-  current_amount    Decimal             @db.Decimal
-  interest_rate     Float               @default(0) @db.Real
-  debt_transactions debt_transactions[]
-  users             auth_users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([due_date], map: "idx_debts_due_date")
-  @@index([user_id], map: "idx_debts_user_id")
   @@schema("public")
 }
 
@@ -502,24 +458,6 @@ model messages {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model onboarding_chat {
-  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  conversation_id String         @db.Uuid
-  user_id         String         @db.Uuid
-  sender          message_sender
-  content         String
-  component_id    String?
-  metadata        Json?
-  created_at      DateTime       @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime       @default(now()) @db.Timestamptz(6)
-  conversations   conversations  @relation(fields: [conversation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users           auth_users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([conversation_id, created_at], map: "idx_onboarding_chat_conv_created")
-  @@schema("public")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model onboarding_profiles {
   id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id      String     @unique @db.Uuid
@@ -538,23 +476,6 @@ model onboarding_profiles {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model onboarding_responses {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id       String     @db.Uuid
-  component_id  String
-  response_data Json
-  created_at    DateTime   @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime   @default(now()) @db.Timestamptz(6)
-  users         auth_users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@unique([user_id, component_id])
-  @@index([component_id], map: "idx_onboarding_responses_component_id")
-  @@index([created_at], map: "idx_onboarding_responses_created_at")
-  @@index([user_id], map: "idx_onboarding_responses_user_id")
-  @@schema("public")
-}
-
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model transactions {
@@ -568,7 +489,6 @@ model transactions {
   type                transaction_type      @default(income)
   user_id             String?               @db.Uuid
   budget_transactions budget_transactions[]
-  debt_transactions   debt_transactions[]
   goal_transactions   goal_transactions[]
   users               auth_users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -581,19 +501,34 @@ model transactions {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model public_users {
-  id                      String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at              DateTime         @default(now()) @db.Timestamptz(6)
-  updated_at              DateTime         @default(now()) @db.Timestamptz(6)
+  id                      String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at              DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime   @default(now()) @db.Timestamptz(6)
   name                    String
-  user_id                 String           @unique(map: "users_user_id_unique") @db.Uuid
-  total_asset_value       Decimal          @default(0) @db.Decimal
-  onboarding_completed_at DateTime?        @db.Timestamptz(6)
+  user_id                 String     @unique(map: "users_user_id_unique") @db.Uuid
+  onboarding_completed_at DateTime?  @db.Timestamptz(6)
   financial_stage         String?
-  budgeting_style         budgeting_style?
-  users                   auth_users       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  language                language   @default(vi)
+  currency                currency   @default(vnd)
+  users                   auth_users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([user_id], map: "idx_users_user_id")
   @@map("users")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model onboarding_messages {
+  id           String         @id(map: "onboarding_chat_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String         @db.Uuid
+  sender       message_sender
+  content      String
+  component_id String?
+  metadata     Json?
+  created_at   DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime       @default(now()) @db.Timestamptz(6)
+  users        auth_users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "onboarding_chat_user_id_fkey")
+
   @@schema("public")
 }
 
@@ -670,6 +605,32 @@ enum transaction_type {
   income
   outcome
   transfer
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum currency {
+  vnd
+  usd
+  eur
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum financial_stage {
+  debt
+  start_saving
+  start_investing
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum language {
+  vi
+  en
 
   @@schema("public")
 }

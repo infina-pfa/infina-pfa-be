@@ -8,6 +8,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 import { loadEnvFile } from 'process';
+import { ValidationPipe } from '@nestjs/common';
 
 loadEnvFile('.env');
 
@@ -15,6 +16,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalGuards(new SupabaseAuthGuard(app.get(Reflector)));
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Apply global interceptors
   app.useGlobalInterceptors(

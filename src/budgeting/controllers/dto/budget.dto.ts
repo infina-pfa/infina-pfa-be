@@ -22,9 +22,11 @@ export class CreateBudgetDto {
   @ApiProperty({
     description: 'Budget amount',
     example: 500,
+    minimum: 0.01,
   })
   @IsNumber()
   @IsNotEmpty()
+  @Min(0.01, { message: 'Budget amount must be greater than 0' })
   amount: number;
 
   @ApiProperty({
@@ -72,6 +74,7 @@ export class CreateBudgetDto {
     example: 2023,
   })
   @IsNumber()
+  @Min(2025)
   year: number;
 }
 
@@ -89,8 +92,10 @@ export class UpdateBudgetDto {
     description: 'Budget amount',
     example: 500,
     required: false,
+    minimum: 0.01,
   })
   @IsNumber()
+  @Min(0.01, { message: 'Budget amount must be greater than 0' })
   amount?: number;
 
   @ApiProperty({

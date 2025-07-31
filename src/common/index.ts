@@ -15,3 +15,4 @@ export * from './types/database';
 export * from './types/supabase';
 
 export * from './types/auth-user';
+export * from './types/user';

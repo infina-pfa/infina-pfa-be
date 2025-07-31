@@ -1,18 +1,24 @@
 import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
-import type { Enums } from '@/common/types/database';
+import { Currency, Language } from '@/common/types/user';
 
 export enum BudgetingStyle {
   DETAIL_TRACKER = 'detail_tracker',
   GOAL_FOCUSED = 'goal_focused',
 }
 
+export enum FinancialStage {
+  DEBT = 'debt',
+  START_SAVING = 'start_saving',
+  START_INVESTING = 'start_investing',
+}
+
 export interface UserEntityProps extends BaseProps {
   name: string;
-  user_id: string;
-  budgeting_style: BudgetingStyle | null;
-  financial_stage: string | null;
-  onboarding_completed_at?: Date | null;
-  total_asset_value: number;
+  userId: string;
+  financialStage: FinancialStage | null;
+  onboardingCompletedAt: Date | null;
+  currency: Currency;
+  language: Language;
 }
 
 export class UserEntity extends BaseEntity<UserEntityProps> {
@@ -23,34 +29,38 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
     return new UserEntity(
       {
         ...props,
-        total_asset_value: props.total_asset_value ?? 0,
       },
       id,
     );
   }
 
-  public setBudgetingStyle(style: BudgetingStyle): void {
-    this._props.budgeting_style = style;
-    this._props.updatedAt = new Date();
+  public updateName(name: string): void {
+    this._props.name = name;
+    this.updated();
   }
 
-  public setFinancialStage(stage: string): void {
-    this._props.financial_stage = stage;
-    this._props.updatedAt = new Date();
+  public setFinancialStage(stage: FinancialStage): void {
+    this._props.financialStage = stage;
+    this.updated();
   }
 
   public completeOnboarding(): void {
-    this._props.onboarding_completed_at = new Date();
-    this._props.updatedAt = new Date();
+    this._props.onboardingCompletedAt = new Date();
+    this.updated();
   }
 
-  public updateTotalAssetValue(value: number): void {
-    this._props.total_asset_value = value;
-    this._props.updatedAt = new Date();
+  public updateCurrency(currency: Currency): void {
+    this._props.currency = currency;
+    this.updated();
+  }
+
+  public updateLanguage(language: Language): void {
+    this._props.language = language;
+    this.updated();
   }
 
   public isOnboardingCompleted(): boolean {
-    return !!this.props.onboarding_completed_at;
+    return !!this.props.onboardingCompletedAt;
   }
 
   get name(): string {
@@ -58,22 +68,22 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
   }
 
   get userId(): string {
-    return this.props.user_id;
-  }
-
-  get budgetingStyle(): Enums<'budgeting_style'> | null | undefined {
-    return this.props.budgeting_style;
+    return this.props.userId;
   }
 
   get financialStage(): string | null | undefined {
-    return this.props.financial_stage;
+    return this.props.financialStage;
   }
 
   get onboardingCompletedAt(): Date | null | undefined {
-    return this.props.onboarding_completed_at;
+    return this.props.onboardingCompletedAt;
   }
 
-  get totalAssetValue(): number {
-    return this.props.total_asset_value;
+  get currency(): string {
+    return this.props.currency;
+  }
+
+  get language(): string {
+    return this.props.language;
   }
 }

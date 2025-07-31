@@ -22,6 +22,7 @@ export class CreateBudgetUseCase {
       ...input,
       createdAt: new Date(),
       updatedAt: new Date(),
+      archivedAt: null,
     });
     return this.budgetRepository.create(budget);
   }
