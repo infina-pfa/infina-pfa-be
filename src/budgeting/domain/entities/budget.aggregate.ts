@@ -28,7 +28,7 @@ export class BudgetAggregate extends BaseEntity<BudgetAggregateProps> {
     return this.props.spending.items;
   }
 
-  public get totalSpending(): CurrencyVO {
+  public get spent(): CurrencyVO {
     return this.props.spending.items.reduce(
       (acc, spending) => acc.add(spending.amount),
       new CurrencyVO(0),
@@ -40,7 +40,7 @@ export class BudgetAggregate extends BaseEntity<BudgetAggregateProps> {
   }
 
   public get remainingBudget(): CurrencyVO {
-    return this.totalBudget.subtract(this.totalSpending);
+    return this.totalBudget.subtract(this.spent);
   }
 
   public spend(props: {

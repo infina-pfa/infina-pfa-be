@@ -1,13 +1,8 @@
-import { BudgetCategory } from '@/budgeting/domain';
+import { BudgetAggregate, BudgetCategory } from '@/budgeting/domain';
+import { BaseDto } from '@/common/base';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class BudgetResponseDto {
-  @ApiProperty({
-    description: 'Unique identifier',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  id: string;
-
+export class BudgetResponseDto extends BaseDto {
   @ApiProperty({
     description: 'Name of the budget',
     example: 'Groceries',
@@ -68,4 +63,21 @@ export class BudgetResponseDto {
     example: '2023-07-21T15:30:00Z',
   })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Spent amount',
+    example: 100,
+  })
+  spent: number;
+
+  public static fromEntity(entity: BudgetAggregate): BudgetResponseDto {
+    const { budget } = entity;
+    return {
+      ...budget.props,
+      id: budget.id,
+      amount: budget.amount.value,
+      spent: entity.spent.value,
+      userId: budget.userId,
+    };
+  }
 }
