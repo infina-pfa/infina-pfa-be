@@ -5,6 +5,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -17,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateBudgetUseCase } from '../use-cases/create-budget.use-case';
+import { GetBudgetDetailUseCase } from '../use-cases/get-budget-detail.use-case';
 import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
 import { SpendUseCase } from '../use-cases/spend.use-case';
 import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
@@ -33,6 +35,7 @@ export class BudgetController {
   constructor(
     private readonly createBudgetUseCase: CreateBudgetUseCase,
     private readonly getBudgetsUseCase: GetBudgetsUseCase,
+    private readonly getBudgetDetailUseCase: GetBudgetDetailUseCase,
     private readonly updateBudgetUseCase: UpdateBudgetUseCase,
     private readonly spendUseCase: SpendUseCase,
   ) {}
@@ -74,6 +77,30 @@ export class BudgetController {
     return (
       await this.getBudgetsUseCase.execute({ userId: user.id, month, year })
     ).map((budget) => BudgetResponseDto.fromEntity(budget));
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get budget detail by ID' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Budget detail retrieved successfully',
+    type: BudgetResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid budget ID format' })
+  @ApiResponse({ status: 401, description: 'User not authenticated' })
+  @ApiResponse({ status: 403, description: 'Access denied to budget' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async getBudgetDetail(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<BudgetResponseDto> {
+    const budget = await this.getBudgetDetailUseCase.execute({
+      id,
+      userId: user.id,
+    });
+
+    return BudgetResponseDto.fromEntity(budget, true);
   }
 
   @Patch(':id')
