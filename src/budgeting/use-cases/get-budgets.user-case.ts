@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BudgetEntity, BudgetRepository } from '../domain';
-import { BaseUseCase } from '@/common/use-case/base.use-case';
+import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 
 @Injectable()
 export class GetBudgetsUseCase extends BaseUseCase<

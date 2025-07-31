@@ -1,16 +1,16 @@
 import { TransactionEntity, TransactionType } from '@/budgeting/domain';
+import { Decimal, PrismaDelegate } from '@/common/types/prisma';
 import { Injectable } from '@nestjs/common';
-import { Decimal } from '@prisma/client/runtime/library';
 import {
   transaction_type,
   transactions as TransactionORM,
-} from '../../../generated/prisma';
-import { PrismaDelegate } from '../types/prisma';
+} from '../../../../generated/prisma';
+import { CurrencyVO } from '../../base/value-objects';
+import { BaseRepository } from '../../base/repositories/base.repository';
 import { PrismaRepository } from './prisma.repository';
-import { BaseRepository } from './base.repository';
 
 @Injectable()
-export class TransactionPrismaRepository
+export abstract class TransactionPrismaRepository
   extends PrismaRepository<TransactionEntity>
   implements BaseRepository<TransactionEntity>
 {
@@ -26,7 +26,7 @@ export class TransactionPrismaRepository
       id: entity.id,
       name: props.name,
       user_id: props.userId,
-      amount: new Decimal(props.amount),
+      amount: new Decimal(props.amount.value),
       recurring: props.recurring,
       description: props.description,
       type: props.type as unknown as transaction_type,
@@ -40,7 +40,7 @@ export class TransactionPrismaRepository
       {
         name: data.name,
         userId: data.user_id as string,
-        amount: data.amount.toNumber(),
+        amount: new CurrencyVO(data.amount.toNumber()),
         recurring: data.recurring,
         description: data.description as string,
         type: data.type as unknown as TransactionType,

@@ -8,7 +8,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { BudgetCategory } from '@/budgeting/domain/entities/budget.entity';
+import { BudgetCategory } from '@/budgeting/domain';
 
 export class CreateBudgetDto {
   @ApiProperty({

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from '../domain/entities/user.entity';
-import { Currency, Language } from '@/common/index';
+import { Currency, Language } from '@/common/types';
 
 export class UserProfileResponseDto {
   @ApiProperty({ example: 'user-123', description: 'User unique identifier' })

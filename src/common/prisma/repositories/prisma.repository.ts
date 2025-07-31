@@ -1,8 +1,7 @@
-import { BaseEntity, BaseProps } from '@/common';
-import { PrismaDelegate } from '../types/prisma';
-import { FindManyOptions } from '../types/query.types';
-import { camelCaseToSnakeCase } from '../utils/object';
-import { BaseRepository } from './base.repository';
+import { BaseEntity, BaseProps, BaseRepository } from '@/common/base';
+import { PrismaDelegate } from '@/common/types/prisma';
+import { FindManyOptions } from '@/common/types/query.types';
+import { camelCaseToSnakeCase } from '@/common/utils/object';
 
 export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
   implements BaseRepository<E>

@@ -1,6 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { OptionalProp } from '../utils/type';
+import { OptionalProp } from '@/common/utils/type';
 import { BaseValueObject } from '../value-objects/base.value-object';
+
+export type Props<T> = T extends BaseEntity<infer P> ? P : never;
 
 export interface BaseProps {
   createdAt: Date;

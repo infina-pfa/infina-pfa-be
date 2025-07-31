@@ -1,4 +1,4 @@
-import { Currency } from '../types/user';
+import { Currency } from '@/common/types/user';
 import { BaseValueObject } from './base.value-object';
 
 interface CurrencyProps {

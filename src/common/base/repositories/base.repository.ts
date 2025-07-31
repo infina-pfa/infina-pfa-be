@@ -1,5 +1,5 @@
+import { FindManyOptions } from '../../types/query.types';
 import { BaseEntity, BaseProps } from '../entities/base.entity';
-import { FindManyOptions } from '../types/query.types';
 
 export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
   abstract toEntity(data: unknown): E;

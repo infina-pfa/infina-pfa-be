@@ -1,11 +1,11 @@
 import { FinancialStage, UserEntity } from '@/user/domain';
 import { Injectable } from '@nestjs/common';
-import { public_users as UserORM } from '../../../generated/prisma';
-import { PrismaClient } from '../prisma/prisma-client';
-import { PrismaDelegate } from '../types/prisma';
-import { BaseRepository } from './base.repository';
+import { PrismaClient } from '../prisma-client';
+import { PrismaDelegate } from '@/common/types/prisma';
 import { PrismaRepository } from './prisma.repository';
-import { Currency, Language } from '../types/user';
+import { UserORM } from '@/common/types/orms';
+import { Currency, Language } from '@/common/types/user';
+import { BaseRepository } from '@/common/base';
 
 @Injectable()
 export class UserPrismaRepository

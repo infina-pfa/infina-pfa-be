@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { BaseUseCase } from '@/common/use-case/base.use-case';
+import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserRepository } from '../domain/repositories/user.repository';
 import { UpdateUserProfileDto } from '../controllers/dto/update-user-profile.dto';

@@ -1,6 +1,5 @@
-import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
+import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProp } from '@/common/utils/type';
-import { CurrencyVO } from '@/common/value-objects';
 
 export enum TransactionType {
   INCOME = 'income',

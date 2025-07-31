@@ -1,5 +1,4 @@
-import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
-import { CurrencyVO } from '@/common/value-objects';
+import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 
 export enum BudgetCategory {
   FIXED = 'fixed',
@@ -36,8 +35,16 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     );
   }
 
+  public get userId(): string {
+    return this.props.userId;
+  }
+
   public get amount(): CurrencyVO {
     return this.props.amount;
+  }
+
+  public get name(): string {
+    return this.props.name;
   }
 
   public archive(): void {

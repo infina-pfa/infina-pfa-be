@@ -1,3 +1,5 @@
+export { Decimal } from '../../../generated/prisma/runtime/library';
+
 export interface PrismaDelegate<T = unknown> {
   findUnique: (args: unknown) => Promise<T | null>;
   findUniqueOrThrow: (args: unknown) => Promise<T>;
