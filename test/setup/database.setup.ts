@@ -1,5 +1,5 @@
-import { PrismaClient } from '../../generated/prisma';
 import { execSync } from 'child_process';
+import { PrismaClient } from '../../generated/prisma';
 
 export class TestDatabaseManager {
   private static prisma: PrismaClient;
