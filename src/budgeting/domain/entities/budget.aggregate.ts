@@ -62,9 +62,9 @@ export class BudgetAggregate extends BaseEntity<
       TransactionEntity.create({
         amount: props.amount,
         type: TransactionType.OUTCOME,
-        name: props.name || 'spending',
+        name: props.name || 'Spending',
         description:
-          props.description || 'spending for ' + this.props.budget.name,
+          props.description || 'Spending for ' + this.props.budget.name,
         recurring: props.recurring || 0,
         userId: this.props.budget.userId,
         createdAt: new Date(),
