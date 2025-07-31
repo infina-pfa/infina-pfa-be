@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { OptionalProp } from '../utils/type';
 import { BaseValueObject } from '../value-objects/base.value-object';
 
 export interface BaseProps {
@@ -6,27 +7,24 @@ export interface BaseProps {
   updatedAt: Date;
 }
 
-export abstract class BaseEntity<Props extends BaseProps> {
+export abstract class BaseEntity<P extends BaseProps> {
   private readonly _id: string;
-  protected _props: Props;
+  protected _props: P;
 
-  constructor(
-    props?: Omit<Props, 'id' | 'createdAt' | 'updatedAt'>,
-    id?: string,
-  ) {
+  constructor(props?: OptionalProp<P, 'createdAt' | 'updatedAt'>, id?: string) {
     this._id = id ?? uuid();
     this._props = {
       ...props,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as Props;
+      createdAt: props?.createdAt ?? new Date(),
+      updatedAt: props?.updatedAt ?? new Date(),
+    } as P;
   }
 
   public get id(): string {
     return this._id;
   }
 
-  public get props(): Readonly<Props> {
+  public get props(): Readonly<P> {
     return Object.freeze(this._props);
   }
 
@@ -34,7 +32,7 @@ export abstract class BaseEntity<Props extends BaseProps> {
     this._props.updatedAt = new Date();
   }
 
-  public equals(other?: BaseEntity<Props>): boolean {
+  public equals(other?: BaseEntity<P>): boolean {
     if (other === null || other === undefined) {
       return false;
     }

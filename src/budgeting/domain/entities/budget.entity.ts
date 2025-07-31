@@ -36,6 +36,10 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     );
   }
 
+  public get amount(): CurrencyVO {
+    return this.props.amount;
+  }
+
   public archive(): void {
     this._props.archivedAt = new Date();
     this.updated();

@@ -1,4 +1,6 @@
 import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
+import { OptionalProp } from '@/common/utils/type';
+import { CurrencyVO } from '@/common/value-objects';
 
 export enum TransactionType {
   INCOME = 'income',
@@ -8,7 +10,7 @@ export enum TransactionType {
 
 export interface TransactionEntityProps extends BaseProps {
   userId: string;
-  amount: number;
+  amount: CurrencyVO;
   recurring: number;
   name: string;
   description: string;
@@ -17,9 +19,18 @@ export interface TransactionEntityProps extends BaseProps {
 
 export class TransactionEntity extends BaseEntity<TransactionEntityProps> {
   public static create(
-    props: Omit<TransactionEntityProps, 'id'>,
+    props: OptionalProp<TransactionEntityProps, 'createdAt' | 'updatedAt'>,
     id?: string,
   ): TransactionEntity {
-    return new TransactionEntity(props, id);
+    return new TransactionEntity(
+      {
+        ...props,
+      },
+      id,
+    );
+  }
+
+  public get amount(): CurrencyVO {
+    return this.props.amount;
   }
 }

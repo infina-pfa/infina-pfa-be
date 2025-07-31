@@ -1,41 +1,26 @@
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthUser } from '@/common/index';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   CreateBudgetUseCase,
   CreateBudgetUseCaseInput,
 } from '../use-cases/create-budget.use-case';
-import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
 import { GetBudgetsWithSpendingUseCase } from '../use-cases/get-budgets-with-spending.use-case';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { AuthUser } from '@/common/index';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
+import { GetBudgetsWithSpendingQueryDto } from './dto/budget-with-spending.dto';
 import {
   BudgetResponseDto,
   BudgetWithSpendingResponseDto,
 } from './dto/budget.dto';
-import { IsOptional, IsNumber, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
 
-class GetBudgetsWithSpendingQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  @Max(12)
-  month?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  year?: number;
-}
-
-@ApiTags('budgets')
+@ApiTags('Budgets')
 @ApiBearerAuth()
 @Controller('budgets')
 export class BudgetController {
