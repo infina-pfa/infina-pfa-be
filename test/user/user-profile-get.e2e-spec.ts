@@ -1,46 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import {
-  CanActivate,
-  ExecutionContext,
-  INestApplication,
-} from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { TestDatabaseManager } from '../setup/database.setup';
 import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-// cSpell:ignore Supabase
 import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { User } from '@supabase/supabase-js';
-import { Request } from 'express';
 import { PrismaClient } from '../../generated/prisma';
 import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
+import { MockGuard } from '../mocks/guard.mock';
 
-class MockGuard implements CanActivate {
-  canActivate(context: ExecutionContext) {
-    const request: Request & { user?: User } = context
-      .switchToHttp()
-      .getRequest();
-    const authHeader = request.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return false;
-    }
-
-    const token = authHeader.split(' ')[1];
-    const mockUsers = Object.values(TEST_USERS);
-    const user = mockUsers.find((u) => token.includes(u.id ?? ''));
-
-    if (user) {
-      request.user = AuthTestUtils.createMockSupabaseUser(user);
-      return true;
-    }
-
-    return false;
-  }
-}
-
-describe('User Controller (e2e)', () => {
+describe('User Profile GET Endpoints (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
@@ -213,7 +182,7 @@ describe('User Controller (e2e)', () => {
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 
-      expect(responseTime).toBeLessThan(500); // Should respond within 1 second
+      expect(responseTime).toBeLessThan(500); // Should respond within 500ms
     });
   });
 });

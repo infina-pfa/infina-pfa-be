@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from '../domain/entities/user.entity';
+import { Currency, Language } from '@/common/index';
 
 export class UserProfileResponseDto {
   @ApiProperty({ example: 'user-123', description: 'User unique identifier' })
@@ -34,11 +35,25 @@ export class UserProfileResponseDto {
   })
   updatedAt: Date;
 
+  @ApiProperty({
+    example: 'vnd',
+    description: 'Preferred currency',
+  })
+  currency: Currency;
+
+  @ApiProperty({
+    example: 'vi',
+    description: 'Preferred language',
+  })
+  language: Language;
+
   static fromEntity(entity: UserEntity): UserProfileResponseDto {
     const {
       name,
       financialStage,
       onboardingCompletedAt,
+      currency,
+      language,
       createdAt,
       updatedAt,
     } = entity.props;
@@ -48,6 +63,8 @@ export class UserProfileResponseDto {
       name,
       financialStage,
       onboardingCompletedAt,
+      currency,
+      language,
       createdAt,
       updatedAt,
     };

@@ -1,6 +1,6 @@
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { AuthUser } from '@/common/types/auth-user';
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -8,9 +8,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserProfileResponseDto } from '../dto/user-profile.dto';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { GetUserProfileUseCase } from '../use-cases/get-user-profile.use-case';
 import { UpdateUserProfileUseCase } from '../use-cases/update-user-profile.use-case';
+import { CreateUserProfileUseCase } from '../use-cases/create-user-profile.use-case';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -19,6 +21,7 @@ export class UserController {
   constructor(
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
     private readonly updateUserProfileUseCase: UpdateUserProfileUseCase,
+    private readonly createUserProfileUseCase: CreateUserProfileUseCase,
   ) {}
 
   @Get('profile')
@@ -42,6 +45,41 @@ export class UserController {
     const userProfile = await this.getUserProfileUseCase.execute(user.id);
 
     return UserProfileResponseDto.fromEntity(userProfile);
+  }
+
+  @Post('profile')
+  @ApiOperation({
+    summary: 'Create user profile',
+    description:
+      'Create a new user profile for the authenticated user with basic information',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'User profile created successfully',
+    type: UserProfileResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Authentication required',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'User profile already exists',
+  })
+  async createUserProfile(
+    @CurrentUser() user: AuthUser,
+    @Body() createDto: CreateUserProfileDto,
+  ): Promise<UserProfileResponseDto> {
+    const createdUser = await this.createUserProfileUseCase.execute({
+      userId: user.id,
+      profileData: createDto,
+    });
+
+    return UserProfileResponseDto.fromEntity(createdUser);
   }
 
   @Put('profile')

@@ -11,23 +11,21 @@ import {
   Matches,
 } from 'class-validator';
 
-export class UpdateUserProfileDto {
+export class CreateUserProfileDto {
   @ApiProperty({
     example: 'John Doe',
     description: 'Full name of the user',
-    required: false,
   })
-  @IsOptional()
   @IsString()
   @IsNotEmpty({ message: 'Name cannot be empty' })
   @MinLength(2, { message: 'Name must be at least 2 characters long' })
   @MaxLength(100, { message: 'Name must not exceed 100 characters' })
   @Matches(/.*\S.*/, { message: 'Name cannot contain only whitespace' })
-  name?: string;
+  name: string;
 
   @ApiProperty({
-    example: 'building_wealth',
-    description: 'Current financial stage of the user',
+    example: 'start_saving',
+    description: 'Initial financial stage of the user',
     enum: [
       FinancialStage.DEBT,
       FinancialStage.START_SAVING,
@@ -36,7 +34,6 @@ export class UpdateUserProfileDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
   @IsEnum(
     [
       FinancialStage.DEBT,
@@ -45,16 +42,17 @@ export class UpdateUserProfileDto {
     ],
     {
       message:
-        'Financial stage must be one of: getting_started, building_wealth, preserving_wealth, retirement_planning',
+        'Financial stage must be one of: debt, start_saving, start_investing',
     },
   )
   financialStage?: FinancialStage;
 
   @ApiProperty({
-    example: 'usd',
+    example: 'vnd',
     description: 'Preferred currency for the user',
     enum: Currency,
     required: false,
+    default: Currency.VND,
   })
   @IsOptional()
   @IsEnum(Currency, {
@@ -67,6 +65,7 @@ export class UpdateUserProfileDto {
     description: 'Preferred language for the user',
     enum: Language,
     required: false,
+    default: Language.VI,
   })
   @IsOptional()
   @IsEnum(Language, {

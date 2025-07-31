@@ -138,6 +138,44 @@ export class AuthTestUtils {
   }
 
   /**
+   * Create a test user in the database (auth.users table only)
+   * This is useful for testing profile creation where public.users should not exist yet
+   */
+  static async createAuthUserOnly(
+    prisma: PrismaClient,
+    testUser: TestUser,
+  ): Promise<void> {
+    try {
+      const uniqueEmail = `test-${testUser.id.slice(0, 8)}@random.com`;
+      await prisma.auth_users.create({
+        data: {
+          id: testUser.id,
+          email: uniqueEmail,
+          aud: testUser.aud,
+          role: testUser.role,
+          email_confirmed_at: new Date(),
+          created_at: new Date(),
+          updated_at: new Date(),
+          raw_user_meta_data: {
+            name: testUser.name,
+            email: uniqueEmail,
+          },
+          raw_app_meta_data: {
+            provider: 'email',
+            providers: ['email'],
+          },
+        },
+      });
+    } catch (error) {
+      // Ignore duplicate key errors since we clean up between tests
+      if (!error?.message?.includes('duplicate key')) {
+        console.error('Error creating auth user:', error);
+        throw error;
+      }
+    }
+  }
+
+  /**
    * Create a test user in the database (auth.users table)
    * This is useful for integration tests that need real user data
    */
