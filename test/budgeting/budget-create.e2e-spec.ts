@@ -56,7 +56,6 @@ describe('Budget CREATE Endpoints (e2e)', () => {
 
     // Create both auth and public users for budget creation tests
     for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createAuthUserOnly(prisma, testUser);
       await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
     }
   });

@@ -140,6 +140,7 @@ export class AuthTestUtils {
   /**
    * Create a test user in the database (auth.users table only)
    * This is useful for testing profile creation where public.users should not exist yet
+   * DON'T USE THIS AND createTestUserInDatabase at the same time
    */
   static async createAuthUserOnly(
     prisma: PrismaClient,
