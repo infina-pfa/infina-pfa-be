@@ -21,21 +21,21 @@ export interface TestUser {
  */
 export const TEST_USERS: Record<string, TestUser> = {
   JOHN_DOE: {
-    id: '99999999-9999-9999-9999-999999999999',
+    id: '40d261fe-2f11-420e-9879-e0eb57b4b632',
     email: 'john.doe@test.com',
     name: 'John Doe',
     aud: 'authenticated',
     role: 'authenticated',
   },
   JANE_SMITH: {
-    id: '88888888-8888-8888-8888-888888888888',
+    id: '27ed0f56-9306-4d65-9f16-20bca71b26ce',
     email: 'jane.smith@test.com',
     name: 'Jane Smith',
     aud: 'authenticated',
     role: 'authenticated',
   },
   ADMIN_USER: {
-    id: '77777777-7777-7777-7777-777777777777',
+    id: '6e1f634f-bc10-44f5-bd40-87e1b5e41bc1',
     email: 'admin@test.com',
     name: 'Admin User',
     aud: 'authenticated',
@@ -140,6 +140,7 @@ export class AuthTestUtils {
   /**
    * Create a test user in the database (auth.users table only)
    * This is useful for testing profile creation where public.users should not exist yet
+   * DON'T USE THIS AND createTestUserInDatabase at the same time
    */
   static async createAuthUserOnly(
     prisma: PrismaClient,

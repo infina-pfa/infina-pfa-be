@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { BaseUseCase } from '@/common/use-case/base.use-case';
-import { UserEntity } from '../domain/entities/user.entity';
-import { UserRepository } from '../domain/repositories/user.repository';
+import { BaseUseCase } from '@/common/base/use-case/base.use-case';
+import { Injectable } from '@nestjs/common';
 import { UpdateUserProfileDto } from '../controllers/dto/update-user-profile.dto';
+import { UserEntity } from '../domain/entities/user.entity';
+import { UserErrorFactory } from '../domain/errors';
+import { UserRepository } from '../domain/repositories/user.repository';
 
 export interface UpdateUserProfileInput {
   userId: string;
@@ -24,7 +25,7 @@ export class UpdateUserProfileUseCase extends BaseUseCase<
     // Find the user
     const user = await this.userRepository.findOne({ userId });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw UserErrorFactory.userProfileNotFound();
     }
 
     // Update name if provided

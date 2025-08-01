@@ -1,6 +1,6 @@
 import { TransactionEntity, TransactionRepository } from '@/budgeting/domain';
-import { PrismaClient } from '@/common';
-import { TransactionPrismaRepository } from '@/common/repositories';
+import { PrismaClient } from '@/common/prisma/prisma-client';
+import { TransactionPrismaRepository } from '@/common/prisma';
 import { TransactionORM } from '@/common/types/orms';
 import { FindManyOptions } from '@/common/types/query.types';
 import { Injectable } from '@nestjs/common';

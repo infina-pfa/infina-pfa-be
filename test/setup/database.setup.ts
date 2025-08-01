@@ -1,5 +1,5 @@
-import { PrismaClient } from '../../generated/prisma';
 import { execSync } from 'child_process';
+import { PrismaClient } from '../../generated/prisma';
 
 export class TestDatabaseManager {
   private static prisma: PrismaClient;
@@ -15,7 +15,7 @@ export class TestDatabaseManager {
       datasources: {
         db: {
           url:
-            process.env.DATABASE_URL ||
+            process.env.E2E_TEST_DATABASE_URL ||
             'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
         },
       },

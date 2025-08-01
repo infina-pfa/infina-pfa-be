@@ -1,4 +1,4 @@
-import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
+import { BaseEntity, BaseProps } from '@/common/base';
 import { Currency, Language } from '@/common/types/user';
 
 export enum BudgetingStyle {

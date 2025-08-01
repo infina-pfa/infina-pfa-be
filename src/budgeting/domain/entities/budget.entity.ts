@@ -1,4 +1,6 @@
-import { BaseEntity, BaseProps } from '@/common/entities/base.entity';
+import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
+import { OptionalProps } from '@/common/utils';
+import { BudgetErrorFactory } from '../errors';
 
 export enum BudgetCategory {
   FIXED = 'fixed',
@@ -7,7 +9,7 @@ export enum BudgetCategory {
 
 export interface BudgetEntityProps extends BaseProps {
   name: string;
-  amount: number;
+  amount: CurrencyVO;
   userId: string;
   category: BudgetCategory;
   color: string;
@@ -19,29 +21,54 @@ export interface BudgetEntityProps extends BaseProps {
 
 export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
   public static create(
-    props: Omit<BudgetEntityProps, 'id'>,
+    props: OptionalProps<
+      Omit<BudgetEntityProps, 'id'>,
+      'createdAt' | 'updatedAt' | 'archivedAt'
+    >,
     id?: string,
   ): BudgetEntity {
-    // Business rule: Amount must be greater than 0
-    if (props.amount <= 0) {
-      throw new Error('Budget amount must be greater than 0');
+    if (props.amount.value <= 0) {
+      throw BudgetErrorFactory.budgetInvalidAmount();
     }
 
     return new BudgetEntity(
       {
         ...props,
+        archivedAt: props.archivedAt ?? null,
+        createdAt: props.createdAt ?? new Date(),
+        updatedAt: props.updatedAt ?? new Date(),
       },
       id,
     );
   }
 
-  public archive(): void {
-    this._props.archivedAt = new Date();
+  public get userId(): string {
+    return this.props.userId;
+  }
+
+  public get amount(): CurrencyVO {
+    return this.props.amount;
+  }
+
+  public get name(): string {
+    return this.props.name;
+  }
+
+  public update(
+    props: Omit<
+      Partial<BudgetEntityProps>,
+      'createdAt' | 'updatedAt' | 'userId' | 'amount'
+    >,
+  ): void {
+    this._props = {
+      ...this._props,
+      ...props,
+    };
     this.updated();
   }
 
-  public unarchive(): void {
-    this._props.archivedAt = null;
+  public archive(): void {
+    this._props.archivedAt = new Date();
     this.updated();
   }
 

@@ -1,48 +1,43 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { CurrentUser } from '@/common/decorators';
+import { AuthUser } from '@/common/types';
 import {
-  CreateBudgetUseCase,
-  CreateBudgetUseCaseInput,
-} from '../use-cases/create-budget.use-case';
-import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
-import { GetBudgetsWithSpendingUseCase } from '../use-cases/get-budgets-with-spending.use-case';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { AuthUser } from '@/common/index';
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
   ApiBearerAuth,
-  ApiQuery,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import {
-  BudgetResponseDto,
-  BudgetWithSpendingResponseDto,
-} from './dto/budget.dto';
-import { IsOptional, IsNumber, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { CreateBudgetUseCase } from '../use-cases/create-budget.use-case';
+import { GetBudgetDetailUseCase } from '../use-cases/get-budget-detail.use-case';
+import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
+import { SpendUseCase } from '../use-cases/spend.use-case';
+import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
+import { BudgetResponseDto } from './dto/budget.dto';
+import { CreateBudgetDto } from './dto/create-budget.dto';
+import { SpendDto } from './dto/spend.dto';
+import { TransactionResponseDto } from './dto/transaction.dto';
+import { UpdateBudgetDto } from './dto/update-budget.dto';
 
-class GetBudgetsWithSpendingQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  @Max(12)
-  month?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  year?: number;
-}
-
-@ApiTags('budgets')
+@ApiTags('Budgets')
 @ApiBearerAuth()
 @Controller('budgets')
 export class BudgetController {
   constructor(
     private readonly createBudgetUseCase: CreateBudgetUseCase,
     private readonly getBudgetsUseCase: GetBudgetsUseCase,
-    private readonly getBudgetsWithSpendingUseCase: GetBudgetsWithSpendingUseCase,
+    private readonly getBudgetDetailUseCase: GetBudgetDetailUseCase,
+    private readonly updateBudgetUseCase: UpdateBudgetUseCase,
+    private readonly spendUseCase: SpendUseCase,
   ) {}
 
   @Post()
@@ -54,65 +49,113 @@ export class BudgetController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async createBudget(@Body() createBudgetDto: CreateBudgetUseCaseInput) {
-    return this.createBudgetUseCase.execute(createBudgetDto);
+  @ApiResponse({
+    status: 409,
+    description: 'Budget with same name already exists for this month',
+  })
+  async createBudget(
+    @Body() createBudgetDto: CreateBudgetDto,
+  ): Promise<BudgetResponseDto> {
+    const budget = await this.createBudgetUseCase.execute(createBudgetDto);
+
+    return BudgetResponseDto.fromEntity(budget);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all budgets for the current user' })
+  @ApiOperation({ summary: 'Get all budgets for the current user in a month' })
   @ApiResponse({
     status: 200,
-    description: 'List of budgets',
+    description: 'List of budgets for the current user in a month',
     type: [BudgetResponseDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getBudgets(@CurrentUser() user: AuthUser) {
-    return (await this.getBudgetsUseCase.execute({ userId: user.id })).map(
-      (budget) => budget.toObject(),
-    );
+  async getBudgets(
+    @CurrentUser() user: AuthUser,
+    @Query('month') month: number,
+    @Query('year') year: number,
+  ): Promise<BudgetResponseDto[]> {
+    return (
+      await this.getBudgetsUseCase.execute({ userId: user.id, month, year })
+    ).map((budget) => BudgetResponseDto.fromEntity(budget));
   }
 
-  @Get('with-spending')
-  @ApiOperation({
-    summary: 'Get budgets with spending analytics for the current user',
-    description:
-      'Retrieves budgets enriched with spending data including total spent, transaction count, remaining amount, and spending percentage',
-  })
-  @ApiQuery({
-    name: 'month',
-    required: false,
-    description: 'Month (1-12). Defaults to current month',
-    example: 7,
-    type: Number,
-  })
-  @ApiQuery({
-    name: 'year',
-    required: false,
-    description: 'Year. Defaults to current year',
-    example: 2023,
-    type: Number,
-  })
+  @Get(':id')
+  @ApiOperation({ summary: 'Get budget detail by ID' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
   @ApiResponse({
     status: 200,
-    description: 'List of budgets with spending analytics',
-    type: [BudgetWithSpendingResponseDto],
+    description: 'Budget detail retrieved successfully',
+    type: BudgetResponseDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - invalid month or year',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getBudgetsWithSpending(
+  @ApiResponse({ status: 400, description: 'Invalid budget ID format' })
+  @ApiResponse({ status: 401, description: 'User not authenticated' })
+  @ApiResponse({ status: 403, description: 'Access denied to budget' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async getBudgetDetail(
+    @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: AuthUser,
-    @Query() query: GetBudgetsWithSpendingQueryDto,
-  ) {
-    const budgetsWithSpending =
-      await this.getBudgetsWithSpendingUseCase.execute({
-        userId: user.id,
-        month: query.month,
-        year: query.year,
-      });
+  ): Promise<BudgetResponseDto> {
+    const budget = await this.getBudgetDetailUseCase.execute({
+      id,
+      userId: user.id,
+    });
 
-    return budgetsWithSpending.map((projection) => projection.toObject());
+    return BudgetResponseDto.fromEntity(budget, true);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a budget' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Budget updated successfully',
+    type: BudgetResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async updateBudget(
+    @Param('id') id: string,
+    @Body() updateBudgetDto: UpdateBudgetDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<BudgetResponseDto> {
+    const updatedBudget = await this.updateBudgetUseCase.execute({
+      id,
+      props: {
+        name: updateBudgetDto.name,
+        category: updateBudgetDto.category,
+        color: updateBudgetDto.color,
+        icon: updateBudgetDto.icon,
+        userId: user.id,
+      },
+    });
+
+    return BudgetResponseDto.fromEntity(updatedBudget);
+  }
+
+  @Post(':id/spend')
+  @ApiOperation({ summary: 'Record spending for a budget' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiResponse({
+    status: 201,
+    description: 'Spending recorded successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async spend(
+    @Param('id') id: string,
+    @Body() spendDto: SpendDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.spendUseCase.execute({
+      budgetId: id,
+      userId: user.id,
+      amount: spendDto.amount,
+      name: spendDto.name,
+      description: spendDto.description,
+      recurring: spendDto.recurring,
+    });
   }
 }

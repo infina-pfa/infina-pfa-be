@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserRepository } from '../domain/repositories/user.repository';
+import { BaseUseCase } from '@/common/base/use-case/base.use-case';
+import { Injectable } from '@nestjs/common';
 import { UserEntity } from '../domain/entities/user.entity';
-import { BaseUseCase } from '@/common/use-case/base.use-case';
+import { UserErrorFactory } from '../domain/errors';
+import { UserRepository } from '../domain/repositories/user.repository';
 
 @Injectable()
 export class GetUserProfileUseCase extends BaseUseCase<string, UserEntity> {
@@ -13,7 +14,7 @@ export class GetUserProfileUseCase extends BaseUseCase<string, UserEntity> {
     const user = await this.userRepository.findOne({ userId });
 
     if (!user) {
-      throw new NotFoundException('User profile not found');
+      throw UserErrorFactory.userProfileNotFound();
     }
 
     return user;

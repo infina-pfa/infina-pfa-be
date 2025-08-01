@@ -59,3 +59,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .claude
 .claude/*
+
+test/coverage
