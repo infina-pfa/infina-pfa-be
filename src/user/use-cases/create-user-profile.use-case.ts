@@ -1,9 +1,10 @@
-import { Injectable, ConflictException } from '@nestjs/common';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
-import { UserEntity } from '../domain/entities/user.entity';
-import { UserRepository } from '../domain/repositories/user.repository';
-import { CreateUserProfileDto } from '../controllers/dto/create-user-profile.dto';
 import { Currency, Language } from '@/common/types/user';
+import { Injectable } from '@nestjs/common';
+import { CreateUserProfileDto } from '../controllers/dto/create-user-profile.dto';
+import { UserEntity } from '../domain/entities/user.entity';
+import { UserErrorFactory } from '../domain/errors';
+import { UserRepository } from '../domain/repositories/user.repository';
 
 export interface CreateUserProfileInput {
   userId: string;
@@ -25,7 +26,7 @@ export class CreateUserProfileUseCase extends BaseUseCase<
     // Check if user profile already exists
     const existingUser = await this.userRepository.findOne({ userId });
     if (existingUser) {
-      throw new ConflictException('User profile already exists');
+      throw UserErrorFactory.userProfileAlreadyExists();
     }
 
     // Create new user profile with defaults

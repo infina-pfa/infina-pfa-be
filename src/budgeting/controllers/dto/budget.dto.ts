@@ -1,6 +1,7 @@
 import { BudgetAggregate, BudgetCategory } from '@/budgeting/domain';
 import { BaseDto } from '@/common/base';
 import { ApiProperty } from '@nestjs/swagger';
+import { TransactionResponseDto } from './transaction.dto';
 
 export class BudgetResponseDto extends BaseDto {
   @ApiProperty({
@@ -70,14 +71,30 @@ export class BudgetResponseDto extends BaseDto {
   })
   spent: number;
 
-  public static fromEntity(entity: BudgetAggregate): BudgetResponseDto {
+  @ApiProperty({
+    description: 'List of transactions for this budget',
+    type: [TransactionResponseDto],
+    required: false,
+  })
+  transactions?: TransactionResponseDto[];
+
+  public static fromEntity(
+    entity: BudgetAggregate,
+    includeTransactions = false,
+  ): BudgetResponseDto {
     const { budget } = entity;
-    return {
+    const dto: BudgetResponseDto = {
       ...budget.props,
       id: budget.id,
       amount: budget.amount.value,
       spent: entity.spent.value,
       userId: budget.userId,
     };
+
+    if (includeTransactions) {
+      dto.transactions = TransactionResponseDto.fromEntity(entity);
+    }
+
+    return dto;
   }
 }

@@ -1,5 +1,6 @@
 import { Currency } from '@/common/types/user';
 import { BaseValueObject } from './base.value-object';
+import { CommonErrorFactory } from '@/common/errors';
 
 interface CurrencyProps {
   value: number;
@@ -21,14 +22,14 @@ export class CurrencyVO extends BaseValueObject<CurrencyProps> {
 
   public add(other: CurrencyVO): CurrencyVO {
     if (this.currency !== other.currency) {
-      throw new Error('Currencies must match');
+      throw CommonErrorFactory.currencyMismatch();
     }
     return new CurrencyVO(this.value + other.value, this.currency);
   }
 
   public subtract(other: CurrencyVO): CurrencyVO {
     if (this.currency !== other.currency) {
-      throw new Error('Currencies must match');
+      throw CommonErrorFactory.currencyMismatch();
     }
     return new CurrencyVO(this.value - other.value, this.currency);
   }

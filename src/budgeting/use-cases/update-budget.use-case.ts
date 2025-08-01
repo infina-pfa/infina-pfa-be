@@ -1,9 +1,10 @@
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   BudgetAggregate,
   BudgetAggregateRepository,
   BudgetEntityProps,
+  BudgetErrorFactory,
 } from '../domain';
 
 type UpdateBudgetUseCaseInput = {
@@ -28,7 +29,7 @@ export class UpdateBudgetUseCase extends BaseUseCase<
     );
 
     if (!budgetAggregate) {
-      throw new NotFoundException('Budget not found');
+      throw BudgetErrorFactory.budgetNotFound();
     }
 
     budgetAggregate.budget.update(input.props);

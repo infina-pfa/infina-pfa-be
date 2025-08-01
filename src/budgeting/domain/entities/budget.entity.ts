@@ -1,5 +1,6 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
+import { BudgetErrorFactory } from '../errors';
 
 export enum BudgetCategory {
   FIXED = 'fixed',
@@ -27,7 +28,7 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     id?: string,
   ): BudgetEntity {
     if (props.amount.value <= 0) {
-      throw new Error('Budget amount must be greater than 0');
+      throw BudgetErrorFactory.budgetInvalidAmount();
     }
 
     return new BudgetEntity(

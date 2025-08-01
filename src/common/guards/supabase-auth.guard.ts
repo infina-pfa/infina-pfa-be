@@ -1,13 +1,9 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { CommonErrorFactory } from '../errors';
 
 // Extend the Request interface to include the user property
 interface AuthenticatedRequest extends Request {
@@ -39,20 +35,20 @@ export class SupabaseAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('No token provided');
+      throw CommonErrorFactory.unauthorizedNoToken();
     }
 
     const { data, error } = await this.supabase.auth.getUser(token);
 
     if (error) {
       console.error('Error fetching user:', error.message);
-      throw new UnauthorizedException('Invalid token');
+      throw CommonErrorFactory.unauthorizedInvalidToken();
     }
 
     const user = data?.user;
 
     if (!user) {
-      throw new UnauthorizedException('Invalid token');
+      throw CommonErrorFactory.unauthorizedInvalidToken();
     }
 
     request.user = user;
