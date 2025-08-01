@@ -32,6 +32,16 @@ export class UpdateBudgetUseCase extends BaseUseCase<
       throw BudgetErrorFactory.budgetNotFound();
     }
 
+    // Check if the budget belongs to the user
+    if (budgetAggregate.userId !== input.props.userId) {
+      throw BudgetErrorFactory.budgetNotFound();
+    }
+
+    // Check if budget is archived
+    if (budgetAggregate.budget.isArchived()) {
+      throw BudgetErrorFactory.budgetNotFound();
+    }
+
     budgetAggregate.budget.update(input.props);
 
     await this.budgetAggregateRepository.save(budgetAggregate);

@@ -115,17 +115,25 @@ export class BudgetController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async updateBudget(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateBudgetDto: UpdateBudgetDto,
     @CurrentUser() user: AuthUser,
   ): Promise<BudgetResponseDto> {
     const updatedBudget = await this.updateBudgetUseCase.execute({
       id,
       props: {
-        name: updateBudgetDto.name,
-        category: updateBudgetDto.category,
-        color: updateBudgetDto.color,
-        icon: updateBudgetDto.icon,
+        ...(updateBudgetDto.name !== undefined && {
+          name: updateBudgetDto.name,
+        }),
+        ...(updateBudgetDto.category !== undefined && {
+          category: updateBudgetDto.category,
+        }),
+        ...(updateBudgetDto.color !== undefined && {
+          color: updateBudgetDto.color,
+        }),
+        ...(updateBudgetDto.icon !== undefined && {
+          icon: updateBudgetDto.icon,
+        }),
         userId: user.id,
       },
     });
