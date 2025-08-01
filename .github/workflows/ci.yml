@@ -22,12 +22,12 @@ on:
         description: 'Environment to run tests against'
         required: false
         type: string
-        default: 'development'
+        default: 'staging'
 
 jobs:
   e2e-testing:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment || github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || (github.ref == 'refs/heads/staging' && 'staging' || 'development')) }}
+    environment: ${{ inputs.environment || github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || (github.ref == 'refs/heads/staging' && 'staging' || 'staging')) }}
 
     steps:
       - name: Checkout code
