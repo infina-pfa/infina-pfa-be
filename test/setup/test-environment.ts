@@ -9,19 +9,19 @@ export const testConfig = {
   // Database configuration for tests
   database: {
     url:
-      process.env.DATABASE_URL ||
+      process.env.E2E_TEST_DATABASE_URL ||
       'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
   },
 
   // Supabase configuration for tests (using local Supabase instance)
   supabase: {
-    url: process.env.SUPABASE_URL || 'http://127.0.0.1:54321',
+    url: process.env.E2E_TEST_SUPABASE_URL || 'http://127.0.0.1:54321',
     anonKey:
-      process.env.SUPABASE_ANON_KEY ||
+      process.env.E2E_TEST_SUPABASE_ANON_KEY ||
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
     // Service role key for admin operations in tests (if needed)
     serviceRoleKey:
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.E2E_TEST_SUPABASE_SERVICE_ROLE_KEY ||
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU',
   },
 
@@ -43,7 +43,11 @@ export const testConfig = {
  * Environment validation for tests
  */
 export const validateTestEnvironment = (): void => {
-  const requiredEnvVars = ['DATABASE_URL', 'SUPABASE_URL', 'SUPABASE_ANON_KEY'];
+  const requiredEnvVars = [
+    'E2E_TEST_DATABASE_URL',
+    'E2E_TEST_SUPABASE_URL',
+    'E2E_TEST_SUPABASE_ANON_KEY',
+  ];
 
   const missingVars = requiredEnvVars.filter(
     (varName) => !process.env[varName],
@@ -69,17 +73,17 @@ export const setupTestEnvironment = (): void => {
   }
 
   // Set default test database URL if not provided
-  if (!process.env.DATABASE_URL) {
-    process.env.DATABASE_URL = testConfig.database.url;
+  if (!process.env.E2E_TEST_DATABASE_URL) {
+    process.env.E2E_TEST_DATABASE_URL = testConfig.database.url;
   }
 
   // Set default Supabase configuration if not provided
-  if (!process.env.SUPABASE_URL) {
-    process.env.SUPABASE_URL = testConfig.supabase.url;
+  if (!process.env.E2E_TEST_SUPABASE_URL) {
+    process.env.E2E_TEST_SUPABASE_URL = testConfig.supabase.url;
   }
 
-  if (!process.env.SUPABASE_ANON_KEY) {
-    process.env.SUPABASE_ANON_KEY = testConfig.supabase.anonKey;
+  if (!process.env.E2E_TEST_SUPABASE_ANON_KEY) {
+    process.env.E2E_TEST_SUPABASE_ANON_KEY = testConfig.supabase.anonKey;
   }
 
   validateTestEnvironment();
