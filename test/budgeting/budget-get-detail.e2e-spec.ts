@@ -1,16 +1,15 @@
+import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { MockGuard } from '../mocks/guard.mock';
 import { PrismaClient } from '../../generated/prisma';
+import { AppModule } from '../../src/app.module';
 import { BudgetResponseDto } from '../../src/budgeting/controllers/dto/budget.dto';
 import { BudgetCategory } from '../../src/budgeting/domain';
-import { TransactionResponseDto } from '../../src/budgeting/controllers/dto/transaction.dto';
 import { TransactionType } from '../../src/budgeting/domain/entities/transactions.entity';
+import { MockGuard } from '../mocks/guard.mock';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
 
 describe('Budget GET DETAIL Endpoint (e2e)', () => {
   let app: INestApplication;
