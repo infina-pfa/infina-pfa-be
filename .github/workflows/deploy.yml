@@ -55,11 +55,44 @@ jobs:
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
+            # Install Docker if not installed
+            if ! command -v docker &> /dev/null; then
+              echo "Installing Docker..."
+              sudo apt update
+              sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+              sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+              sudo apt update
+              sudo apt install -y docker-ce
+              sudo usermod -aG docker $USER
+            fi
+
+            # Install Docker Compose if not installed
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Installing Docker Compose..."
+              sudo curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+
+            # Install doctl if not installed
+            if ! command -v doctl &> /dev/null; then
+              echo "Installing doctl..."
+              cd ~
+              wget https://github.com/digitalocean/doctl/releases/download/v1.101.0/doctl-1.101.0-linux-amd64.tar.gz
+              tar xf doctl-1.101.0-linux-amd64.tar.gz
+              sudo mv doctl /usr/local/bin
+              rm doctl-1.101.0-linux-amd64.tar.gz
+              
+              # Configure doctl with API token
+              doctl auth init -t ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+            fi
+
             # Login to DO Container Registry
             doctl registry login
 
             # Create deployment directory if it doesn't exist
-            mkdir -p /opt/infina-pfa-be/${{ github.environment }}
+            sudo mkdir -p /opt/infina-pfa-be/${{ github.environment }}
+            sudo chown -R $(whoami):$(whoami) /opt/infina-pfa-be
             cd /opt/infina-pfa-be/${{ github.environment }}
 
             # Create or update docker-compose.yml
@@ -85,11 +118,11 @@ jobs:
             EOL
 
             # Pull the latest image
-            docker-compose pull
+            sudo docker-compose pull
 
             # Restart services
-            docker-compose down
-            docker-compose up -d
+            sudo docker-compose down
+            sudo docker-compose up -d
 
             # Clean up
-            docker system prune -af
+            sudo docker system prune -af
