@@ -46,10 +46,6 @@ jobs:
         run: |
           cat > .env << 'EOL'
           ${{ secrets.APP_ENV }}
-          SUPABASE_URL=${{ secrets.E2E_TEST_SUPABASE_URL }}
-          SUPABASE_ANON_KEY=${{ secrets.E2E_TEST_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.E2E_TEST_SUPABASE_SERVICE_ROLE_KEY }}
-          DATABASE_URL=${{ secrets.E2E_TEST_DATABASE_URL }}
           EOL
 
       - name: Generate Prisma client
