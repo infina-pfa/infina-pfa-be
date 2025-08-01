@@ -1,6 +1,6 @@
 import { BudgetCategory } from '@/budgeting/domain';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateBudgetDto {
   @ApiProperty({
@@ -8,19 +8,10 @@ export class UpdateBudgetDto {
     example: 'Groceries',
     required: false,
   })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   name?: string;
-
-  @ApiProperty({
-    description: 'Budget amount',
-    example: 500,
-    required: false,
-    minimum: 0.01,
-  })
-  @IsNumber()
-  @Min(0.01, { message: 'Budget amount must be greater than 0' })
-  amount?: number;
 
   @ApiProperty({
     description: 'Budget category',
@@ -28,6 +19,7 @@ export class UpdateBudgetDto {
     example: BudgetCategory.FIXED,
     required: false,
   })
+  @IsOptional()
   @IsEnum(BudgetCategory)
   category?: BudgetCategory;
 
@@ -36,6 +28,7 @@ export class UpdateBudgetDto {
     example: '#FF5733',
     required: false,
   })
+  @IsOptional()
   @IsString()
   color?: string;
 
@@ -44,6 +37,7 @@ export class UpdateBudgetDto {
     example: 'shopping-cart',
     required: false,
   })
+  @IsOptional()
   @IsString()
   icon?: string;
 }
