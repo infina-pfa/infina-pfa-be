@@ -1,7 +1,7 @@
-import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { CurrencyVO } from '@/common/base';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { BudgetAggregateRepository } from '../domain';
+import { BaseUseCase } from '@/common/base/use-case/base.use-case';
+import { Injectable } from '@nestjs/common';
+import { BudgetAggregateRepository, BudgetErrorFactory } from '../domain';
 
 type SpendUseCaseInput = {
   budgetId: string;
@@ -26,7 +26,7 @@ export class SpendUseCase extends BaseUseCase<SpendUseCaseInput, void> {
     );
 
     if (!budgetAggregate) {
-      throw new NotFoundException('Budget not found');
+      throw BudgetErrorFactory.budgetNotFound();
     }
 
     budgetAggregate.spend({
