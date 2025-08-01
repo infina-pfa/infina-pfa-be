@@ -55,40 +55,36 @@ jobs:
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            # Install Docker if not installed
+            # Install Docker using Digital Ocean's recommended method
             if ! command -v docker &> /dev/null; then
-              echo "Installing Docker..."
-              sudo apt update
-              sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-              sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-              sudo apt update
-              sudo apt install -y docker-ce
+              echo "Installing Docker using official script..."
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sudo sh get-docker.sh
               sudo usermod -aG docker $USER
+              sudo systemctl enable docker
+              sudo systemctl start docker
             fi
 
-            # Install Docker Compose if not installed
+            # Install Docker Compose
             if ! command -v docker-compose &> /dev/null; then
               echo "Installing Docker Compose..."
-              sudo curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
+              DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+              mkdir -p $DOCKER_CONFIG/cli-plugins
+              curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+              chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+              sudo ln -sf $DOCKER_CONFIG/cli-plugins/docker-compose /usr/local/bin/docker-compose
             fi
 
-            # Install doctl if not installed
+            # Install doctl
             if ! command -v doctl &> /dev/null; then
               echo "Installing doctl..."
               cd ~
-              wget https://github.com/digitalocean/doctl/releases/download/v1.101.0/doctl-1.101.0-linux-amd64.tar.gz
-              tar xf doctl-1.101.0-linux-amd64.tar.gz
-              sudo mv doctl /usr/local/bin
-              rm doctl-1.101.0-linux-amd64.tar.gz
+              curl -sL https://github.com/digitalocean/doctl/releases/download/v1.101.0/doctl-1.101.0-linux-amd64.tar.gz | tar -xzv
+              sudo mv ~/doctl /usr/local/bin
               
               # Configure doctl with API token
-              doctl auth init -t ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+              echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | doctl auth init --access-token
             fi
-
-            # Login to DO Container Registry
-            doctl registry login
 
             # Create deployment directory if it doesn't exist
             sudo mkdir -p /opt/infina-pfa-be/${{ github.environment }}
@@ -117,12 +113,16 @@ jobs:
             ${{ secrets.APP_ENV }}
             EOL
 
+            # Login to DO Container Registry
+            echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | doctl auth init --access-token
+            doctl registry login --expiry-seconds 3600
+
             # Pull the latest image
-            sudo docker-compose pull
+            docker-compose pull
 
             # Restart services
-            sudo docker-compose down
-            sudo docker-compose up -d
+            docker-compose down
+            docker-compose up -d
 
             # Clean up
-            sudo docker system prune -af
+            docker system prune -af
