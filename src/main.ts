@@ -7,10 +7,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
-import { loadEnvFile } from 'process';
 import { ValidationPipe } from '@nestjs/common';
-
-loadEnvFile('.env');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
