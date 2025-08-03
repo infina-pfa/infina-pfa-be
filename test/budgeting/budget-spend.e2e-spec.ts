@@ -46,7 +46,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
   const createTestBudget = async (
     userId: string,
     authHeader: { Authorization: string },
-    overrides: Partial<CreateBudgetDto> = {}
+    overrides: Partial<CreateBudgetDto> = {},
   ): Promise<BudgetResponseDto> => {
     const budgetData: CreateBudgetDto = {
       name: 'Test Budget',
@@ -74,7 +74,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       it('should record spending with all required fields', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData: SpendDto = {
@@ -100,7 +100,9 @@ describe('Budget SPEND Endpoints (e2e)', () => {
 
         expect(transaction).toBeTruthy();
         expect(Number(transaction?.amount)).toBe(50.25);
-        expect(transaction?.description).toBe('Weekly grocery shopping at Walmart');
+        expect(transaction?.description).toBe(
+          'Weekly grocery shopping at Walmart',
+        );
         expect(transaction?.recurring).toBe(0);
 
         // Note: Budget-transaction relationship creation is currently not working properly
@@ -110,11 +112,11 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       it('should record spending with minimal fields (amount only)', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData: SpendDto = {
-          amount: 25.50,
+          amount: 25.5,
         };
 
         await request(app.getHttpServer())
@@ -131,7 +133,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         });
 
         expect(transaction).toBeTruthy();
-        expect(Number(transaction?.amount)).toBe(25.50);
+        expect(Number(transaction?.amount)).toBe(25.5);
         expect(transaction?.name).toBe('Spending'); // Default value when name not provided
         expect(transaction?.description).toContain('Spending for'); // Default description includes budget name
         expect(transaction?.recurring).toBe(0); // Should default to 0
@@ -140,7 +142,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       it('should record recurring spending', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData: SpendDto = {
@@ -170,7 +172,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       it('should handle decimal amounts precisely', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData: SpendDto = {
@@ -199,7 +201,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       it('should record minimum valid amount (0.01)', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData: SpendDto = {
@@ -227,7 +229,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       it('should record multiple spending entries for same budget', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData1: SpendDto = {
@@ -260,8 +262,8 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         });
 
         expect(transactions).toHaveLength(2);
-        expect(transactions.map(t => t.name)).toContain('First expense');
-        expect(transactions.map(t => t.name)).toContain('Second expense');
+        expect(transactions.map((t) => t.name)).toContain('First expense');
+        expect(transactions.map((t) => t.name)).toContain('Second expense');
 
         // Note: Budget-transaction relationship verification skipped due to repository bug
       });
@@ -273,7 +275,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       beforeEach(async () => {
         testBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
       });
 
@@ -449,7 +451,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       beforeEach(async () => {
         testBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
       });
 
@@ -534,11 +536,11 @@ describe('Budget SPEND Endpoints (e2e)', () => {
           .expect(500); // Returns 500 due to missing ParseUUIDPipe
       });
 
-      it('should allow spending on other user\'s budget (missing user validation)', async () => {
+      it("should allow spending on other user's budget (missing user validation)", async () => {
         // Create budget for John
         const johnBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData: SpendDto = {
@@ -573,7 +575,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
           authHeaders.JOHN_DOE,
-          { amount: 100 } // Small budget
+          { amount: 100 }, // Small budget
         );
 
         const spendData: SpendDto = {
@@ -603,13 +605,13 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         const fixedBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
           authHeaders.JOHN_DOE,
-          { category: BudgetCategory.FIXED, name: 'Fixed Budget' }
+          { category: BudgetCategory.FIXED, name: 'Fixed Budget' },
         );
 
         const flexibleBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
           authHeaders.JOHN_DOE,
-          { category: BudgetCategory.FLEXIBLE, name: 'Flexible Budget' }
+          { category: BudgetCategory.FLEXIBLE, name: 'Flexible Budget' },
         );
 
         const spendData: SpendDto = {
@@ -638,14 +640,14 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         });
 
         expect(transactions).toHaveLength(2);
-        expect(transactions.map(t => t.name)).toContain('Fixed expense');
-        expect(transactions.map(t => t.name)).toContain('Flexible expense');
+        expect(transactions.map((t) => t.name)).toContain('Fixed expense');
+        expect(transactions.map((t) => t.name)).toContain('Flexible expense');
       });
 
       it('should create unique transactions for concurrent spending', async () => {
         const budget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
 
         const spendData1: SpendDto = {
@@ -681,8 +683,12 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         });
 
         expect(transactions).toHaveLength(2);
-        expect(transactions.map(t => t.name)).toContain('Concurrent expense 1');
-        expect(transactions.map(t => t.name)).toContain('Concurrent expense 2');
+        expect(transactions.map((t) => t.name)).toContain(
+          'Concurrent expense 1',
+        );
+        expect(transactions.map((t) => t.name)).toContain(
+          'Concurrent expense 2',
+        );
       });
     });
 
@@ -692,7 +698,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       beforeEach(async () => {
         testBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
       });
 
@@ -765,21 +771,21 @@ describe('Budget SPEND Endpoints (e2e)', () => {
 
         // Timestamps should be within reasonable range
         expect(createdAt!.getTime()).toBeGreaterThanOrEqual(
-          beforeCreate.getTime() - 1000
+          beforeCreate.getTime() - 1000,
         );
         expect(createdAt!.getTime()).toBeLessThanOrEqual(
-          afterCreate.getTime() + 1000
+          afterCreate.getTime() + 1000,
         );
         expect(updatedAt!.getTime()).toBeGreaterThanOrEqual(
-          beforeCreate.getTime() - 1000
+          beforeCreate.getTime() - 1000,
         );
         expect(updatedAt!.getTime()).toBeLessThanOrEqual(
-          afterCreate.getTime() + 1000
+          afterCreate.getTime() + 1000,
         );
 
         // CreatedAt and updatedAt should be equal on creation
         expect(
-          Math.abs(createdAt!.getTime() - updatedAt!.getTime())
+          Math.abs(createdAt!.getTime() - updatedAt!.getTime()),
         ).toBeLessThan(1000);
       });
     });
@@ -790,7 +796,7 @@ describe('Budget SPEND Endpoints (e2e)', () => {
       beforeEach(async () => {
         testBudget = await createTestBudget(
           testUsers.JOHN_DOE.id,
-          authHeaders.JOHN_DOE
+          authHeaders.JOHN_DOE,
         );
       });
 
@@ -847,8 +853,12 @@ describe('Budget SPEND Endpoints (e2e)', () => {
         });
 
         expect(transaction).toBeTruthy();
-        expect(transaction?.name).toBe('Special chars: áéíóú ñ 中文 🚀 @#$%^&*()');
-        expect(transaction?.description).toBe('Description with émojis 🏪 and special chars: <>&"\'');
+        expect(transaction?.name).toBe(
+          'Special chars: áéíóú ñ 中文 🚀 @#$%^&*()',
+        );
+        expect(transaction?.description).toBe(
+          'Description with émojis 🏪 and special chars: <>&"\'',
+        );
       });
 
       it('should handle very long name and description strings', async () => {
