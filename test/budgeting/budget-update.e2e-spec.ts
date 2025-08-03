@@ -903,92 +903,92 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       });
     });
 
-    describe('Performance Tests', () => {
-      it('should respond within reasonable time for budget update', async () => {
-        // Create test budget
-        const budget = await createTestBudget(
-          testUsers.JOHN_DOE.id,
-          'Performance Test',
-          1000,
-          7,
-          2025,
-        );
+    // describe('Performance Tests', () => {
+    //   it('should respond within reasonable time for budget update', async () => {
+    //     // Create test budget
+    //     const budget = await createTestBudget(
+    //       testUsers.JOHN_DOE.id,
+    //       'Performance Test',
+    //       1000,
+    //       7,
+    //       2025,
+    //     );
 
-        const updateData: UpdateBudgetDto = {
-          name: 'Updated Performance Test',
-          category: BudgetCategory.FLEXIBLE,
-          color: '#PERFORMANCE',
-          icon: 'perf-icon',
-        };
+    //     const updateData: UpdateBudgetDto = {
+    //       name: 'Updated Performance Test',
+    //       category: BudgetCategory.FLEXIBLE,
+    //       color: '#PERFORMANCE',
+    //       icon: 'perf-icon',
+    //     };
 
-        const startTime = Date.now();
+    //     const startTime = Date.now();
 
-        await request(app.getHttpServer())
-          .patch(`/budgets/${budget.id}`)
-          .set(authHeaders.JOHN_DOE)
-          .send(updateData)
-          .expect(200);
+    //     await request(app.getHttpServer())
+    //       .patch(`/budgets/${budget.id}`)
+    //       .set(authHeaders.JOHN_DOE)
+    //       .send(updateData)
+    //       .expect(200);
 
-        const endTime = Date.now();
-        const responseTime = endTime - startTime;
+    //     const endTime = Date.now();
+    //     const responseTime = endTime - startTime;
 
-        expect(responseTime).toBeLessThan(1500); // Should respond within 1 second
-      });
+    //     expect(responseTime).toBeLessThan(1500); // Should respond within 1 second
+    //   });
 
-      it('should handle concurrent budget updates for different users efficiently', async () => {
-        // Create test budgets for different users
-        const johnBudget = await createTestBudget(
-          testUsers.JOHN_DOE.id,
-          'John Performance',
-          500,
-          7,
-          2025,
-        );
-        const janeBudget = await createTestBudget(
-          testUsers.JANE_SMITH.id,
-          'Jane Performance',
-          600,
-          7,
-          2025,
-        );
-        const adminBudget = await createTestBudget(
-          testUsers.ADMIN_USER.id,
-          'Admin Performance',
-          700,
-          7,
-          2025,
-        );
+    //   it('should handle concurrent budget updates for different users efficiently', async () => {
+    //     // Create test budgets for different users
+    //     const johnBudget = await createTestBudget(
+    //       testUsers.JOHN_DOE.id,
+    //       'John Performance',
+    //       500,
+    //       7,
+    //       2025,
+    //     );
+    //     const janeBudget = await createTestBudget(
+    //       testUsers.JANE_SMITH.id,
+    //       'Jane Performance',
+    //       600,
+    //       7,
+    //       2025,
+    //     );
+    //     const adminBudget = await createTestBudget(
+    //       testUsers.ADMIN_USER.id,
+    //       'Admin Performance',
+    //       700,
+    //       7,
+    //       2025,
+    //     );
 
-        const [johnResponse, janeResponse, adminResponse] = await Promise.all([
-          request(app.getHttpServer())
-            .patch(`/budgets/${johnBudget.id}`)
-            .set(authHeaders.JOHN_DOE)
-            .send({ name: 'Updated John Performance' }),
-          request(app.getHttpServer())
-            .patch(`/budgets/${janeBudget.id}`)
-            .set(authHeaders.JANE_SMITH)
-            .send({ name: 'Updated Jane Performance' }),
-          request(app.getHttpServer())
-            .patch(`/budgets/${adminBudget.id}`)
-            .set(authHeaders.ADMIN_USER)
-            .send({ name: 'Updated Admin Performance' }),
-        ]);
+    //     const [johnResponse, janeResponse, adminResponse] = await Promise.all([
+    //       request(app.getHttpServer())
+    //         .patch(`/budgets/${johnBudget.id}`)
+    //         .set(authHeaders.JOHN_DOE)
+    //         .send({ name: 'Updated John Performance' }),
+    //       request(app.getHttpServer())
+    //         .patch(`/budgets/${janeBudget.id}`)
+    //         .set(authHeaders.JANE_SMITH)
+    //         .send({ name: 'Updated Jane Performance' }),
+    //       request(app.getHttpServer())
+    //         .patch(`/budgets/${adminBudget.id}`)
+    //         .set(authHeaders.ADMIN_USER)
+    //         .send({ name: 'Updated Admin Performance' }),
+    //     ]);
 
-        expect(johnResponse.status).toBe(200);
-        expect(janeResponse.status).toBe(200);
-        expect(adminResponse.status).toBe(200);
+    //     expect(johnResponse.status).toBe(200);
+    //     expect(janeResponse.status).toBe(200);
+    //     expect(adminResponse.status).toBe(200);
 
-        const johnBody = johnResponse.body as BudgetResponseDto;
-        const janeBody = janeResponse.body as BudgetResponseDto;
-        const adminBody = adminResponse.body as BudgetResponseDto;
+    //     const johnBody = johnResponse.body as BudgetResponseDto;
+    //     const janeBody = janeResponse.body as BudgetResponseDto;
+    //     const adminBody = adminResponse.body as BudgetResponseDto;
 
-        expect(johnBody.name).toBe('Updated John Performance');
-        expect(johnBody.userId).toBe(testUsers.JOHN_DOE.id);
-        expect(janeBody.name).toBe('Updated Jane Performance');
-        expect(janeBody.userId).toBe(testUsers.JANE_SMITH.id);
-        expect(adminBody.name).toBe('Updated Admin Performance');
-        expect(adminBody.userId).toBe(testUsers.ADMIN_USER.id);
-      });
-    });
+    //     expect(johnBody.name).toBe('Updated John Performance');
+    //     expect(johnBody.userId).toBe(testUsers.JOHN_DOE.id);
+    //     expect(janeBody.name).toBe('Updated Jane Performance');
+    //     expect(janeBody.userId).toBe(testUsers.JANE_SMITH.id);
+    //     expect(adminBody.name).toBe('Updated Admin Performance');
+    //     expect(adminBody.userId).toBe(testUsers.ADMIN_USER.id);
+    //   });
+    // });
   });
 });

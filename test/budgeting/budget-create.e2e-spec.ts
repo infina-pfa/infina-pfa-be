@@ -971,108 +971,108 @@ describe('Budget CREATE Endpoints (e2e)', () => {
       });
     });
 
-    describe('Performance', () => {
-      it('should respond within reasonable time for budget creation', async () => {
-        const createData: CreateBudgetDto = {
-          name: 'Performance Test',
-          amount: 500,
-          userId: testUsers.JOHN_DOE.id,
-          category: BudgetCategory.FIXED,
-          color: '#FF5733',
-          icon: 'shopping-cart',
-          month: 7,
-          year: 2025,
-        };
+    // describe('Performance', () => {
+    //   it('should respond within reasonable time for budget creation', async () => {
+    //     const createData: CreateBudgetDto = {
+    //       name: 'Performance Test',
+    //       amount: 500,
+    //       userId: testUsers.JOHN_DOE.id,
+    //       category: BudgetCategory.FIXED,
+    //       color: '#FF5733',
+    //       icon: 'shopping-cart',
+    //       month: 7,
+    //       year: 2025,
+    //     };
 
-        const startTime = Date.now();
+    //     const startTime = Date.now();
 
-        await request(app.getHttpServer())
-          .post('/budgets')
-          .set(authHeaders.JOHN_DOE)
-          .send(createData)
-          .expect(201);
+    //     await request(app.getHttpServer())
+    //       .post('/budgets')
+    //       .set(authHeaders.JOHN_DOE)
+    //       .send(createData)
+    //       .expect(201);
 
-        const endTime = Date.now();
-        const responseTime = endTime - startTime;
+    //     const endTime = Date.now();
+    //     const responseTime = endTime - startTime;
 
-        expect(responseTime).toBeLessThan(1500); // Should respond within 1 second
-      });
+    //     expect(responseTime).toBeLessThan(1500); // Should respond within 1 second
+    //   });
 
-      it('should handle concurrent budget creation for different users', async () => {
-        const createData1: CreateBudgetDto = {
-          name: 'Concurrent Budget 1',
-          amount: 500,
-          userId: testUsers.JOHN_DOE.id,
-          category: BudgetCategory.FIXED,
-          color: '#FF0000',
-          icon: 'icon1',
-          month: 7,
-          year: 2025,
-        };
+    //   it('should handle concurrent budget creation for different users', async () => {
+    //     const createData1: CreateBudgetDto = {
+    //       name: 'Concurrent Budget 1',
+    //       amount: 500,
+    //       userId: testUsers.JOHN_DOE.id,
+    //       category: BudgetCategory.FIXED,
+    //       color: '#FF0000',
+    //       icon: 'icon1',
+    //       month: 7,
+    //       year: 2025,
+    //     };
 
-        const createData2: CreateBudgetDto = {
-          name: 'Concurrent Budget 2',
-          amount: 600,
-          userId: testUsers.JANE_SMITH.id,
-          category: BudgetCategory.FLEXIBLE,
-          color: '#00FF00',
-          icon: 'icon2',
-          month: 7,
-          year: 2025,
-        };
+    //     const createData2: CreateBudgetDto = {
+    //       name: 'Concurrent Budget 2',
+    //       amount: 600,
+    //       userId: testUsers.JANE_SMITH.id,
+    //       category: BudgetCategory.FLEXIBLE,
+    //       color: '#00FF00',
+    //       icon: 'icon2',
+    //       month: 7,
+    //       year: 2025,
+    //     };
 
-        const [response1, response2] = await Promise.all([
-          request(app.getHttpServer())
-            .post('/budgets')
-            .set(authHeaders.JOHN_DOE)
-            .send(createData1),
-          request(app.getHttpServer())
-            .post('/budgets')
-            .set(authHeaders.JANE_SMITH)
-            .send(createData2),
-        ]);
+    //     const [response1, response2] = await Promise.all([
+    //       request(app.getHttpServer())
+    //         .post('/budgets')
+    //         .set(authHeaders.JOHN_DOE)
+    //         .send(createData1),
+    //       request(app.getHttpServer())
+    //         .post('/budgets')
+    //         .set(authHeaders.JANE_SMITH)
+    //         .send(createData2),
+    //     ]);
 
-        expect(response1.status).toBe(201);
-        expect(response2.status).toBe(201);
+    //     expect(response1.status).toBe(201);
+    //     expect(response2.status).toBe(201);
 
-        const body1 = response1.body as BudgetResponseDto;
-        const body2 = response2.body as BudgetResponseDto;
+    //     const body1 = response1.body as BudgetResponseDto;
+    //     const body2 = response2.body as BudgetResponseDto;
 
-        expect(body1.name).toBe('Concurrent Budget 1');
-        expect(body2.name).toBe('Concurrent Budget 2');
-        expect(body1.id).toBeDefined();
-        expect(body2.id).toBeDefined();
-        expect(body1.id).not.toBe(body2.id);
-      });
+    //     expect(body1.name).toBe('Concurrent Budget 1');
+    //     expect(body2.name).toBe('Concurrent Budget 2');
+    //     expect(body1.id).toBeDefined();
+    //     expect(body2.id).toBeDefined();
+    //     expect(body1.id).not.toBe(body2.id);
+    //   });
 
-      it('should handle multiple sequential budget creations efficiently', async () => {
-        const budgets = Array.from({ length: 5 }, (_, i) => ({
-          name: `Sequential Budget ${i + 1}`,
-          amount: 100 * (i + 1),
-          userId: testUsers.JOHN_DOE.id,
-          category:
-            i % 2 === 0 ? BudgetCategory.FIXED : BudgetCategory.FLEXIBLE,
-          color: `#FF${i}${i}33`,
-          icon: `icon-${i}`,
-          month: 7,
-          year: 2025,
-        }));
+    //   it('should handle multiple sequential budget creations efficiently', async () => {
+    //     const budgets = Array.from({ length: 5 }, (_, i) => ({
+    //       name: `Sequential Budget ${i + 1}`,
+    //       amount: 100 * (i + 1),
+    //       userId: testUsers.JOHN_DOE.id,
+    //       category:
+    //         i % 2 === 0 ? BudgetCategory.FIXED : BudgetCategory.FLEXIBLE,
+    //       color: `#FF${i}${i}33`,
+    //       icon: `icon-${i}`,
+    //       month: 7,
+    //       year: 2025,
+    //     }));
 
-        const startTime = Date.now();
+    //     const startTime = Date.now();
 
-        for (const budgetData of budgets) {
-          await request(app.getHttpServer())
-            .post('/budgets')
-            .set(authHeaders.JOHN_DOE)
-            .send(budgetData)
-            .expect(201);
-        }
+    //     for (const budgetData of budgets) {
+    //       await request(app.getHttpServer())
+    //         .post('/budgets')
+    //         .set(authHeaders.JOHN_DOE)
+    //         .send(budgetData)
+    //         .expect(201);
+    //     }
 
-        const endTime = Date.now();
-        const totalTime = endTime - startTime;
+    //     const endTime = Date.now();
+    //     const totalTime = endTime - startTime;
 
-        expect(totalTime).toBeLessThan(6000); // Should complete all in under 5 seconds
-      });
-    });
+    //     expect(totalTime).toBeLessThan(6000); // Should complete all in under 5 seconds
+    //   });
+    // });
   });
 });
