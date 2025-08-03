@@ -19,6 +19,19 @@ describe('Budget CREATE Endpoints (e2e)', () => {
       await AppSetup.initApp();
     app = appInstance;
     prisma = prismaInstance;
+
+    // Setup test authentication
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
+  });
+
+  beforeEach(async () => {
+    await TestDatabaseManager.cleanupTables([
+      'budget_transactions',
+      'transactions',
+      'budgets',
+    ]);
   });
 
   afterAll(async () => {
@@ -26,16 +39,6 @@ describe('Budget CREATE Endpoints (e2e)', () => {
     await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
-  });
-
-  beforeEach(async () => {
-    // Clean up test data before each test
-    await TestDatabaseManager.cleanupTestDatabase();
-
-    // Setup test authentication
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
-    testUsers = authSetup.testUsers;
   });
 
   describe('POST /budgets', () => {

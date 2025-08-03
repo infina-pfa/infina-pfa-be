@@ -39,6 +39,14 @@ export class TestDatabaseManager {
     return this.prisma;
   }
 
+  static async cleanupTables(tables: string[]): Promise<void> {
+    if (!this.prisma) return;
+    for (const table of tables) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      await this.prisma[table].deleteMany();
+    }
+  }
+
   static async cleanupTestDatabase(): Promise<void> {
     if (!this.prisma) return;
 

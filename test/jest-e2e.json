@@ -17,5 +17,5 @@
   "maxWorkers": 1,
   "forceExit": true,
   "detectOpenHandles": true,
-  "verbose": true
+  "verbose": false
 }

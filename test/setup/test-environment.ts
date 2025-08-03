@@ -29,7 +29,7 @@ export const testConfig = {
   test: {
     timeout: 30000, // 30 seconds timeout for integration tests
     retries: 0, // No retries for tests to avoid flaky behavior
-    verbose: true,
+    verbose: false,
   },
 
   // JWT configuration for test tokens

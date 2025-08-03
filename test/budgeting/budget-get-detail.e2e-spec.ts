@@ -19,6 +19,10 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       await AppSetup.initApp();
     app = appInstance;
     prisma = prismaInstance;
+
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   afterAll(async () => {
@@ -29,12 +33,11 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
   });
 
   beforeEach(async () => {
-    // Clean up test data before each test
-    await TestDatabaseManager.cleanupTestDatabase();
-
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
-    testUsers = authSetup.testUsers;
+    await TestDatabaseManager.cleanupTables([
+      'budget_transactions',
+      'transactions',
+      'budgets',
+    ]);
   });
 
   // Helper function to create test budgets
