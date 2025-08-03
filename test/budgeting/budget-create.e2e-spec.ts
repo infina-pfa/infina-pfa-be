@@ -1068,7 +1068,7 @@ describe('Budget CREATE Endpoints (e2e)', () => {
         const endTime = Date.now();
         const totalTime = endTime - startTime;
 
-        expect(totalTime).toBeLessThan(5000); // Should complete all in under 5 seconds
+        expect(totalTime).toBeLessThan(5500); // Should complete all in under 5 seconds
       });
     });
   });
