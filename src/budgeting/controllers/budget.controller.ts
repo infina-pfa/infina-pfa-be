@@ -55,8 +55,12 @@ export class BudgetController {
   })
   async createBudget(
     @Body() createBudgetDto: CreateBudgetDto,
+    @CurrentUser() user: AuthUser,
   ): Promise<BudgetResponseDto> {
-    const budget = await this.createBudgetUseCase.execute(createBudgetDto);
+    const budget = await this.createBudgetUseCase.execute({
+      ...createBudgetDto,
+      userId: user.id,
+    });
 
     return BudgetResponseDto.fromEntity(budget);
   }

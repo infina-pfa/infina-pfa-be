@@ -1,52 +1,29 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { MockGuard } from '../mocks/guard.mock';
 import { PrismaClient } from '../../generated/prisma';
 import { Currency, Language } from '../../src/common/types/user';
 import { UpdateUserProfileDto } from '../../src/user/controllers/dto/update-user-profile.dto';
 import { FinancialStage } from '../../src/user/domain/entities/user.entity';
 import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
+import { AppSetup } from '../setup/app.setup';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TestUser } from '../utils/auth.utils';
 
 describe('User Profile UPDATE Endpoints (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
-
+  let testUsers: { [key: string]: TestUser } = {};
   beforeAll(async () => {
-    // Setup test database
-    prisma = await TestDatabaseManager.setupTestDatabase();
-
-    // Create test module
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(SupabaseAuthGuard)
-      .useClass(MockGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-    await app.init();
-
-    // Setup test authentication
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
+    const { app: appInstance, prisma: prismaInstance } =
+      await AppSetup.initApp();
+    app = appInstance;
+    prisma = prismaInstance;
   });
 
   afterAll(async () => {
     await TestDatabaseManager.cleanupTestDatabase();
-    await AuthTestUtils.cleanupTestUsers(prisma);
+    await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
   });
@@ -55,10 +32,9 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
     // Clean up test data before each test
     await TestDatabaseManager.cleanupTestDatabase();
 
-    // Recreate test users for each test
-    for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
-    }
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   describe('PUT /users/profile', () => {
@@ -87,7 +63,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
         // Verify data was persisted in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.name).toBe('John Updated');
@@ -112,7 +88,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
         // Verify other fields weren't changed
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.name).toBe('Partial Update');
@@ -137,7 +113,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
         // Verify in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.financial_stage).toBe(FinancialStage.DEBT);
@@ -157,7 +133,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
         // Verify in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.currency).toBe(Currency.USD);
@@ -299,7 +275,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
         // Verify consistency between API response and database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(body.name).toBe(userInDb?.name);
@@ -311,7 +287,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
       it('should preserve onboarding status when updating profile', async () => {
         // Set user as onboarded
         await prisma.public_users.update({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
           data: {
             onboarding_completed_at: new Date('2024-01-01'),
             financial_stage: FinancialStage.START_SAVING,
@@ -337,7 +313,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
         // Verify onboarding status preserved in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.onboarding_completed_at).toBeTruthy();
@@ -346,7 +322,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
       it('should update profile for user without onboarding completed', async () => {
         // Ensure user has no onboarding completion
         await prisma.public_users.update({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
           data: {
             onboarding_completed_at: null,
             financial_stage: null,
@@ -394,7 +370,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
           // Verify in database
           const userInDb = await prisma.public_users.findUnique({
-            where: { user_id: TEST_USERS.JOHN_DOE.id },
+            where: { user_id: testUsers.JOHN_DOE.id },
           });
 
           expect(userInDb?.financial_stage).toBe(stage);
@@ -417,7 +393,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
           // Verify in database
           const userInDb = await prisma.public_users.findUnique({
-            where: { user_id: TEST_USERS.JOHN_DOE.id },
+            where: { user_id: testUsers.JOHN_DOE.id },
           });
 
           expect(userInDb?.currency).toBe(currency);
@@ -440,7 +416,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
 
           // Verify in database
           const userInDb = await prisma.public_users.findUnique({
-            where: { user_id: TEST_USERS.JOHN_DOE.id },
+            where: { user_id: testUsers.JOHN_DOE.id },
           });
 
           expect(userInDb?.language).toBe(language);
@@ -553,7 +529,7 @@ describe('User Profile UPDATE Endpoints (e2e)', () => {
       it('should return 404 if user profile not found in database', async () => {
         // Delete the user from public_users table but keep auth
         await prisma.public_users.delete({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         const updateData: UpdateUserProfileDto = {

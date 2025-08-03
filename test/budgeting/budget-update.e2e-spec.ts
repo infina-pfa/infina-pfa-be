@@ -1,51 +1,28 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { MockGuard } from '../mocks/guard.mock';
+import { AppSetup } from '../setup/app.setup';
 import { PrismaClient } from '../../generated/prisma';
 import { BudgetResponseDto } from '../../src/budgeting/controllers/dto/budget.dto';
-import { BudgetCategory } from '../../src/budgeting/domain';
 import { UpdateBudgetDto } from '../../src/budgeting/controllers/dto/update-budget.dto';
+import { BudgetCategory } from '../../src/budgeting/domain';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TestUser } from '../utils/auth.utils';
 
 describe('Budget UPDATE Endpoint (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
-
+  let testUsers: { [key: string]: TestUser } = {};
   beforeAll(async () => {
-    // Setup test database
-    prisma = await TestDatabaseManager.setupTestDatabase();
-
-    // Create test module
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(SupabaseAuthGuard)
-      .useClass(MockGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-    await app.init();
-
-    // Setup test authentication
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
+    const { app: appInstance, prisma: prismaInstance } =
+      await AppSetup.initApp();
+    app = appInstance;
+    prisma = prismaInstance;
   });
 
   afterAll(async () => {
     await TestDatabaseManager.cleanupTestDatabase();
-    await AuthTestUtils.cleanupTestUsers(prisma);
+    await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
   });
@@ -54,10 +31,9 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
     // Clean up test data before each test
     await TestDatabaseManager.cleanupTestDatabase();
 
-    // Create both auth and public users for budget tests
-    for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
-    }
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   // Helper function to create test budgets
@@ -94,7 +70,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should update budget name successfully', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Original Name',
           500,
           7,
@@ -117,7 +93,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         expect(body.id).toBe(budget.id);
         expect(body.name).toBe('Updated Budget Name');
         expect(body.amount).toBe(500);
-        expect(body.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(body.userId).toBe(testUsers.JOHN_DOE.id);
         expect(body.category).toBe(BudgetCategory.FIXED);
         expect(body.color).toBe('#FF5733');
         expect(body.icon).toBe('shopping-cart');
@@ -136,7 +112,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should update budget category successfully', async () => {
         // Create test budget with FIXED category
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Test Budget',
           800,
           8,
@@ -160,7 +136,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         expect(body.name).toBe('Test Budget');
         expect(body.category).toBe(BudgetCategory.FLEXIBLE);
         expect(body.amount).toBe(800);
-        expect(body.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(body.userId).toBe(testUsers.JANE_SMITH.id);
 
         // Verify database was updated
         const updatedBudget = await prisma.budgets.findUnique({
@@ -172,7 +148,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should update budget color and icon successfully', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Visual Test Budget',
           300,
           9,
@@ -213,7 +189,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should update multiple budget fields simultaneously', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Multi Update Test',
           600,
           10,
@@ -244,7 +220,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         expect(body.color).toBe('#123456');
         expect(body.icon).toBe('updated-icon');
         expect(body.amount).toBe(600); // Should remain unchanged
-        expect(body.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(body.userId).toBe(testUsers.JOHN_DOE.id);
         expect(body.month).toBe(10); // Should remain unchanged
         expect(body.year).toBe(2025); // Should remain unchanged
 
@@ -261,7 +237,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should update budget with empty update (no changes)', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'No Change Budget',
           400,
           11,
@@ -285,7 +261,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         expect(body.category).toBe(BudgetCategory.FIXED);
         expect(body.color).toBe('#FF5733');
         expect(body.icon).toBe('shopping-cart');
-        expect(body.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(body.userId).toBe(testUsers.JANE_SMITH.id);
       });
 
       it('should preserve timestamps correctly on update', async () => {
@@ -293,7 +269,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
 
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Timestamp Test',
           500,
           12,
@@ -348,7 +324,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should return 403 for unauthenticated requests', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Auth Test Budget',
           500,
           7,
@@ -368,7 +344,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should return 403 with invalid authentication token', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Invalid Auth Test',
           500,
           7,
@@ -389,7 +365,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should return 404 when users try to update budgets belonging to other users', async () => {
         // Create budget for John
         const johnBudget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget',
           500,
           7,
@@ -419,7 +395,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should successfully update own budget with valid authentication', async () => {
         // Create budget for Jane
         const janeBudget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget',
           600,
           8,
@@ -438,7 +414,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
 
         const body = response.body as BudgetResponseDto;
         expect(body.name).toBe('Jane Updated Budget');
-        expect(body.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(body.userId).toBe(testUsers.JANE_SMITH.id);
       });
     });
 
@@ -446,7 +422,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should validate required string fields are not empty', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Validation Test',
           500,
           7,
@@ -469,7 +445,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should validate budget category enum values', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Category Validation Test',
           500,
           7,
@@ -492,7 +468,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should reject amount field in updates', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Amount Update Test',
           500,
           7,
@@ -516,7 +492,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should reject unknown fields in request body', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Unknown Fields Test',
           500,
           7,
@@ -559,7 +535,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should return 404 for archived budgets', async () => {
         // Create archived budget
         const archivedBudget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Archived Budget',
           500,
           7,
@@ -608,7 +584,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should return 400 for malformed JSON in request body', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'JSON Test Budget',
           500,
           7,
@@ -626,7 +602,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should handle validation errors gracefully', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Validation Test',
           500,
           7,
@@ -652,7 +628,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should preserve budget month and year on update', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Business Logic Test',
           500,
           7,
@@ -682,7 +658,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should preserve budget userId on update', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'User ID Preservation Test',
           500,
           8,
@@ -703,7 +679,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         const body = response.body as BudgetResponseDto;
 
         // User ID should remain unchanged
-        expect(body.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(body.userId).toBe(testUsers.JANE_SMITH.id);
         expect(body.name).toBe('Updated User ID Test');
         expect(body.color).toBe('#ABCDEF');
       });
@@ -711,7 +687,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should not affect spending calculations when updating budget metadata', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Spending Test Budget',
           1000,
           9,
@@ -733,7 +709,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
 
         await prisma.budget_transactions.create({
           data: {
-            user_id: TEST_USERS.ADMIN_USER.id,
+            user_id: testUsers.ADMIN_USER.id,
             budget_id: budget.id,
             transaction_id: transaction.id,
             created_at: new Date(),
@@ -764,7 +740,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should handle concurrent updates correctly', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Concurrent Test',
           500,
           10,
@@ -819,7 +795,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should return correct response structure with all required fields', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Structure Test',
           750,
           11,
@@ -878,13 +854,13 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         expect(body.icon).toBe('test-icon');
         expect(body.month).toBe(11);
         expect(body.year).toBe(2025);
-        expect(body.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(body.userId).toBe(testUsers.JANE_SMITH.id);
       });
 
       it('should maintain data consistency between API response and database', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Consistency Test',
           900,
           12,
@@ -928,7 +904,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should respond within reasonable time for budget update', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Performance Test',
           1000,
           7,
@@ -959,21 +935,21 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
       it('should handle concurrent budget updates for different users efficiently', async () => {
         // Create test budgets for different users
         const johnBudget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Performance',
           500,
           7,
           2025,
         );
         const janeBudget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Performance',
           600,
           7,
           2025,
         );
         const adminBudget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Admin Performance',
           700,
           7,
@@ -1004,11 +980,11 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
         const adminBody = adminResponse.body as BudgetResponseDto;
 
         expect(johnBody.name).toBe('Updated John Performance');
-        expect(johnBody.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(johnBody.userId).toBe(testUsers.JOHN_DOE.id);
         expect(janeBody.name).toBe('Updated Jane Performance');
-        expect(janeBody.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(janeBody.userId).toBe(testUsers.JANE_SMITH.id);
         expect(adminBody.name).toBe('Updated Admin Performance');
-        expect(adminBody.userId).toBe(TEST_USERS.ADMIN_USER.id);
+        expect(adminBody.userId).toBe(testUsers.ADMIN_USER.id);
       });
     });
   });

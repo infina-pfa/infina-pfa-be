@@ -1,52 +1,30 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { MockGuard } from '../mocks/guard.mock';
 import { PrismaClient } from '../../generated/prisma';
 import { Currency, Language } from '../../src/common/types/user';
 import { CreateUserProfileDto } from '../../src/user/controllers/dto/create-user-profile.dto';
 import { FinancialStage } from '../../src/user/domain/entities/user.entity';
 import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
+import { AppSetup } from '../setup/app.setup';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TestUser } from '../utils/auth.utils';
 
 describe('User Profile CREATE Endpoints (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
+  let testUsers: { [key: string]: TestUser } = {};
 
   beforeAll(async () => {
-    // Setup test database
-    prisma = await TestDatabaseManager.setupTestDatabase();
-
-    // Create test module
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(SupabaseAuthGuard)
-      .useClass(MockGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-    await app.init();
-
-    // Setup test authentication
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
+    const { app: appInstance, prisma: prismaInstance } =
+      await AppSetup.initApp();
+    app = appInstance;
+    prisma = prismaInstance;
   });
 
   afterAll(async () => {
     await TestDatabaseManager.cleanupTestDatabase();
-    await AuthTestUtils.cleanupTestUsers(prisma);
+    await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
   });
@@ -55,10 +33,11 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
     // Clean up test data before each test
     await TestDatabaseManager.cleanupTestDatabase();
 
-    // Create auth users but NOT public users for profile creation tests
-    for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createAuthUserOnly(prisma, testUser);
-    }
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma, {
+      authOnly: true,
+    });
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   describe('POST /users/profile', () => {
@@ -90,7 +69,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         // Verify data was persisted in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb).toBeTruthy();
@@ -125,7 +104,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         // Verify in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JANE_SMITH.id },
+          where: { user_id: testUsers.JANE_SMITH.id },
         });
 
         expect(userInDb).toBeTruthy();
@@ -157,7 +136,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         // Verify defaults in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.currency).toBe(Currency.VND);
@@ -291,7 +270,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
         // First, create a user profile in public_users table (bypassing our create endpoint)
         await prisma.public_users.create({
           data: {
-            user_id: TEST_USERS.JOHN_DOE.id,
+            user_id: testUsers.JOHN_DOE.id,
             name: 'Existing User',
             created_at: new Date(),
             updated_at: new Date(),
@@ -328,7 +307,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         // Verify in database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(userInDb?.onboarding_completed_at).toBeNull();
@@ -343,7 +322,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         for (let i = 0; i < testCases.length; i++) {
           const stage = testCases[i];
-          const testUser = Object.values(TEST_USERS)[i]; // Use different users
+          const testUser = Object.values(testUsers)[i]; // Use different users
 
           const createData: CreateUserProfileDto = {
             name: `User ${stage}`,
@@ -352,7 +331,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
           const response = await request(app.getHttpServer())
             .post('/users/profile')
-            .set(authHeaders[Object.keys(TEST_USERS)[i]])
+            .set(authHeaders[Object.keys(testUsers)[i]])
             .send(createData)
             .expect(201);
 
@@ -373,7 +352,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         for (let i = 0; i < testCases.length; i++) {
           const currency = testCases[i];
-          const testUser = Object.values(TEST_USERS)[i];
+          const testUser = Object.values(testUsers)[i];
 
           const createData: CreateUserProfileDto = {
             name: `User ${currency}`,
@@ -382,7 +361,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
           const response = await request(app.getHttpServer())
             .post('/users/profile')
-            .set(authHeaders[Object.keys(TEST_USERS)[i]])
+            .set(authHeaders[Object.keys(testUsers)[i]])
             .send(createData)
             .expect(201);
 
@@ -403,7 +382,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         for (let i = 0; i < testCases.length; i++) {
           const language = testCases[i];
-          const testUser = Object.values(TEST_USERS)[i];
+          const testUser = Object.values(testUsers)[i];
 
           const createData: CreateUserProfileDto = {
             name: `User ${language}`,
@@ -412,7 +391,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
           const response = await request(app.getHttpServer())
             .post('/users/profile')
-            .set(authHeaders[Object.keys(TEST_USERS)[i]])
+            .set(authHeaders[Object.keys(testUsers)[i]])
             .send(createData)
             .expect(201);
 
@@ -566,7 +545,7 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         // Verify consistency between API response and database
         const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: TEST_USERS.JOHN_DOE.id },
+          where: { user_id: testUsers.JOHN_DOE.id },
         });
 
         expect(body.name).toBe(userInDb?.name);

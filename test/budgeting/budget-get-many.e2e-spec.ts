@@ -1,50 +1,28 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { MockGuard } from '../mocks/guard.mock';
 import { PrismaClient } from '../../generated/prisma';
 import { BudgetResponseDto } from '../../src/budgeting/controllers/dto/budget.dto';
 import { BudgetCategory } from '../../src/budgeting/domain';
+import { AppSetup } from '../setup/app.setup';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TestUser } from '../utils/auth.utils';
 
 describe('Budget GET MANY Endpoints (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
+  let testUsers: { [key: string]: TestUser } = {};
 
   beforeAll(async () => {
-    // Setup test database
-    prisma = await TestDatabaseManager.setupTestDatabase();
-
-    // Create test module
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(SupabaseAuthGuard)
-      .useClass(MockGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-    await app.init();
-
-    // Setup test authentication
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
+    const { app: appInstance, prisma: prismaInstance } =
+      await AppSetup.initApp();
+    app = appInstance;
+    prisma = prismaInstance;
   });
 
   afterAll(async () => {
     await TestDatabaseManager.cleanupTestDatabase();
-    await AuthTestUtils.cleanupTestUsers(prisma);
+    await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
   });
@@ -53,10 +31,9 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
     // Clean up test data before each test
     await TestDatabaseManager.cleanupTestDatabase();
 
-    // Create both auth and public users for budget tests
-    for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
-    }
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   // Helper function to create test budgets
@@ -106,7 +83,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
     // Link transaction to budget through join table
     await prisma.budget_transactions.create({
       data: {
-        user_id: TEST_USERS.JOHN_DOE.id, // Default to John, could be parameterized if needed
+        user_id: testUsers.JOHN_DOE.id, // Default to John, could be parameterized if needed
         budget_id: budgetId,
         transaction_id: transaction.id,
         created_at: new Date(),
@@ -122,14 +99,14 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
       it('should get all budgets for user in specified month/year', async () => {
         // Create test budgets for John in July 2025
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Groceries',
           500,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Entertainment',
           200,
           7,
@@ -139,7 +116,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
         // Create budget for John in different month (should not be returned)
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'August Budget',
           300,
           8,
@@ -148,7 +125,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
         // Create budget for different user (should not be returned)
         await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget',
           400,
           7,
@@ -164,7 +141,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
         expect(budgets).toHaveLength(2);
         expect(
-          budgets.every((budget) => budget.userId === TEST_USERS.JOHN_DOE.id),
+          budgets.every((budget) => budget.userId === testUsers.JOHN_DOE.id),
         ).toBe(true);
         expect(
           budgets.every((budget) => budget.month === 7 && budget.year === 2025),
@@ -200,7 +177,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
       it('should include spent amounts for budgets with transactions', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Groceries',
           500,
           7,
@@ -227,7 +204,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
       it('should handle budgets with different categories correctly', async () => {
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Fixed Budget',
           1000,
           7,
@@ -235,7 +212,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
           BudgetCategory.FIXED,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Flexible Budget',
           500,
           7,
@@ -267,7 +244,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
       it('should return budgets with correct visual properties (color, icon)', async () => {
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Colorful Budget',
           500,
           7,
@@ -301,7 +278,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
         for (let i = 0; i < budgetNames.length; i++) {
           await createTestBudget(
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             budgetNames[i],
             (i + 1) * 100,
             7,
@@ -319,7 +296,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
         expect(budgets).toHaveLength(5);
         expect(
-          budgets.every((budget) => budget.userId === TEST_USERS.JOHN_DOE.id),
+          budgets.every((budget) => budget.userId === testUsers.JOHN_DOE.id),
         ).toBe(true);
         expect(budgets.map((b) => b.name).sort()).toEqual(budgetNames.sort());
       });
@@ -409,14 +386,14 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
       it('should handle edge case months correctly (1 and 12)', async () => {
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'January Budget',
           500,
           1,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'December Budget',
           600,
           12,
@@ -469,14 +446,14 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
       it('should work with valid authentication for different users', async () => {
         // Create budgets for both users
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget',
           500,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget',
           600,
           7,
@@ -492,7 +469,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         const johnBudgets = johnResponse.body as BudgetResponseDto[];
         expect(johnBudgets).toHaveLength(1);
         expect(johnBudgets[0].name).toBe('John Budget');
-        expect(johnBudgets[0].userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(johnBudgets[0].userId).toBe(testUsers.JOHN_DOE.id);
 
         // Test Jane's budgets
         const janeResponse = await request(app.getHttpServer())
@@ -503,14 +480,14 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         const janeBudgets = janeResponse.body as BudgetResponseDto[];
         expect(janeBudgets).toHaveLength(1);
         expect(janeBudgets[0].name).toBe('Jane Budget');
-        expect(janeBudgets[0].userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(janeBudgets[0].userId).toBe(testUsers.JANE_SMITH.id);
       });
     });
 
     describe('Data Structure Validation', () => {
       it('should return correct response structure for each budget', async () => {
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Structure Test',
           500,
           7,
@@ -556,7 +533,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         // Verify values
         expect(budget.name).toBe('Structure Test');
         expect(budget.amount).toBe(500);
-        expect(budget.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(budget.userId).toBe(testUsers.JOHN_DOE.id);
         expect(budget.category).toBe(BudgetCategory.FIXED);
         expect(budget.month).toBe(7);
         expect(budget.year).toBe(2025);
@@ -579,7 +556,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
       it('should maintain data consistency between API response and database', async () => {
         const budgetInDb = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Consistency Test',
           750,
           7,
@@ -613,35 +590,35 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
       it('should only return budgets for the authenticated user', async () => {
         // Create budgets for multiple users
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget 1',
           500,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget 2',
           600,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget 1',
           700,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget 2',
           800,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Admin Budget',
           900,
           7,
@@ -657,7 +634,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         const johnBudgets = johnResponse.body as BudgetResponseDto[];
         expect(johnBudgets).toHaveLength(2);
         expect(
-          johnBudgets.every((b) => b.userId === TEST_USERS.JOHN_DOE.id),
+          johnBudgets.every((b) => b.userId === testUsers.JOHN_DOE.id),
         ).toBe(true);
         expect(johnBudgets.map((b) => b.name).sort()).toEqual([
           'John Budget 1',
@@ -673,7 +650,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         const janeBudgets = janeResponse.body as BudgetResponseDto[];
         expect(janeBudgets).toHaveLength(2);
         expect(
-          janeBudgets.every((b) => b.userId === TEST_USERS.JANE_SMITH.id),
+          janeBudgets.every((b) => b.userId === testUsers.JANE_SMITH.id),
         ).toBe(true);
         expect(janeBudgets.map((b) => b.name).sort()).toEqual([
           'Jane Budget 1',
@@ -688,35 +665,35 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
         const adminBudgets = adminResponse.body as BudgetResponseDto[];
         expect(adminBudgets).toHaveLength(1);
-        expect(adminBudgets[0].userId).toBe(TEST_USERS.ADMIN_USER.id);
+        expect(adminBudgets[0].userId).toBe(testUsers.ADMIN_USER.id);
         expect(adminBudgets[0].name).toBe('Admin Budget');
       });
 
       it('should only return budgets for the exact month/year combination', async () => {
         // Create budgets for different months and years
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'July 2025',
           500,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'August 2025',
           600,
           8,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'July 2024',
           700,
           7,
           2024,
         );
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'July 2026',
           800,
           7,
@@ -760,7 +737,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
       it('should correctly calculate spent amounts from transactions', async () => {
         // Create budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Groceries',
           1000,
           7,
@@ -785,7 +762,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
 
       it('should handle budgets with zero spending correctly', async () => {
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Unused Budget',
           1000,
           7,
@@ -871,7 +848,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         // Create multiple budgets
         for (let i = 1; i <= 10; i++) {
           await createTestBudget(
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             `Budget ${i}`,
             i * 100,
             7,
@@ -895,21 +872,21 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
       it('should handle concurrent requests from different users efficiently', async () => {
         // Create budgets for multiple users
         await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget',
           500,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget',
           600,
           7,
           2025,
         );
         await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Admin Budget',
           700,
           7,
@@ -948,7 +925,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         // Create 50 budgets for John in July 2025
         for (let i = 1; i <= 50; i++) {
           await createTestBudget(
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             `Budget ${i}`,
             i * 10,
             7,
@@ -977,7 +954,7 @@ describe('Budget GET MANY Endpoints (e2e)', () => {
         const months = [1, 3, 5, 7, 9, 11];
         for (const month of months) {
           await createTestBudget(
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             `Budget Month ${month}`,
             500,
             month,

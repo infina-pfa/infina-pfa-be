@@ -1,42 +1,26 @@
 import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
 import { PrismaClient } from '../../generated/prisma';
 import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
-import { MockGuard } from '../mocks/guard.mock';
+import { AppSetup } from '../setup/app.setup';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TestUser } from '../utils/auth.utils';
 
 describe('User Profile GET Endpoints (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
-
+  let testUsers: { [key: string]: TestUser } = {};
   beforeAll(async () => {
-    // Setup test database
-    prisma = await TestDatabaseManager.setupTestDatabase();
-
-    // Create test module
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(SupabaseAuthGuard)
-      .useClass(MockGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-
-    // Setup test authentication
-    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
-    authHeaders = authSetup.authHeaders;
+    const { app: appInstance, prisma: prismaInstance } =
+      await AppSetup.initApp();
+    app = appInstance;
+    prisma = prismaInstance;
   });
 
   afterAll(async () => {
     await TestDatabaseManager.cleanupTestDatabase();
-    await AuthTestUtils.cleanupTestUsers(prisma);
+    await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
   });
@@ -45,10 +29,9 @@ describe('User Profile GET Endpoints (e2e)', () => {
     // Clean up test data before each test
     await TestDatabaseManager.cleanupTestDatabase();
 
-    // Recreate test users for each test
-    for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
-    }
+    const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
+    authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   describe('GET /users/profile', () => {
@@ -120,7 +103,7 @@ describe('User Profile GET Endpoints (e2e)', () => {
     it('should handle user with completed onboarding', async () => {
       // Update user to have completed onboarding
       await prisma.public_users.update({
-        where: { user_id: TEST_USERS.JOHN_DOE.id },
+        where: { user_id: testUsers.JOHN_DOE.id },
         data: {
           onboarding_completed_at: new Date(),
           financial_stage: 'start_investing',
@@ -140,7 +123,7 @@ describe('User Profile GET Endpoints (e2e)', () => {
     it('should handle user without completed onboarding', async () => {
       // Ensure user has no onboarding completion
       await prisma.public_users.update({
-        where: { user_id: TEST_USERS.JOHN_DOE.id },
+        where: { user_id: testUsers.JOHN_DOE.id },
         data: {
           onboarding_completed_at: null,
           financial_stage: null,
@@ -160,7 +143,7 @@ describe('User Profile GET Endpoints (e2e)', () => {
     it('should return 404 if user profile not found in database', async () => {
       // Delete the user from public_users table but keep auth
       await prisma.public_users.delete({
-        where: { user_id: TEST_USERS.JOHN_DOE.id },
+        where: { user_id: testUsers.JOHN_DOE.id },
       });
 
       await request(app.getHttpServer())
