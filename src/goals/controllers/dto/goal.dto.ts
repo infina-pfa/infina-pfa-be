@@ -77,7 +77,7 @@ export class GoalResponseDto extends BaseDto {
     dto.targetAmount = props.targetAmount?.value;
     dto.dueDate = props.dueDate?.toISOString();
     dto.remainingAmount = goalAggregate.remainingAmount.value;
-    dto.transactions = contributions.map((contribution) =>
+    dto.transactions = transactions.map((contribution) =>
       TransactionResponseDto.fromEntity(contribution),
     );
     dto.createdAt = props.createdAt;
