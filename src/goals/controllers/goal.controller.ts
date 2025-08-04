@@ -3,6 +3,7 @@ import { AuthUser, Currency } from '@/common/types';
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -15,7 +16,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateGoalUseCase, UpdateGoalUseCase } from '../use-cases';
+import {
+  CreateGoalUseCase,
+  GetGoalsUseCase,
+  UpdateGoalUseCase,
+} from '../use-cases';
 import { CreateGoalDto, GoalResponseDto, UpdateGoalDto } from './dto';
 import { CurrencyVO } from '@/common/base';
 
@@ -25,6 +30,7 @@ import { CurrencyVO } from '@/common/base';
 export class GoalController {
   constructor(
     private readonly createGoalUseCase: CreateGoalUseCase,
+    private readonly getGoalsUseCase: GetGoalsUseCase,
     private readonly updateGoalUseCase: UpdateGoalUseCase,
   ) {}
 
@@ -54,6 +60,24 @@ export class GoalController {
     });
 
     return GoalResponseDto.fromEntity(goalAggregate);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all user financial goals' })
+  @ApiResponse({
+    status: 200,
+    description: 'Goals retrieved successfully',
+    type: [GoalResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getGoals(@CurrentUser() user: AuthUser): Promise<GoalResponseDto[]> {
+    const goalAggregates = await this.getGoalsUseCase.execute({
+      userId: user.id,
+    });
+
+    return goalAggregates.map((goalAggregate) =>
+      GoalResponseDto.fromEntity(goalAggregate),
+    );
   }
 
   @Patch(':id')
