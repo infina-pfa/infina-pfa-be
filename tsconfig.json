@@ -20,7 +20,8 @@
     "paths": {
       "@/common/*": ["src/common/*"],
       "@/budgeting/*": ["src/budgeting/*"],
-      "@/user/*": ["src/user/*"]
+      "@/user/*": ["src/user/*"],
+      "@/goals/*": ["src/goals/*"]
     }
   }
 }
