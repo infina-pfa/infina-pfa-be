@@ -27,7 +27,7 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
     return GoalAggregate.create(
       {
         goal: this.goalRepository.toEntity(data.goal),
-        contributions: new GoalTransactionsWatchList(
+        transactions: new GoalTransactionsWatchList(
           data.contributions.map((transaction) =>
             this.transactionRepository.toEntity(transaction),
           ),
@@ -43,7 +43,7 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
   } {
     return {
       goal: this.goalRepository.toORM(entity.props.goal) as GoalORM,
-      contributions: entity.props.contributions.items.map(
+      contributions: entity.props.transactions.items.map(
         (transaction) =>
           this.transactionRepository.toORM(transaction) as TransactionORM,
       ),
@@ -67,7 +67,7 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
       });
 
       // 2. Handle added transactions
-      for (const transaction of entity.props.contributions.addedItems) {
+      for (const transaction of entity.props.transactions.addedItems) {
         const transactionORM = this.transactionRepository.toORM(
           transaction,
         ) as TransactionORM;
@@ -90,7 +90,7 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
       }
 
       // 3. Handle updated transactions
-      for (const transaction of entity.props.contributions.updatedItems) {
+      for (const transaction of entity.props.transactions.updatedItems) {
         const transactionORM = this.transactionRepository.toORM(
           transaction,
         ) as TransactionORM;
@@ -101,7 +101,7 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
       }
 
       // 4. Handle removed transactions
-      for (const transaction of entity.props.contributions.removedItems) {
+      for (const transaction of entity.props.transactions.removedItems) {
         await tx.goal_transactions.deleteMany({
           where: {
             goal_id: entity.id,

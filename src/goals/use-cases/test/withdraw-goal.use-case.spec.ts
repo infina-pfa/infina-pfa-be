@@ -65,7 +65,7 @@ describe('WithdrawGoalUseCase', () => {
     return GoalAggregate.create(
       {
         goal: goalEntity,
-        contributions: new GoalTransactionsWatchList(existingTransactions),
+        transactions: new GoalTransactionsWatchList(existingTransactions),
       },
       mockGoalId,
     );
@@ -665,7 +665,7 @@ describe('WithdrawGoalUseCase', () => {
         const mockGoalAggregate = GoalAggregate.create(
           {
             goal: goalEntity,
-            contributions: new GoalTransactionsWatchList([
+            transactions: new GoalTransactionsWatchList([
               contributionTransaction,
             ]),
           },

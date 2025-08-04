@@ -9,7 +9,7 @@ import { GoalErrorFactory } from '../errors/goal-error.factory';
 
 export interface GoalAggregateProps {
   goal: GoalEntity;
-  contributions: GoalTransactionsWatchList;
+  transactions: GoalTransactionsWatchList;
 }
 
 export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
@@ -26,7 +26,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
   public validate(): void {
     this.props.goal.validate();
-    this.props.contributions.items.forEach((transaction) => {
+    this.props.transactions.items.forEach((transaction) => {
       transaction.validate();
     });
   }
@@ -39,13 +39,13 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     return this.props.goal;
   }
 
-  public get contributions(): TransactionEntity[] {
-    return this.props.contributions.items;
+  public get transactions(): TransactionEntity[] {
+    return this.props.transactions.items;
   }
 
   // Computed properties
   public get totalContributed(): CurrencyVO {
-    const transactions = this.props.contributions.items;
+    const transactions = this.props.transactions.items;
 
     // If no transactions, return zero in the goal's currency (or VND if no target amount)
     if (transactions.length === 0) {
@@ -95,7 +95,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
       throw new Error('Contribution amount must be positive');
     }
 
-    this.props.contributions.add(
+    this.props.transactions.add(
       TransactionEntity.create({
         amount: props.amount,
         type: TransactionType.INCOME,
@@ -133,7 +133,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
       );
     }
 
-    this.props.contributions.add(
+    this.props.transactions.add(
       TransactionEntity.create({
         amount: props.amount,
         type: TransactionType.OUTCOME,

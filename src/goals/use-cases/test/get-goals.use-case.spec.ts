@@ -63,7 +63,7 @@ describe('GetGoalsUseCase', () => {
 
       return GoalAggregate.create({
         goal: goalEntity,
-        contributions,
+        transactions: contributions,
       });
     };
 
@@ -141,7 +141,7 @@ describe('GetGoalsUseCase', () => {
       const returnedGoal = result[0];
       expect(returnedGoal).toBeInstanceOf(GoalAggregate);
       expect(returnedGoal.goal).toBeDefined();
-      expect(returnedGoal.contributions).toBeDefined();
+      expect(returnedGoal.transactions).toBeDefined();
       expect(returnedGoal.goal.props.title).toBe('Test Goal');
       expect(returnedGoal.goal.props.description).toBe('Test Description');
       expect(returnedGoal.goal.props.targetAmount!.value).toBe(10000);

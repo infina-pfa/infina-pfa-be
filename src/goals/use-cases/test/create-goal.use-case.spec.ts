@@ -178,7 +178,7 @@ describe('CreateGoalUseCase', () => {
       expect(result.props.goal.props.targetAmount).toBeUndefined();
       expect(result.props.goal.props.dueDate).toBeUndefined();
       expect(result.props.goal.props.currentAmount.value).toBe(0);
-      expect(result.props.contributions.items).toEqual([]);
+      expect(result.props.transactions.items).toEqual([]);
       expect(goalAggregateRepository.save).toHaveBeenCalled();
     });
 
@@ -247,7 +247,7 @@ describe('CreateGoalUseCase', () => {
       expect(result).toBeInstanceOf(Object);
       expect(result.props).toBeDefined();
       expect(result.props.goal).toBeDefined();
-      expect(result.props.contributions).toBeDefined();
+      expect(result.props.transactions).toBeDefined();
 
       // Verify goal properties
       expect(result.props.goal.props.userId).toBe(validInput.userId);
@@ -260,7 +260,7 @@ describe('CreateGoalUseCase', () => {
       expect(result.props.goal.props.currentAmount).toEqual(new CurrencyVO(0));
 
       // Verify empty contributions list
-      expect(result.props.contributions.items).toEqual([]);
+      expect(result.props.transactions.items).toEqual([]);
 
       // Verify timestamps are set
       expect(result.props.createdAt).toBeInstanceOf(Date);

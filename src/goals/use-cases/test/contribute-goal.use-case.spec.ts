@@ -60,7 +60,7 @@ describe('ContributeGoalUseCase', () => {
     return GoalAggregate.create(
       {
         goal: goalEntity,
-        contributions: new GoalTransactionsWatchList([]),
+        transactions: new GoalTransactionsWatchList([]),
       },
       mockGoalId,
     );
@@ -415,7 +415,7 @@ describe('ContributeGoalUseCase', () => {
         const mockGoalAggregate = GoalAggregate.create(
           {
             goal: goalEntity,
-            contributions: new GoalTransactionsWatchList([]),
+            transactions: new GoalTransactionsWatchList([]),
           },
           mockGoalId,
         );
