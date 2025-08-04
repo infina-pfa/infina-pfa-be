@@ -14,6 +14,7 @@ describe('Budget Spending API E2E (Fixed)', () => {
   // Test data
   let johnBudget1: any;
   let johnBudget2: any;
+  let janeBudget: any;
 
   beforeAll(async () => {
     const { app: appInstance, prisma: prismaInstance } =

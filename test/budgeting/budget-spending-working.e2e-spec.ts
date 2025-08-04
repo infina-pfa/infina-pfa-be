@@ -13,6 +13,7 @@ describe('Budget Spending API E2E (Working Tests)', () => {
 
   // Test data
   let johnBudget1: any;
+  let janeBudget: any;
 
   beforeAll(async () => {
     const { app: appInstance, prisma: prismaInstance } =
