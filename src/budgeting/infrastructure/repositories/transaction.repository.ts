@@ -38,4 +38,44 @@ export class TransactionRepositoryImpl
 
     return transactions.map((transaction) => this.toEntity(transaction));
   }
+
+  async findBudgetSpendingByMonth(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<TransactionEntity[]> {
+    if (month < 1 || month > 12 || year <= 0) {
+      return [];
+    }
+
+    // Query through budget_transactions junction table with proper include
+    const budgetTransactions =
+      await this.prismaClient.budget_transactions.findMany({
+        where: {
+          user_id: userId,
+        },
+        include: {
+          transactions: true,
+        },
+      });
+
+    // Filter transactions for outcome type and date range, then extract the transaction data
+    const transactions: TransactionORM[] = budgetTransactions
+      .map((bt) => bt.transactions)
+      .filter((transaction) => {
+        if (!transaction) return false;
+
+        // Filter for outcome type only
+        if (transaction.type !== 'outcome') return false;
+
+        // Filter by date range
+        const transactionDate = new Date(transaction.created_at);
+        const startOfMonth = new Date(year, month - 1, 1);
+        const endOfMonth = new Date(year, month, 0);
+
+        return transactionDate >= startOfMonth && transactionDate <= endOfMonth;
+      });
+
+    return transactions.map((transaction) => this.toEntity(transaction));
+  }
 }

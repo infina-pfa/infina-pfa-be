@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BudgetAggregate } from '@/budgeting/domain';
-import { TransactionType } from '@/budgeting/domain/entities/transactions.entity';
+import {
+  TransactionEntity,
+  TransactionType,
+} from '@/budgeting/domain/entities/transactions.entity';
 
 export class TransactionResponseDto {
   @ApiProperty({
@@ -67,5 +70,31 @@ export class TransactionResponseDto {
       dto.updatedAt = transaction.props.updatedAt;
       return dto;
     });
+  }
+
+  static fromTransactionEntity(
+    transaction: TransactionEntity,
+  ): TransactionResponseDto {
+    const dto = new TransactionResponseDto();
+    dto.id = transaction.id;
+    dto.name = transaction.props.name;
+    dto.description = transaction.props.description;
+    dto.amount = transaction.amount.value;
+    dto.type = transaction.props.type;
+    dto.recurring = transaction.props.recurring;
+    dto.createdAt = transaction.props.createdAt;
+    dto.updatedAt = transaction.props.updatedAt;
+    return dto;
+  }
+
+  static fromTransactionEntities(
+    transactions: TransactionEntity[],
+  ): TransactionResponseDto[] {
+    if (!transactions || !Array.isArray(transactions)) {
+      return [];
+    }
+    return transactions.map((transaction) =>
+      TransactionResponseDto.fromTransactionEntity(transaction),
+    );
   }
 }

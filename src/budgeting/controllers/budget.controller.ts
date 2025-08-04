@@ -20,10 +20,12 @@ import {
 import { CreateBudgetUseCase } from '../use-cases/create-budget.use-case';
 import { GetBudgetDetailUseCase } from '../use-cases/get-budget-detail.use-case';
 import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
+import { GetMonthlySpendingUseCase } from '../use-cases/get-monthly-spending.use-case';
 import { SpendUseCase } from '../use-cases/spend.use-case';
 import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
 import { BudgetResponseDto } from './dto/budget.dto';
 import { CreateBudgetDto } from './dto/create-budget.dto';
+import { MonthlySpendingQueryDto } from './dto/monthly-spending-query.dto';
 import { SpendDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
@@ -36,6 +38,7 @@ export class BudgetController {
     private readonly createBudgetUseCase: CreateBudgetUseCase,
     private readonly getBudgetsUseCase: GetBudgetsUseCase,
     private readonly getBudgetDetailUseCase: GetBudgetDetailUseCase,
+    private readonly getMonthlySpendingUseCase: GetMonthlySpendingUseCase,
     private readonly updateBudgetUseCase: UpdateBudgetUseCase,
     private readonly spendUseCase: SpendUseCase,
   ) {}
@@ -81,6 +84,35 @@ export class BudgetController {
     return (
       await this.getBudgetsUseCase.execute({ userId: user.id, month, year })
     ).map((budget) => BudgetResponseDto.fromEntity(budget));
+  }
+
+  @Get('spending')
+  @ApiOperation({
+    summary: 'Get monthly spending transactions',
+    description:
+      'Retrieve all outcome transactions linked to budgets for a specific month and year',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of spending transactions for the specified month',
+    type: [TransactionResponseDto],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid query parameters',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getMonthlySpending(
+    @CurrentUser() user: AuthUser,
+    @Query() query: MonthlySpendingQueryDto,
+  ): Promise<TransactionResponseDto[]> {
+    const transactions = await this.getMonthlySpendingUseCase.execute({
+      userId: user.id,
+      month: query.month,
+      year: query.year,
+    });
+
+    return TransactionResponseDto.fromTransactionEntities(transactions);
   }
 
   @Get(':id')
