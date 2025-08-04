@@ -20,8 +20,16 @@ import {
   CreateGoalUseCase,
   GetGoalsUseCase,
   UpdateGoalUseCase,
+  ContributeGoalUseCase,
+  WithdrawGoalUseCase,
 } from '../use-cases';
-import { CreateGoalDto, GoalResponseDto, UpdateGoalDto } from './dto';
+import {
+  CreateGoalDto,
+  GoalResponseDto,
+  UpdateGoalDto,
+  ContributeGoalDto,
+  WithdrawGoalDto,
+} from './dto';
 import { CurrencyVO } from '@/common/base';
 
 @ApiTags('Goals')
@@ -32,6 +40,8 @@ export class GoalController {
     private readonly createGoalUseCase: CreateGoalUseCase,
     private readonly getGoalsUseCase: GetGoalsUseCase,
     private readonly updateGoalUseCase: UpdateGoalUseCase,
+    private readonly contributeGoalUseCase: ContributeGoalUseCase,
+    private readonly withdrawGoalUseCase: WithdrawGoalUseCase,
   ) {}
 
   @Post()
@@ -112,6 +122,65 @@ export class GoalController {
           ? new CurrencyVO(updateGoalDto.targetAmount, Currency.VND)
           : undefined,
       },
+    });
+
+    return GoalResponseDto.fromEntity(goalAggregate);
+  }
+
+  @Post(':id/contribute')
+  @ApiOperation({ summary: 'Contribute to a financial goal' })
+  @ApiParam({ name: 'id', description: 'Goal ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Contribution added successfully',
+    type: GoalResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Goal not found' })
+  async contributeToGoal(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() contributeGoalDto: ContributeGoalDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<GoalResponseDto> {
+    const goalAggregate = await this.contributeGoalUseCase.execute({
+      goalId: id,
+      userId: user.id,
+      amount: contributeGoalDto.amount,
+      name: contributeGoalDto.name,
+      description: contributeGoalDto.description,
+      recurring: contributeGoalDto.recurring,
+    });
+
+    return GoalResponseDto.fromEntity(goalAggregate);
+  }
+
+  @Post(':id/withdraw')
+  @ApiOperation({ summary: 'Withdraw from a financial goal' })
+  @ApiParam({ name: 'id', description: 'Goal ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Withdrawal processed successfully',
+    type: GoalResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request or insufficient balance',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Goal not found' })
+  async withdrawFromGoal(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() withdrawGoalDto: WithdrawGoalDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<GoalResponseDto> {
+    const goalAggregate = await this.withdrawGoalUseCase.execute({
+      goalId: id,
+      userId: user.id,
+      amount: withdrawGoalDto.amount,
+      name: withdrawGoalDto.name,
+      description: withdrawGoalDto.description,
+      recurring: withdrawGoalDto.recurring,
     });
 
     return GoalResponseDto.fromEntity(goalAggregate);

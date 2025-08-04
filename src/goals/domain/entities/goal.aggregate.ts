@@ -5,6 +5,7 @@ import {
 } from '@/budgeting/domain/entities/transactions.entity';
 import { GoalTransactionsWatchList } from '../watch-list/goal-transactions.watch-list';
 import { GoalEntity } from './goal.entity';
+import { GoalErrorFactory } from '../errors/goal-error.factory';
 
 export interface GoalAggregateProps {
   goal: GoalEntity;
@@ -121,6 +122,15 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     // Validate that amount is positive
     if (props.amount.value <= 0) {
       throw new Error('Withdrawal amount must be positive');
+    }
+
+    // Validate sufficient balance - cannot withdraw more than total contributed
+    const currentBalance = this.totalContributed;
+    if (props.amount.value > currentBalance.value) {
+      throw GoalErrorFactory.goalInsufficientBalance(
+        props.amount.value,
+        currentBalance.value,
+      );
     }
 
     this.props.contributions.add(

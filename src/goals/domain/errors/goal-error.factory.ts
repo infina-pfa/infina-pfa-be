@@ -40,4 +40,14 @@ export class GoalErrorFactory {
       message: `Goal with title '${title}' already exists for this user`,
     });
   }
+
+  static goalInsufficientBalance(
+    requestedAmount: number,
+    availableBalance: number,
+  ): BadRequestException {
+    return new BadRequestException({
+      code: GoalErrorCode.GOAL_INSUFFICIENT_BALANCE,
+      message: `Insufficient balance. Requested ${requestedAmount}, but only ${availableBalance} available`,
+    });
+  }
 }

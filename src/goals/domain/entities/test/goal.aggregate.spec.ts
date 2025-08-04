@@ -143,8 +143,11 @@ describe('GoalAggregate', () => {
   });
 
   describe('withdraw method', () => {
-    it('should add OUTCOME transaction with positive amount', () => {
-      // Arrange
+    it('should add OUTCOME transaction with positive amount when sufficient balance exists', () => {
+      // Arrange - First contribute to have balance
+      const contributionAmount = new CurrencyVO(100, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
       const withdrawalAmount = new CurrencyVO(50, Currency.USD);
       const withdrawalProps = {
         amount: withdrawalAmount,
@@ -158,19 +161,22 @@ describe('GoalAggregate', () => {
 
       // Assert
       const transactions = goalAggregate.contributions;
-      expect(transactions).toHaveLength(1);
+      expect(transactions).toHaveLength(2); // 1 contribution + 1 withdrawal
 
-      const transaction = transactions[0];
-      expect(transaction.props.amount).toEqual(withdrawalAmount);
-      expect(transaction.props.type).toBe(TransactionType.OUTCOME);
-      expect(transaction.props.name).toBe('Emergency withdrawal');
-      expect(transaction.props.description).toBe('Unexpected expense');
-      expect(transaction.props.recurring).toBe(0);
-      expect(transaction.props.userId).toBe(mockUserId);
+      const withdrawalTransaction = transactions[1];
+      expect(withdrawalTransaction.props.amount).toEqual(withdrawalAmount);
+      expect(withdrawalTransaction.props.type).toBe(TransactionType.OUTCOME);
+      expect(withdrawalTransaction.props.name).toBe('Emergency withdrawal');
+      expect(withdrawalTransaction.props.description).toBe('Unexpected expense');
+      expect(withdrawalTransaction.props.recurring).toBe(0);
+      expect(withdrawalTransaction.props.userId).toBe(mockUserId);
     });
 
     it('should update goal progress after withdrawal', () => {
-      // Arrange
+      // Arrange - First contribute to have balance
+      const contributionAmount = new CurrencyVO(100, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
       const withdrawalAmount = new CurrencyVO(75, Currency.USD);
       const updateProgressSpy = jest.spyOn(mockGoalEntity, 'updateProgress');
 
@@ -179,12 +185,15 @@ describe('GoalAggregate', () => {
 
       // Assert
       expect(updateProgressSpy).toHaveBeenCalledWith(
-        new CurrencyVO(-75, Currency.USD),
+        new CurrencyVO(25, Currency.USD), // 100 - 75 = 25
       );
     });
 
     it('should use default name if not provided', () => {
-      // Arrange
+      // Arrange - First contribute to have balance
+      const contributionAmount = new CurrencyVO(100, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
       const withdrawalAmount = new CurrencyVO(50, Currency.USD);
 
       // Act
@@ -192,11 +201,14 @@ describe('GoalAggregate', () => {
 
       // Assert
       const transactions = goalAggregate.contributions;
-      expect(transactions[0].props.name).toBe('Goal Withdrawal');
+      expect(transactions[1].props.name).toBe('Goal Withdrawal'); // Second transaction is withdrawal
     });
 
     it('should use default description if not provided', () => {
-      // Arrange
+      // Arrange - First contribute to have balance
+      const contributionAmount = new CurrencyVO(100, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
       const withdrawalAmount = new CurrencyVO(50, Currency.USD);
 
       // Act
@@ -204,13 +216,16 @@ describe('GoalAggregate', () => {
 
       // Assert
       const transactions = goalAggregate.contributions;
-      expect(transactions[0].props.description).toBe(
+      expect(transactions[1].props.description).toBe(
         `Withdrawal from ${mockGoalTitle}`,
       );
     });
 
     it('should use default recurring value if not provided', () => {
-      // Arrange
+      // Arrange - First contribute to have balance
+      const contributionAmount = new CurrencyVO(100, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
       const withdrawalAmount = new CurrencyVO(50, Currency.USD);
 
       // Act
@@ -218,7 +233,7 @@ describe('GoalAggregate', () => {
 
       // Assert
       const transactions = goalAggregate.contributions;
-      expect(transactions[0].props.recurring).toBe(0);
+      expect(transactions[1].props.recurring).toBe(0);
     });
 
     it('should throw error for zero amount', () => {
@@ -250,6 +265,35 @@ describe('GoalAggregate', () => {
         goalAggregate.withdraw({ amount: verySmallNegativeAmount });
       }).toThrow('Withdrawal amount must be positive');
     });
+
+    it('should throw error for insufficient balance', () => {
+      // Arrange - Contribute some amount first
+      const contributionAmount = new CurrencyVO(50, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
+      const withdrawalAmount = new CurrencyVO(100, Currency.USD); // More than available
+
+      // Act & Assert
+      expect(() => {
+        goalAggregate.withdraw({ amount: withdrawalAmount });
+      }).toThrow('Insufficient balance. Requested 100, but only 50 available');
+    });
+
+    it('should allow withdrawal equal to total contributed amount', () => {
+      // Arrange - Contribute some amount first
+      const contributionAmount = new CurrencyVO(100, Currency.USD);
+      goalAggregate.contribute({ amount: contributionAmount });
+
+      const withdrawalAmount = new CurrencyVO(100, Currency.USD); // Exactly equal to available
+
+      // Act
+      goalAggregate.withdraw({ amount: withdrawalAmount });
+
+      // Assert - Should have 2 transactions: 1 contribution, 1 withdrawal
+      const transactions = goalAggregate.contributions;
+      expect(transactions).toHaveLength(2);
+      expect(goalAggregate.totalContributed.value).toBe(0); // Net result is 0
+    });
   });
 
   describe('totalContributed computed property', () => {
@@ -276,7 +320,8 @@ describe('GoalAggregate', () => {
     });
 
     it('should subtract OUTCOME transactions correctly', () => {
-      // Arrange
+      // Arrange - First contribute to have balance
+      goalAggregate.contribute({ amount: new CurrencyVO(100, Currency.USD) });
       goalAggregate.withdraw({ amount: new CurrencyVO(50, Currency.USD) });
       goalAggregate.withdraw({ amount: new CurrencyVO(25, Currency.USD) });
 
@@ -284,7 +329,7 @@ describe('GoalAggregate', () => {
       const total = goalAggregate.totalContributed;
 
       // Assert
-      expect(total.value).toBe(-75);
+      expect(total.value).toBe(25); // 100 - 50 - 25 = 25
     });
 
     it('should handle mixed INCOME/OUTCOME transactions correctly', () => {
@@ -834,16 +879,14 @@ describe('GoalAggregate', () => {
       );
     });
 
-    it('should handle transactions that result in negative total', () => {
+    it('should prevent transactions that would result in negative balance', () => {
       // Arrange
       goalAggregate.contribute({ amount: new CurrencyVO(100, Currency.USD) });
-      goalAggregate.withdraw({ amount: new CurrencyVO(150, Currency.USD) });
 
-      // Act
-      const total = goalAggregate.totalContributed;
-
-      // Assert
-      expect(total.value).toBe(-50);
+      // Act & Assert - Should throw error when trying to withdraw more than available
+      expect(() => {
+        goalAggregate.withdraw({ amount: new CurrencyVO(150, Currency.USD) });
+      }).toThrow('Insufficient balance. Requested 150, but only 100 available');
     });
 
     it('should handle zero net contribution (equal contributions and withdrawals)', () => {

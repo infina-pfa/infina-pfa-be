@@ -10,6 +10,8 @@ import {
   CreateGoalUseCase,
   GetGoalsUseCase,
   UpdateGoalUseCase,
+  ContributeGoalUseCase,
+  WithdrawGoalUseCase,
 } from '../use-cases';
 import { GoalRepository, GoalAggregateRepository } from '../domain';
 import { TransactionRepository } from '../domain/repositories/transaction.repository';
@@ -33,6 +35,8 @@ import { TransactionRepository } from '../domain/repositories/transaction.reposi
     CreateGoalUseCase,
     GetGoalsUseCase,
     UpdateGoalUseCase,
+    ContributeGoalUseCase,
+    WithdrawGoalUseCase,
   ],
 })
 export class GoalModule {}
