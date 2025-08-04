@@ -25,6 +25,9 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
   public validate(): void {
     this.props.goal.validate();
+    this.props.contributions.items.forEach((transaction) => {
+      transaction.validate();
+    });
   }
 
   public get userId(): string {
@@ -146,5 +149,6 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
   }): void {
     this.props.goal.update(props);
     this.updated();
+    this.validate();
   }
 }

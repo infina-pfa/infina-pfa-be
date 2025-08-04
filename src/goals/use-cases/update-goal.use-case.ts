@@ -55,9 +55,6 @@ export class UpdateGoalUseCase extends BaseUseCase<
     // Update goal details using existing goalAggregate.updateGoalDetails(input.props)
     goalAggregate.updateGoalDetails(input.props);
 
-    // Validate using existing goalAggregate.validate()
-    goalAggregate.validate();
-
     // Save aggregate
     await this.goalAggregateRepository.save(goalAggregate);
 

@@ -1,9 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
-import { UpdateGoalUseCase } from '../update-goal.use-case';
-import { GoalAggregateRepository, GoalErrorFactory, GoalAggregate, GoalEntity } from '@/goals/domain';
 import { CurrencyVO } from '@/common/base';
+import {
+  GoalAggregate,
+  GoalAggregateRepository,
+  GoalEntity,
+  GoalErrorFactory,
+} from '@/goals/domain';
 import { GoalTransactionsWatchList } from '@/goals/domain/watch-list/goal-transactions.watch-list';
+import { Test, TestingModule } from '@nestjs/testing';
+import { UpdateGoalUseCase } from '../update-goal.use-case';
 
 describe('UpdateGoalUseCase', () => {
   let useCase: UpdateGoalUseCase;
@@ -37,14 +41,17 @@ describe('UpdateGoalUseCase', () => {
 
     // Create a mock goal aggregate
     const createMockGoalAggregate = (overrides: any = {}) => {
-      const goalEntity = GoalEntity.create({
-        userId,
-        title: 'Original Goal',
-        description: 'Original description',
-        targetAmount: new CurrencyVO(1000),
-        dueDate: new Date('2025-12-31'),
-        ...overrides.goalProps,
-      }, goalId);
+      const goalEntity = GoalEntity.create(
+        {
+          userId,
+          title: 'Original Goal',
+          description: 'Original description',
+          targetAmount: new CurrencyVO(1000),
+          dueDate: new Date('2025-12-31'),
+          ...overrides.goalProps,
+        },
+        goalId,
+      );
 
       const mockAggregate = {
         id: goalId,
@@ -86,9 +93,12 @@ describe('UpdateGoalUseCase', () => {
           title: input.props.title,
           userId,
         });
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
 
@@ -110,9 +120,12 @@ describe('UpdateGoalUseCase', () => {
         // Assert
         expect(goalAggregateRepository.findById).toHaveBeenCalledWith(goalId);
         expect(goalAggregateRepository.findOne).not.toHaveBeenCalled(); // No title check
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
 
@@ -138,9 +151,12 @@ describe('UpdateGoalUseCase', () => {
         // Assert
         expect(goalAggregateRepository.findById).toHaveBeenCalledWith(goalId);
         expect(goalAggregateRepository.findOne).not.toHaveBeenCalled(); // No title check
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
 
@@ -170,9 +186,12 @@ describe('UpdateGoalUseCase', () => {
           title: input.props.title,
           userId,
         });
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
 
@@ -198,9 +217,12 @@ describe('UpdateGoalUseCase', () => {
           title: input.props.title,
           userId,
         });
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
     });
@@ -251,9 +273,11 @@ describe('UpdateGoalUseCase', () => {
         const differentGoalAggregate = createMockGoalAggregate({
           id: 'different-goal-789',
         });
-        
+
         goalAggregateRepository.findById.mockResolvedValue(mockGoalAggregate);
-        goalAggregateRepository.findOne.mockResolvedValue(differentGoalAggregate); // Different goal with same title
+        goalAggregateRepository.findOne.mockResolvedValue(
+          differentGoalAggregate,
+        ); // Different goal with same title
 
         const input = {
           id: goalId,
@@ -271,7 +295,7 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when empty title (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.validate = jest.fn().mockImplementation(() => {
+        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
           throw GoalErrorFactory.invalidGoal('Title is required');
         });
 
@@ -294,7 +318,7 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when missing target amount (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.validate = jest.fn().mockImplementation(() => {
+        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
           throw GoalErrorFactory.invalidGoal('Target amount is required');
         });
 
@@ -317,7 +341,7 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when invalid target amount ≤ 0 (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.validate = jest.fn().mockImplementation(() => {
+        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
           throw GoalErrorFactory.invalidGoal('Target amount must be positive');
         });
 
@@ -340,7 +364,7 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when past due date (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.validate = jest.fn().mockImplementation(() => {
+        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
           throw GoalErrorFactory.invalidGoal('Due date must be in the future');
         });
 
@@ -419,14 +443,15 @@ describe('UpdateGoalUseCase', () => {
         // Act & Assert
         await expect(useCase.execute(input)).rejects.toThrow(repositoryError);
         expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalled();
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
       });
 
       it('should handle validation errors from domain layer', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        const validationError = GoalErrorFactory.invalidGoal('Custom validation error');
-        mockGoalAggregate.validate = jest.fn().mockImplementation(() => {
+        const validationError = GoalErrorFactory.invalidGoal(
+          'Custom validation error',
+        );
+        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
           throw validationError;
         });
 
@@ -441,6 +466,7 @@ describe('UpdateGoalUseCase', () => {
 
         // Act & Assert
         await expect(useCase.execute(input)).rejects.toThrow(validationError);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
         expect(goalAggregateRepository.save).not.toHaveBeenCalled();
       });
 
@@ -465,7 +491,9 @@ describe('UpdateGoalUseCase', () => {
         // Assert
         expect(goalAggregateRepository.findById).toHaveBeenCalledWith(goalId);
         expect(goalAggregateRepository.findOne).not.toHaveBeenCalled(); // Should not check for duplicate title
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
 
@@ -487,9 +515,12 @@ describe('UpdateGoalUseCase', () => {
         // Assert
         expect(goalAggregateRepository.findById).toHaveBeenCalledWith(goalId);
         expect(goalAggregateRepository.findOne).not.toHaveBeenCalled();
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-        expect(mockGoalAggregate.validate).toHaveBeenCalled();
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
         expect(result).toBe(mockGoalAggregate);
       });
     });
@@ -527,12 +558,14 @@ describe('UpdateGoalUseCase', () => {
         });
 
         expect(goalAggregateRepository.save).toHaveBeenCalledTimes(1);
-        expect(goalAggregateRepository.save).toHaveBeenCalledWith(mockGoalAggregate);
+        expect(goalAggregateRepository.save).toHaveBeenCalledWith(
+          mockGoalAggregate,
+        );
 
         expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledTimes(1);
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
-
-        expect(mockGoalAggregate.validate).toHaveBeenCalledTimes(1);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
       });
 
       it('should verify method calls when only non-title fields are updated', async () => {
@@ -558,7 +591,6 @@ describe('UpdateGoalUseCase', () => {
         expect(goalAggregateRepository.findOne).toHaveBeenCalledTimes(0); // Should not check for duplicate title
         expect(goalAggregateRepository.save).toHaveBeenCalledTimes(1);
         expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledTimes(1);
-        expect(mockGoalAggregate.validate).toHaveBeenCalledTimes(1);
       });
     });
 

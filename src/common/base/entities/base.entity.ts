@@ -33,6 +33,7 @@ export abstract class BaseEntity<P extends BaseProps> {
   }
 
   public updated() {
+    this.validate();
     this._props.updatedAt = new Date();
   }
 
