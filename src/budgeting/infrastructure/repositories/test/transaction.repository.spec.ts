@@ -1,13 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import {
   TransactionEntity,
   TransactionType,
 } from '@/budgeting/domain/entities/transactions.entity';
-import { TransactionORM } from '@/common/types/orms';
-import { PrismaClient } from '@/common/prisma';
 import { CurrencyVO } from '@/common/base';
+import { PrismaClient } from '@/common/prisma';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionRepositoryImpl } from '../transaction.repository';
-import { Decimal } from '@/common/types/prisma';
 
 // Helper function to create mock Decimal objects for tests
 const createMockDecimal = (value: number) => ({
@@ -1048,7 +1046,6 @@ describe('TransactionRepositoryImpl', () => {
         // Index 9: outcome + March = included
         // Index 12: outcome + February = excluded
         // etc.
-        const expectedCount = Math.floor(50 / 3) - Math.floor(50 / 12); // outcome transactions minus wrong month ones
         expect(result.length).toBeGreaterThan(0);
         expect(result.length).toBeLessThan(50);
 

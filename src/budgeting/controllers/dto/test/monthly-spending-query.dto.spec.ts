@@ -1,5 +1,5 @@
+import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { plainToInstance, Transform } from 'class-transformer';
 import { MonthlySpendingQueryDto } from '../monthly-spending-query.dto';
 
 describe('MonthlySpendingQueryDto', () => {
@@ -500,7 +500,7 @@ describe('MonthlySpendingQueryDto', () => {
     });
 
     describe('Transformation', () => {
-      it('should transform string month to number', async () => {
+      it('should transform string month to number', () => {
         const dto = plainToInstance(MonthlySpendingQueryDto, {
           month: '8',
           year: '2024',
@@ -510,7 +510,7 @@ describe('MonthlySpendingQueryDto', () => {
         expect(typeof dto.month).toBe('number');
       });
 
-      it('should transform string year to number', async () => {
+      it('should transform string year to number', () => {
         const dto = plainToInstance(MonthlySpendingQueryDto, {
           month: '6',
           year: '2024',
@@ -520,7 +520,7 @@ describe('MonthlySpendingQueryDto', () => {
         expect(typeof dto.year).toBe('number');
       });
 
-      it('should handle numeric strings with leading zeros', async () => {
+      it('should handle numeric strings with leading zeros', () => {
         const dto = plainToInstance(MonthlySpendingQueryDto, {
           month: '06',
           year: '02024',
@@ -530,7 +530,7 @@ describe('MonthlySpendingQueryDto', () => {
         expect(dto.year).toBe(2024);
       });
 
-      it('should handle numeric strings with whitespace', async () => {
+      it('should handle numeric strings with whitespace', () => {
         const dto = plainToInstance(MonthlySpendingQueryDto, {
           month: ' 7 ',
           year: ' 2024 ',
@@ -540,7 +540,7 @@ describe('MonthlySpendingQueryDto', () => {
         expect(dto.year).toBe(2024);
       });
 
-      it('should maintain original numeric values', async () => {
+      it('should maintain original numeric values', () => {
         const dto = plainToInstance(MonthlySpendingQueryDto, {
           month: 9,
           year: 2024,
@@ -552,7 +552,7 @@ describe('MonthlySpendingQueryDto', () => {
         expect(typeof dto.year).toBe('number');
       });
 
-      it('should handle transformation of edge values', async () => {
+      it('should handle transformation of edge values', () => {
         const dto = plainToInstance(MonthlySpendingQueryDto, {
           month: '1',
           year: '1900',

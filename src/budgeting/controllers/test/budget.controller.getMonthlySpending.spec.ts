@@ -631,7 +631,7 @@ describe('BudgetController - getMonthlySpending', () => {
 
         const fromTransactionEntitiesSpy = jest.spyOn(
           TransactionResponseDto,
-          'fromTransactionEntities',
+          'fromEntity',
         );
 
         await controller.getMonthlySpending(mockAuthUser, query);
@@ -809,7 +809,7 @@ describe('BudgetController - getMonthlySpending', () => {
         ).rejects.toThrow('Invalid month parameter');
       });
 
-      it('should handle null response from use case gracefully', async () => {
+      it('should handle null response from use case gracefully', () => {
         const query: MonthlySpendingQueryDto = { month: 7, year: 2024 };
 
         getMonthlySpendingUseCase.execute.mockResolvedValue(null as any);
@@ -820,7 +820,7 @@ describe('BudgetController - getMonthlySpending', () => {
         }).not.toThrow();
       });
 
-      it('should handle undefined response from use case gracefully', async () => {
+      it('should handle undefined response from use case gracefully', () => {
         const query: MonthlySpendingQueryDto = { month: 8, year: 2024 };
 
         getMonthlySpendingUseCase.execute.mockResolvedValue(undefined as any);
