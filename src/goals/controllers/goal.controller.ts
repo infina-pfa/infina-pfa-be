@@ -1,4 +1,6 @@
+import { CurrencyVO } from '@/common/base';
 import { CurrentUser } from '@/common/decorators';
+import { SupabaseAuthGuard } from '@/common/guards';
 import { AuthUser, Currency } from '@/common/types';
 import {
   Body,
@@ -8,6 +10,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -17,24 +20,24 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
+  ContributeGoalUseCase,
   CreateGoalUseCase,
   GetGoalsUseCase,
   UpdateGoalUseCase,
-  ContributeGoalUseCase,
   WithdrawGoalUseCase,
 } from '../use-cases';
 import {
+  ContributeGoalDto,
   CreateGoalDto,
   GoalResponseDto,
   UpdateGoalDto,
-  ContributeGoalDto,
   WithdrawGoalDto,
 } from './dto';
-import { CurrencyVO } from '@/common/base';
 
 @ApiTags('Goals')
 @ApiBearerAuth()
 @Controller('goals')
+@UseGuards(SupabaseAuthGuard)
 export class GoalController {
   constructor(
     private readonly createGoalUseCase: CreateGoalUseCase,

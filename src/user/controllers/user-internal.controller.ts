@@ -1,6 +1,13 @@
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { AuthUser } from '@/common/types/auth-user';
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { InternalServiceAuthGuard } from '@/common/guards';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -8,25 +15,24 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserProfileResponseDto } from '../dto/user-profile.dto';
+import { CreateUserProfileUseCase } from '../use-cases/create-user-profile.use-case';
 import { GetUserProfileUseCase } from '../use-cases/get-user-profile.use-case';
 import { UpdateUserProfileUseCase } from '../use-cases/update-user-profile.use-case';
-import { CreateUserProfileUseCase } from '../use-cases/create-user-profile.use-case';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
-import { SupabaseAuthGuard } from '@/common/guards';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @ApiTags('Users')
-@Controller('users')
-@ApiBearerAuth()
-@UseGuards(SupabaseAuthGuard)
-export class UserController {
+@Controller('/internal/users')
+@UseGuards(InternalServiceAuthGuard)
+@ApiBearerAuth('x-api-key')
+export class UserInternalController {
   constructor(
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
     private readonly updateUserProfileUseCase: UpdateUserProfileUseCase,
     private readonly createUserProfileUseCase: CreateUserProfileUseCase,
   ) {}
 
-  @Get('profile')
+  @Get('profile/:userId')
   @ApiOperation({
     summary: 'Get current user profile',
     description:
@@ -42,14 +48,14 @@ export class UserController {
     description: 'Authentication required',
   })
   async getUserProfile(
-    @CurrentUser() user: AuthUser,
+    @Param('userId') userId: string,
   ): Promise<UserProfileResponseDto> {
-    const userProfile = await this.getUserProfileUseCase.execute(user.id);
+    const userProfile = await this.getUserProfileUseCase.execute(userId);
 
     return UserProfileResponseDto.fromEntity(userProfile);
   }
 
-  @Post('profile')
+  @Post('profile/:userId')
   @ApiOperation({
     summary: 'Create user profile',
     description:
@@ -73,18 +79,18 @@ export class UserController {
     description: 'User profile already exists',
   })
   async createUserProfile(
-    @CurrentUser() user: AuthUser,
+    @Param('userId') userId: string,
     @Body() createDto: CreateUserProfileDto,
   ): Promise<UserProfileResponseDto> {
     const createdUser = await this.createUserProfileUseCase.execute({
-      userId: user.id,
+      userId,
       profileData: createDto,
     });
 
     return UserProfileResponseDto.fromEntity(createdUser);
   }
 
-  @Put('profile')
+  @Put('profile/:userId')
   @ApiOperation({
     summary: 'Update user profile',
     description:
@@ -108,11 +114,11 @@ export class UserController {
     description: 'User not found',
   })
   async updateUserProfile(
-    @CurrentUser() user: AuthUser,
+    @Param('userId') userId: string,
     @Body() updateDto: UpdateUserProfileDto,
   ): Promise<UserProfileResponseDto> {
     const updatedUser = await this.updateUserProfileUseCase.execute({
-      userId: user.id,
+      userId,
       updates: updateDto,
     });
 

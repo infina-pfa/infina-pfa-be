@@ -1,11 +1,10 @@
+import { CurrencyVO } from '@/common/base';
+import { GoalAggregateRepository, GoalErrorFactory } from '@/goals/domain';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, BadRequestException } from '@nestjs/common';
 import {
   CreateGoalUseCase,
   CreateGoalUseCaseInput,
 } from '../create-goal.use-case';
-import { GoalAggregateRepository, GoalErrorFactory } from '@/goals/domain';
-import { CurrencyVO } from '@/common/base';
 
 describe('CreateGoalUseCase', () => {
   let useCase: CreateGoalUseCase;
@@ -57,9 +56,9 @@ describe('CreateGoalUseCase', () => {
       });
       expect(goalAggregateRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          props: expect.objectContaining({
+          _props: expect.objectContaining({
             goal: expect.objectContaining({
-              props: expect.objectContaining({
+              _props: expect.objectContaining({
                 userId: validInput.userId,
                 title: validInput.title,
                 description: validInput.description,
@@ -69,8 +68,8 @@ describe('CreateGoalUseCase', () => {
                 dueDate: validInput.dueDate,
               }),
             }),
-            contributions: expect.objectContaining({
-              items: [],
+            transactions: expect.objectContaining({
+              _items: [],
             }),
           }),
         }),
@@ -285,9 +284,9 @@ describe('CreateGoalUseCase', () => {
       expect(goalAggregateRepository.save).toHaveBeenCalledTimes(1);
       expect(goalAggregateRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          props: expect.objectContaining({
+          _props: expect.objectContaining({
             goal: expect.objectContaining({
-              props: expect.objectContaining({
+              _props: expect.objectContaining({
                 userId: validInput.userId,
                 title: validInput.title,
                 description: validInput.description,
@@ -296,8 +295,8 @@ describe('CreateGoalUseCase', () => {
                 currentAmount: new CurrencyVO(0),
               }),
             }),
-            contributions: expect.objectContaining({
-              items: [],
+            transactions: expect.objectContaining({
+              _items: [],
             }),
           }),
         }),

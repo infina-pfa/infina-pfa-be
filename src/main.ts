@@ -1,21 +1,22 @@
-import 'dotenv/config';
-import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import 'dotenv/config';
+import { loadEnvFile } from 'process';
+import { AppModule } from './app.module';
+import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
-import { loadEnvFile } from 'process';
-import { ValidationPipe } from '@nestjs/common';
+import { GoalModule } from './goals/module';
+import { UserInternalModule } from './user';
+import { UserModule } from './user/module/user.module';
 
 loadEnvFile('.env');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  app.useGlobalGuards(new SupabaseAuthGuard(app.get(Reflector)));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -38,9 +39,34 @@ async function bootstrap() {
     .setTitle('Infina Personal Finance Advisor APIs')
     .setDescription('API documentation for Infina Personal Finance Advisor')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, config, {
+      include: [UserModule, BudgetingModule, GoalModule],
+    });
   SwaggerModule.setup('api', app, documentFactory);
+
+  const internalConfig = new DocumentBuilder()
+    .setTitle('Internal APIs for Infina Personal Finance Advisor')
+    .setDescription(
+      'API documentation for internal services of Infina Personal Finance Advisor',
+    )
+    .setVersion('1.0')
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+      },
+      'x-api-key',
+    )
+    .build();
+  const internalDocumentFactory = () =>
+    SwaggerModule.createDocument(app, internalConfig, {
+      include: [UserInternalModule],
+    });
+  SwaggerModule.setup('api-internal', app, internalDocumentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }

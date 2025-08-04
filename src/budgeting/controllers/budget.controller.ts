@@ -1,4 +1,5 @@
 import { CurrentUser } from '@/common/decorators';
+import { SupabaseAuthGuard } from '@/common/guards';
 import { AuthUser } from '@/common/types';
 import {
   Body,
@@ -9,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -33,6 +35,7 @@ import { UpdateBudgetDto } from './dto/update-budget.dto';
 @ApiTags('Budgets')
 @ApiBearerAuth()
 @Controller('budgets')
+@UseGuards(SupabaseAuthGuard)
 export class BudgetController {
   constructor(
     private readonly createBudgetUseCase: CreateBudgetUseCase,
