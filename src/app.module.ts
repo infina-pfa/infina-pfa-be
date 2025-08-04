@@ -7,6 +7,7 @@ import { UserModule } from './user';
 import { APP_GUARD } from '@nestjs/core';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { PrismaModule } from './common/prisma';
+import { GoalModule } from './goals/module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaModule } from './common/prisma';
     PrismaModule,
     BudgetingModule,
     UserModule,
+    GoalModule,
   ],
   controllers: [AppController],
   providers: [
