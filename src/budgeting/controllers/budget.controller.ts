@@ -112,6 +112,11 @@ export class BudgetController {
       year: query.year,
     });
 
+    // Handle null/undefined responses gracefully
+    if (!transactions) {
+      return [];
+    }
+
     return transactions.map((transaction) =>
       TransactionResponseDto.fromEntity(transaction),
     );

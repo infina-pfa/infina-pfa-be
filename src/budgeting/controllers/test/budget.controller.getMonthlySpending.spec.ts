@@ -636,9 +636,15 @@ describe('BudgetController - getMonthlySpending', () => {
 
         await controller.getMonthlySpending(mockAuthUser, query);
 
-        expect(fromTransactionEntitiesSpy).toHaveBeenCalledWith(
-          mockTransactions,
+        expect(fromTransactionEntitiesSpy).toHaveBeenCalledTimes(
+          mockTransactions.length,
         );
+        mockTransactions.forEach((transaction, index) => {
+          expect(fromTransactionEntitiesSpy).toHaveBeenNthCalledWith(
+            index + 1,
+            transaction,
+          );
+        });
       });
 
       it('should handle DTO conversion for different transaction types', async () => {
@@ -809,26 +815,24 @@ describe('BudgetController - getMonthlySpending', () => {
         ).rejects.toThrow('Invalid month parameter');
       });
 
-      it('should handle null response from use case gracefully', () => {
+      it('should handle null response from use case gracefully', async () => {
         const query: MonthlySpendingQueryDto = { month: 7, year: 2024 };
 
         getMonthlySpendingUseCase.execute.mockResolvedValue(null as any);
 
-        // The DTO conversion should handle null gracefully
-        expect(async () => {
-          await controller.getMonthlySpending(mockAuthUser, query);
-        }).not.toThrow();
+        const result = await controller.getMonthlySpending(mockAuthUser, query);
+
+        expect(result).toEqual([]);
       });
 
-      it('should handle undefined response from use case gracefully', () => {
+      it('should handle undefined response from use case gracefully', async () => {
         const query: MonthlySpendingQueryDto = { month: 8, year: 2024 };
 
         getMonthlySpendingUseCase.execute.mockResolvedValue(undefined as any);
 
-        // The DTO conversion should handle undefined gracefully
-        expect(async () => {
-          await controller.getMonthlySpending(mockAuthUser, query);
-        }).not.toThrow();
+        const result = await controller.getMonthlySpending(mockAuthUser, query);
+
+        expect(result).toEqual([]);
       });
     });
 

@@ -115,6 +115,13 @@ describe('TransactionRepositoryImpl', () => {
         expect(prismaClient.budget_transactions.findMany).toHaveBeenCalledWith({
           where: {
             user_id: userId,
+            transactions: {
+              type: 'outcome',
+              created_at: {
+                gte: new Date(year, month - 1, 1),
+                lte: new Date(year, month, 0),
+              },
+            },
           },
           include: {
             transactions: true,
@@ -127,11 +134,12 @@ describe('TransactionRepositoryImpl', () => {
         expect(result[1].props.name).toBe('Gas Station');
       });
 
-      it('should filter out non-outcome transactions', async () => {
+      it('should return only outcome transactions from database query', async () => {
         const userId = 'user-filter-type';
         const month = 3;
         const year = 2024;
 
+        // Mock only returns outcome transactions because the database query filters by type: 'outcome'
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -141,38 +149,10 @@ describe('TransactionRepositoryImpl', () => {
               amount: createMockDecimal(50000) as any,
               recurring: 0,
               name: 'Outcome Transaction',
-              description: 'Should be included',
+              description: 'Budget spending transaction',
               type: 'outcome',
               created_at: new Date('2024-03-10T00:00:00Z'),
               updated_at: new Date('2024-03-10T00:00:00Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-income',
-              user_id: userId,
-              amount: createMockDecimal(100000) as any,
-              recurring: 0,
-              name: 'Income Transaction',
-              description: 'Should be filtered out',
-              type: 'income',
-              created_at: new Date('2024-03-15T00:00:00Z'),
-              updated_at: new Date('2024-03-15T00:00:00Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-transfer',
-              user_id: userId,
-              amount: createMockDecimal(25000) as any,
-              recurring: 0,
-              name: 'Transfer Transaction',
-              description: 'Should be filtered out',
-              type: 'transfer',
-              created_at: new Date('2024-03-20T00:00:00Z'),
-              updated_at: new Date('2024-03-20T00:00:00Z'),
             },
           },
         ];
@@ -192,11 +172,12 @@ describe('TransactionRepositoryImpl', () => {
         expect(result[0].props.type).toBe(TransactionType.OUTCOME);
       });
 
-      it('should filter transactions by date range correctly', async () => {
+      it('should return transactions within date range from database query', async () => {
         const userId = 'user-date-filter';
         const month = 3;
         const year = 2024;
 
+        // Mock only returns transactions that match database query: type='outcome' AND within March 2024
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -226,34 +207,6 @@ describe('TransactionRepositoryImpl', () => {
               updated_at: new Date('2024-03-31T23:59:59Z'),
             },
           },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-out-of-range-1',
-              user_id: userId,
-              amount: createMockDecimal(40000) as any,
-              recurring: 0,
-              name: 'February Transaction',
-              description: 'Should be filtered out',
-              type: 'outcome',
-              created_at: new Date('2024-02-28T00:00:00Z'),
-              updated_at: new Date('2024-02-28T00:00:00Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-out-of-range-2',
-              user_id: userId,
-              amount: createMockDecimal(35000) as any,
-              recurring: 0,
-              name: 'April Transaction',
-              description: 'Should be filtered out',
-              type: 'outcome',
-              created_at: new Date('2024-04-01T00:00:00Z'),
-              updated_at: new Date('2024-04-01T00:00:00Z'),
-            },
-          },
         ];
 
         prismaClient.budget_transactions.findMany.mockResolvedValue(
@@ -276,6 +229,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 2;
         const year = 2024; // 2024 is a leap year
 
+        // Mock only returns transactions that match database query: type='outcome' AND within February 2024
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -289,20 +243,6 @@ describe('TransactionRepositoryImpl', () => {
               type: 'outcome',
               created_at: new Date('2024-02-29T12:00:00Z'),
               updated_at: new Date('2024-02-29T12:00:00Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-march-1',
-              user_id: userId,
-              amount: createMockDecimal(30000) as any,
-              recurring: 0,
-              name: 'March 1st Transaction',
-              description: 'Should be filtered out',
-              type: 'outcome',
-              created_at: new Date('2024-03-01T00:00:00Z'),
-              updated_at: new Date('2024-03-01T00:00:00Z'),
             },
           },
         ];
@@ -326,6 +266,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 2;
         const year = 2023; // 2023 is not a leap year
 
+        // Mock only returns transactions that match database query: type='outcome' AND within February 2023
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -339,20 +280,6 @@ describe('TransactionRepositoryImpl', () => {
               type: 'outcome',
               created_at: new Date('2023-02-28T23:59:59Z'),
               updated_at: new Date('2023-02-28T23:59:59Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-march-1',
-              user_id: userId,
-              amount: createMockDecimal(30000) as any,
-              recurring: 0,
-              name: 'March 1st Transaction',
-              description: 'Should be filtered out',
-              type: 'outcome',
-              created_at: new Date('2023-03-01T00:00:00Z'),
-              updated_at: new Date('2023-03-01T00:00:00Z'),
             },
           },
         ];
@@ -393,36 +320,8 @@ describe('TransactionRepositoryImpl', () => {
         const month = 3;
         const year = 2024;
 
-        const mockBudgetTransactions = [
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-wrong-type',
-              user_id: userId,
-              amount: createMockDecimal(50000) as any,
-              recurring: 0,
-              name: 'Income Transaction',
-              description: 'Wrong type',
-              type: 'income',
-              created_at: new Date('2024-03-10T00:00:00Z'),
-              updated_at: new Date('2024-03-10T00:00:00Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'transaction-wrong-date',
-              user_id: userId,
-              amount: createMockDecimal(30000) as any,
-              recurring: 0,
-              name: 'February Transaction',
-              description: 'Wrong month',
-              type: 'outcome',
-              created_at: new Date('2024-02-15T00:00:00Z'),
-              updated_at: new Date('2024-02-15T00:00:00Z'),
-            },
-          },
-        ];
+        // Mock returns empty array because database query filters out transactions that don't match criteria
+        const mockBudgetTransactions = [];
 
         prismaClient.budget_transactions.findMany.mockResolvedValue(
           mockBudgetTransactions,
@@ -481,6 +380,13 @@ describe('TransactionRepositoryImpl', () => {
           ).toHaveBeenCalledWith({
             where: {
               user_id: userId,
+              transactions: {
+                type: 'outcome',
+                created_at: {
+                  gte: new Date(year, month - 1, 1),
+                  lte: new Date(year, month, 0),
+                },
+              },
             },
             include: {
               transactions: true,
@@ -615,6 +521,13 @@ describe('TransactionRepositoryImpl', () => {
         expect(prismaClient.budget_transactions.findMany).toHaveBeenCalledWith({
           where: {
             user_id: '',
+            transactions: {
+              type: 'outcome',
+              created_at: {
+                gte: new Date(year, month - 1, 1),
+                lte: new Date(year, month, 0),
+              },
+            },
           },
           include: {
             transactions: true,
@@ -662,46 +575,6 @@ describe('TransactionRepositoryImpl', () => {
         expect(result).toHaveLength(1);
         expect(result[0].props.name).toBe('Valid Transaction');
       });
-
-      it('should handle undefined transaction in budget_transactions', async () => {
-        const userId = 'user-undefined-transaction';
-        const month = 3;
-        const year = 2024;
-
-        const mockBudgetTransactions = [
-          {
-            user_id: userId,
-            transactions: undefined, // Undefined transaction should be filtered out
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'valid-transaction',
-              user_id: userId,
-              amount: createMockDecimal(35000) as any,
-              recurring: 0,
-              name: 'Valid Transaction',
-              description: 'This should be included',
-              type: 'outcome',
-              created_at: new Date('2024-03-10T00:00:00Z'),
-              updated_at: new Date('2024-03-10T00:00:00Z'),
-            },
-          },
-        ];
-
-        prismaClient.budget_transactions.findMany.mockResolvedValue(
-          mockBudgetTransactions,
-        );
-
-        const result = await repository.findBudgetSpendingByMonth(
-          userId,
-          month,
-          year,
-        );
-
-        expect(result).toHaveLength(1);
-        expect(result[0].props.name).toBe('Valid Transaction');
-      });
     });
 
     describe('Prisma Integration', () => {
@@ -720,6 +593,13 @@ describe('TransactionRepositoryImpl', () => {
         expect(prismaClient.budget_transactions.findMany).toHaveBeenCalledWith({
           where: {
             user_id: userId,
+            transactions: {
+              type: 'outcome',
+              created_at: {
+                gte: new Date(year, month - 1, 1),
+                lte: new Date(year, month, 0),
+              },
+            },
           },
           include: {
             transactions: true,
@@ -851,7 +731,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 4;
         const year = 2024;
 
-        // Test transactions exactly at month boundaries
+        // Mock only returns transactions that match database query: type='outcome' AND within April 2024 boundaries
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -879,34 +759,6 @@ describe('TransactionRepositoryImpl', () => {
               type: 'outcome',
               created_at: new Date('2024-04-30T23:59:59.999Z'),
               updated_at: new Date('2024-04-30T23:59:59.999Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'before-month',
-              user_id: userId,
-              amount: createMockDecimal(30000) as any,
-              recurring: 0,
-              name: 'Before Month',
-              description: 'Just before April',
-              type: 'outcome',
-              created_at: new Date('2024-03-31T23:59:59.999Z'),
-              updated_at: new Date('2024-03-31T23:59:59.999Z'),
-            },
-          },
-          {
-            user_id: userId,
-            transactions: {
-              id: 'after-month',
-              user_id: userId,
-              amount: createMockDecimal(40000) as any,
-              recurring: 0,
-              name: 'After Month',
-              description: 'Just after April',
-              type: 'outcome',
-              created_at: new Date('2024-05-01T00:00:00.000Z'),
-              updated_at: new Date('2024-05-01T00:00:00.000Z'),
             },
           },
         ];
@@ -969,7 +821,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 3;
         const year = 2024;
 
-        // Create 100 budget transactions
+        // Mock only returns transactions that match database query: type='outcome' AND within March 2024
         const mockBudgetTransactions = Array.from(
           { length: 100 },
           (_, index) => ({
@@ -1001,58 +853,6 @@ describe('TransactionRepositoryImpl', () => {
         expect(result).toHaveLength(100);
         expect(result[0].props.name).toBe('Transaction 1');
         expect(result[99].props.name).toBe('Transaction 100');
-      });
-
-      it('should handle mixed valid and invalid transactions in large dataset', async () => {
-        const userId = 'user-mixed-dataset';
-        const month = 3;
-        const year = 2024;
-
-        // Create mixed dataset with valid and invalid transactions
-        const mockBudgetTransactions = Array.from(
-          { length: 50 },
-          (_, index) => ({
-            user_id: userId,
-            transactions: {
-              id: `transaction-${index}`,
-              user_id: userId,
-              amount: createMockDecimal((index + 1) * 1000) as any,
-              recurring: 0,
-              name: `Transaction ${index + 1}`,
-              description: `Description ${index + 1}`,
-              type: index % 3 === 0 ? 'outcome' : 'income', // Only every 3rd transaction is outcome
-              created_at:
-                index % 4 === 0
-                  ? new Date('2024-02-15T00:00:00Z') // Every 4th transaction is in wrong month
-                  : new Date('2024-03-10T00:00:00Z'),
-              updated_at: new Date('2024-03-10T00:00:00Z'),
-            },
-          }),
-        );
-
-        prismaClient.budget_transactions.findMany.mockResolvedValue(
-          mockBudgetTransactions,
-        );
-
-        const result = await repository.findBudgetSpendingByMonth(
-          userId,
-          month,
-          year,
-        );
-
-        // Should only include outcome transactions from March (index 3, 6, 9, 12, etc. but not 0, 12, 24, etc.)
-        // Index 3: outcome + March = included
-        // Index 6: outcome + March = included
-        // Index 9: outcome + March = included
-        // Index 12: outcome + February = excluded
-        // etc.
-        expect(result.length).toBeGreaterThan(0);
-        expect(result.length).toBeLessThan(50);
-
-        // All results should be outcome transactions from March
-        result.forEach((transaction) => {
-          expect(transaction.props.type).toBe(TransactionType.OUTCOME);
-        });
       });
     });
   });
