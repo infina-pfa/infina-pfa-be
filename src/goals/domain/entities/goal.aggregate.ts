@@ -37,9 +37,26 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
   // Computed properties
   public get totalContributed(): CurrencyVO {
-    return this.props.contributions.items.reduce(
-      (acc, contribution) => acc.add(contribution.amount),
-      new CurrencyVO(0),
+    const transactions = this.props.contributions.items;
+
+    // If no transactions, return zero in the goal's currency (or VND if no target amount)
+    if (transactions.length === 0) {
+      const currency =
+        this.props.goal.targetAmount?.currency ||
+        this.props.goal.currentAmount.currency;
+      return new CurrencyVO(0, currency);
+    }
+
+    return transactions.reduce(
+      (acc, transaction) => {
+        if (transaction.props.type === TransactionType.INCOME) {
+          return acc.add(transaction.amount);
+        } else if (transaction.props.type === TransactionType.OUTCOME) {
+          return acc.subtract(transaction.amount);
+        }
+        return acc;
+      },
+      new CurrencyVO(0, transactions[0].amount.currency),
     );
   }
 
@@ -49,10 +66,13 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
   public get remainingAmount(): CurrencyVO {
     if (!this.targetAmount) {
-      return new CurrencyVO(0);
+      const currency = this.props.goal.currentAmount.currency;
+      return new CurrencyVO(0, currency);
     }
     const remaining = this.targetAmount.subtract(this.totalContributed);
-    return remaining.value < 0 ? new CurrencyVO(0) : remaining;
+    return remaining.value < 0
+      ? new CurrencyVO(0, this.targetAmount.currency)
+      : remaining;
   }
 
   // Business methods
@@ -62,6 +82,11 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     description?: string;
     recurring?: number;
   }): void {
+    // Validate that amount is positive
+    if (props.amount.value <= 0) {
+      throw new Error('Contribution amount must be positive');
+    }
+
     this.props.contributions.add(
       TransactionEntity.create({
         amount: props.amount,
@@ -80,15 +105,32 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     this.props.goal.updateProgress(this.totalContributed);
   }
 
-  public removeContribution(transaction: TransactionEntity): void {
-    this.props.contributions.remove(transaction);
-    // Update the goal's current amount after removal
-    this.props.goal.updateProgress(this.totalContributed);
-  }
+  public withdraw(props: {
+    amount: CurrencyVO;
+    name?: string;
+    description?: string;
+    recurring?: number;
+  }): void {
+    // Validate that amount is positive
+    if (props.amount.value <= 0) {
+      throw new Error('Withdrawal amount must be positive');
+    }
 
-  public updateContribution(transaction: TransactionEntity): void {
-    this.props.contributions.update(transaction);
-    // Update the goal's current amount after update
+    this.props.contributions.add(
+      TransactionEntity.create({
+        amount: props.amount,
+        type: TransactionType.OUTCOME,
+        name: props.name || 'Goal Withdrawal',
+        description:
+          props.description || 'Withdrawal from ' + this.props.goal.title,
+        recurring: props.recurring || 0,
+        userId: this.props.goal.userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    );
+
+    // Update the goal's current amount
     this.props.goal.updateProgress(this.totalContributed);
   }
 

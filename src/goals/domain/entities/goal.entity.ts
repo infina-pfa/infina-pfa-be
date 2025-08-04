@@ -67,7 +67,10 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
   }
 
   public updateProgress(amount: CurrencyVO): void {
-    this._props.currentAmount = amount;
+    this._props = {
+      ...this._props,
+      currentAmount: amount,
+    };
     this.updated();
   }
 
