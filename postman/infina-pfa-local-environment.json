@@ -1,0 +1,43 @@
+{
+  "id": "local-env-id",
+  "name": "Infina PFA - Local",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "budget_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "api_version",
+      "value": "v1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "supabase_url",
+      "value": "http://localhost:54321",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "supabase_anon_key",
+      "value": "your-local-supabase-anon-key",
+      "type": "secret",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

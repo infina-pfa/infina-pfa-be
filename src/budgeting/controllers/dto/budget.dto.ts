@@ -92,7 +92,9 @@ export class BudgetResponseDto extends BaseDto {
     };
 
     if (includeTransactions) {
-      dto.transactions = TransactionResponseDto.fromEntity(entity);
+      dto.transactions = entity.spending.map((transaction) =>
+        TransactionResponseDto.fromEntity(transaction),
+      );
     }
 
     return dto;
