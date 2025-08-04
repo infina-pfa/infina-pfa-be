@@ -1,4 +1,8 @@
-import { UserEntity } from '../../src/user/domain/entities/user.entity';
+import { Currency, Language } from '@/common/types/user';
+import {
+  FinancialStage,
+  UserEntity,
+} from '../../src/user/domain/entities/user.entity';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -35,10 +39,12 @@ export class UserFactory {
       {
         userId: userData.userId,
         name: userData.name,
-        financialStage: userData.financialStage,
+        financialStage: userData.financialStage as FinancialStage,
         onboardingCompletedAt: userData.onboardingCompletedAt,
         createdAt: userData.createdAt,
         updatedAt: userData.updatedAt,
+        currency: Currency.USD,
+        language: Language.EN,
       },
       defaults.id,
     );

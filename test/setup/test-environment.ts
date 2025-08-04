@@ -29,7 +29,7 @@ export const testConfig = {
   test: {
     timeout: 30000, // 30 seconds timeout for integration tests
     retries: 0, // No retries for tests to avoid flaky behavior
-    verbose: true,
+    verbose: false,
   },
 
   // JWT configuration for test tokens
@@ -72,10 +72,8 @@ export const setupTestEnvironment = (): void => {
     process.env.NODE_ENV = 'test';
   }
 
-  // Set default test database URL if not provided
-  if (!process.env.E2E_TEST_DATABASE_URL) {
-    process.env.E2E_TEST_DATABASE_URL = testConfig.database.url;
-  }
+  process.env.E2E_TEST_DATABASE_URL = testConfig.database.url;
+  process.env.DATABASE_URL = testConfig.database.url;
 
   // Set default Supabase configuration if not provided
   if (!process.env.E2E_TEST_SUPABASE_URL) {

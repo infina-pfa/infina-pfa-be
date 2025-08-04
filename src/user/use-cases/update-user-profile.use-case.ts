@@ -28,6 +28,11 @@ export class UpdateUserProfileUseCase extends BaseUseCase<
       throw UserErrorFactory.userProfileNotFound();
     }
 
+    // Handle null/undefined updates
+    if (!updates) {
+      return user;
+    }
+
     // Update name if provided
     if (updates.name !== undefined) {
       user.updateName(updates.name);

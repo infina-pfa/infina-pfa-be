@@ -1,64 +1,43 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { TestDatabaseManager } from '../setup/database.setup';
-import { AuthTestUtils, TEST_USERS } from '../utils/auth.utils';
-import { SupabaseAuthGuard } from '@/common/guards/supabase-auth.guard';
-import { MockGuard } from '../mocks/guard.mock';
 import { PrismaClient } from '../../generated/prisma';
 import { BudgetResponseDto } from '../../src/budgeting/controllers/dto/budget.dto';
 import { BudgetCategory } from '../../src/budgeting/domain';
-import { TransactionResponseDto } from '../../src/budgeting/controllers/dto/transaction.dto';
 import { TransactionType } from '../../src/budgeting/domain/entities/transactions.entity';
+import { AppSetup } from '../setup/app.setup';
+import { TestDatabaseManager } from '../setup/database.setup';
+import { AuthTestUtils, TestUser } from '../utils/auth.utils';
 
 describe('Budget GET DETAIL Endpoint (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
   let authHeaders: Record<string, { Authorization: string }>;
+  let testUsers: { [key: string]: TestUser } = {};
 
   beforeAll(async () => {
-    // Setup test database
-    prisma = await TestDatabaseManager.setupTestDatabase();
+    const { app: appInstance, prisma: prismaInstance } =
+      await AppSetup.initApp();
+    app = appInstance;
+    prisma = prismaInstance;
 
-    // Create test module
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(SupabaseAuthGuard)
-      .useClass(MockGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-    await app.init();
-
-    // Setup test authentication
     const authSetup = await AuthTestUtils.setupTestAuthentication(prisma);
     authHeaders = authSetup.authHeaders;
+    testUsers = authSetup.testUsers;
   });
 
   afterAll(async () => {
     await TestDatabaseManager.cleanupTestDatabase();
-    await AuthTestUtils.cleanupTestUsers(prisma);
+    await AuthTestUtils.cleanupTestUsers(prisma, Object.values(testUsers));
     await TestDatabaseManager.teardownTestDatabase();
     await app.close();
   });
 
   beforeEach(async () => {
-    // Clean up test data before each test
-    await TestDatabaseManager.cleanupTestDatabase();
-
-    // Create both auth and public users for budget tests
-    for (const testUser of Object.values(TEST_USERS)) {
-      await AuthTestUtils.createTestUserInDatabase(prisma, testUser);
-    }
+    await TestDatabaseManager.cleanupTables([
+      'budget_transactions',
+      'transactions',
+      'budgets',
+    ]);
   });
 
   // Helper function to create test budgets
@@ -130,7 +109,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should retrieve budget detail successfully for authenticated user', async () => {
         // Create test budget for John
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Groceries',
           500,
           7,
@@ -147,7 +126,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         expect(body.id).toBe(budget.id);
         expect(body.name).toBe('Groceries');
         expect(body.amount).toBe(500);
-        expect(body.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(body.userId).toBe(testUsers.JOHN_DOE.id);
         expect(body.category).toBe(BudgetCategory.FIXED);
         expect(body.color).toBe('#FF5733');
         expect(body.icon).toBe('shopping-cart');
@@ -164,7 +143,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should include spending calculations and transaction list in response', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Groceries',
           500,
           7,
@@ -174,14 +153,14 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         // Create transactions for the budget
         const transaction1 = await createTestTransaction(
           budget.id,
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           100,
           'Store A',
           'Grocery shopping at Store A',
         );
         const transaction2 = await createTestTransaction(
           budget.id,
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           75,
           'Store B',
           'Grocery shopping at Store B',
@@ -224,7 +203,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return budget with transactions showing transaction details correctly', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Entertainment',
           300,
           8,
@@ -235,7 +214,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         // Create a detailed transaction
         const transaction = await createTestTransaction(
           budget.id,
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           50,
           'Movie Tickets',
           'Cinema tickets for weekend movie',
@@ -270,7 +249,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return budget without transactions showing empty transactions array', async () => {
         // Create test budget without any transactions
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Savings',
           1000,
           9,
@@ -308,7 +287,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return 404 for archived budgets', async () => {
         // Create archived budget
         const archivedBudget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Archived Budget',
           500,
           7,
@@ -330,7 +309,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return 403 when users try to access budgets belonging to other users', async () => {
         // Create budget for John
         const johnBudget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget',
           500,
           7,
@@ -360,7 +339,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return 401 for unauthenticated requests', async () => {
         // Create a budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Test Budget',
           500,
           7,
@@ -375,7 +354,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return 403 with invalid authentication token', async () => {
         // Create a budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Test Budget',
           500,
           7,
@@ -393,7 +372,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should handle budget with multiple transactions correctly', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Multi-Transaction Budget',
           1000,
           7,
@@ -405,7 +384,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         transactions.push(
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             250,
             'Transaction 1',
             'First transaction',
@@ -414,7 +393,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         transactions.push(
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             150,
             'Transaction 2',
             'Second transaction',
@@ -423,7 +402,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         transactions.push(
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             100,
             'Transaction 3',
             'Third transaction',
@@ -432,7 +411,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         transactions.push(
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             75,
             'Transaction 4',
             'Fourth transaction',
@@ -441,7 +420,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         transactions.push(
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             25,
             'Transaction 5',
             'Fifth transaction',
@@ -476,7 +455,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should handle budget with zero spending correctly', async () => {
         // Create budget without any transactions
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Zero Spending Budget',
           800,
           7,
@@ -499,7 +478,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should handle budget with maximum spending (over budget)', async () => {
         // Create test budget
         const budget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Over Budget',
           200,
           7,
@@ -509,13 +488,13 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         // Create transactions that exceed the budget
         await createTestTransaction(
           budget.id,
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           150,
           'Large Transaction 1',
         );
         await createTestTransaction(
           budget.id,
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           100,
           'Large Transaction 2',
         );
@@ -538,7 +517,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
 
         // Create budget
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Recently Created',
           400,
           7,
@@ -578,7 +557,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should handle recently updated budget correctly', async () => {
         // Create budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'To Be Updated',
           300,
           7,
@@ -624,7 +603,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should return correct response structure with all required fields', async () => {
         // Create budget with transaction
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Structure Test',
           500,
           7,
@@ -636,7 +615,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
 
         await createTestTransaction(
           budget.id,
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           100,
           'Test Transaction',
           'Test description',
@@ -681,7 +660,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         // Verify values
         expect(body.name).toBe('Structure Test');
         expect(body.amount).toBe(500);
-        expect(body.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(body.userId).toBe(testUsers.JOHN_DOE.id);
         expect(body.category).toBe(BudgetCategory.FLEXIBLE);
         expect(body.color).toBe('#00FF00');
         expect(body.icon).toBe('test-icon');
@@ -721,7 +700,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should validate spending calculations are accurate', async () => {
         // Create budget
         const budget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Calculation Test',
           1000,
           7,
@@ -733,7 +712,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         for (let i = 0; i < amounts.length; i++) {
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JANE_SMITH.id,
+            testUsers.JANE_SMITH.id,
             amounts[i],
             `Transaction ${i + 1}`,
           );
@@ -760,7 +739,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should maintain data consistency between API response and database', async () => {
         // Create budget
         const budgetInDb = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Consistency Test',
           750,
           8,
@@ -794,7 +773,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should respond within reasonable time for budget detail retrieval', async () => {
         // Create budget with multiple transactions
         const budget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'Performance Test',
           1000,
           7,
@@ -805,7 +784,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         for (let i = 1; i <= 10; i++) {
           await createTestTransaction(
             budget.id,
-            TEST_USERS.JOHN_DOE.id,
+            testUsers.JOHN_DOE.id,
             i * 10,
             `Transaction ${i}`,
           );
@@ -827,21 +806,21 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
       it('should handle concurrent requests for different budget details efficiently', async () => {
         // Create budgets for multiple users
         const johnBudget = await createTestBudget(
-          TEST_USERS.JOHN_DOE.id,
+          testUsers.JOHN_DOE.id,
           'John Budget',
           500,
           7,
           2025,
         );
         const janeBudget = await createTestBudget(
-          TEST_USERS.JANE_SMITH.id,
+          testUsers.JANE_SMITH.id,
           'Jane Budget',
           600,
           7,
           2025,
         );
         const adminBudget = await createTestBudget(
-          TEST_USERS.ADMIN_USER.id,
+          testUsers.ADMIN_USER.id,
           'Admin Budget',
           700,
           7,
@@ -869,11 +848,11 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         const adminBody = adminResponse.body as BudgetResponseDto;
 
         expect(johnBody.name).toBe('John Budget');
-        expect(johnBody.userId).toBe(TEST_USERS.JOHN_DOE.id);
+        expect(johnBody.userId).toBe(testUsers.JOHN_DOE.id);
         expect(janeBody.name).toBe('Jane Budget');
-        expect(janeBody.userId).toBe(TEST_USERS.JANE_SMITH.id);
+        expect(janeBody.userId).toBe(testUsers.JANE_SMITH.id);
         expect(adminBody.name).toBe('Admin Budget');
-        expect(adminBody.userId).toBe(TEST_USERS.ADMIN_USER.id);
+        expect(adminBody.userId).toBe(testUsers.ADMIN_USER.id);
       });
     });
   });
