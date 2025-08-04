@@ -1,5 +1,6 @@
 import { BaseEntity, BaseProps } from '@/common/base';
 import { Currency, Language } from '@/common/types/user';
+import { UserErrorFactory } from '../errors/user-error.factory';
 
 export enum BudgetingStyle {
   DETAIL_TRACKER = 'detail_tracker',
@@ -32,6 +33,18 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
       },
       id,
     );
+  }
+
+  public validate(): void {
+    if (!this.props.name) {
+      throw UserErrorFactory.invalidUser('Name is required');
+    }
+    if (![Currency.USD, Currency.VND].includes(this.props.currency)) {
+      throw UserErrorFactory.invalidUser('Invalid currency');
+    }
+    if (![Language.EN, Language.VI].includes(this.props.language)) {
+      throw UserErrorFactory.invalidUser('Invalid language');
+    }
   }
 
   public updateName(name: string): void {

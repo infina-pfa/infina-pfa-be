@@ -23,6 +23,10 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     );
   }
 
+  public validate(): void {
+    this.props.goal.validate();
+  }
+
   public get userId(): string {
     return this.props.goal.userId;
   }

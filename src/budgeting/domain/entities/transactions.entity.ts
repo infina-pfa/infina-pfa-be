@@ -1,5 +1,6 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProp } from '@/common/utils/type';
+import { BudgetErrorFactory } from '../errors/budget-error.factory';
 
 export enum TransactionType {
   INCOME = 'income',
@@ -27,6 +28,12 @@ export class TransactionEntity extends BaseEntity<TransactionEntityProps> {
       },
       id,
     );
+  }
+
+  public validate(): void {
+    if (this.props.amount.value <= 0) {
+      throw BudgetErrorFactory.budgetInvalidAmount();
+    }
   }
 
   public get amount(): CurrencyVO {

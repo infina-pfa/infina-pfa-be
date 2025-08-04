@@ -1,5 +1,6 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
+import { GoalErrorFactory } from '../errors/goal-error.factory';
 
 export interface GoalEntityProps extends BaseProps {
   userId: string;
@@ -27,6 +28,24 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
       },
       id,
     );
+  }
+
+  public validate(): void {
+    if (!this.props.title) {
+      throw GoalErrorFactory.invalidGoal('Title is required');
+    }
+    if (!this.props.targetAmount) {
+      throw GoalErrorFactory.invalidGoal('Target amount is required');
+    }
+    if (this.props.targetAmount.value <= 0) {
+      throw GoalErrorFactory.invalidGoal('Target amount must be positive');
+    }
+    if (this.props.currentAmount.value < 0) {
+      throw GoalErrorFactory.invalidGoal('Current amount must be positive');
+    }
+    if (this.props.dueDate && this.props.dueDate < new Date()) {
+      throw GoalErrorFactory.invalidGoal('Due date must be in the future');
+    }
   }
 
   public get userId(): string {
