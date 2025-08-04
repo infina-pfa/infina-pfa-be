@@ -167,7 +167,9 @@ describe('GoalAggregate', () => {
       expect(withdrawalTransaction.props.amount).toEqual(withdrawalAmount);
       expect(withdrawalTransaction.props.type).toBe(TransactionType.OUTCOME);
       expect(withdrawalTransaction.props.name).toBe('Emergency withdrawal');
-      expect(withdrawalTransaction.props.description).toBe('Unexpected expense');
+      expect(withdrawalTransaction.props.description).toBe(
+        'Unexpected expense',
+      );
       expect(withdrawalTransaction.props.recurring).toBe(0);
       expect(withdrawalTransaction.props.userId).toBe(mockUserId);
     });

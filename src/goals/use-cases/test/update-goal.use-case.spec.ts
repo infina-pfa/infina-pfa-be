@@ -295,9 +295,11 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when empty title (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
-          throw GoalErrorFactory.invalidGoal('Title is required');
-        });
+        mockGoalAggregate.updateGoalDetails = jest
+          .fn()
+          .mockImplementation(() => {
+            throw GoalErrorFactory.invalidGoal('Title is required');
+          });
 
         goalAggregateRepository.findById.mockResolvedValue(mockGoalAggregate);
         goalAggregateRepository.findOne.mockResolvedValue(null);
@@ -318,9 +320,11 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when missing target amount (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
-          throw GoalErrorFactory.invalidGoal('Target amount is required');
-        });
+        mockGoalAggregate.updateGoalDetails = jest
+          .fn()
+          .mockImplementation(() => {
+            throw GoalErrorFactory.invalidGoal('Target amount is required');
+          });
 
         goalAggregateRepository.findById.mockResolvedValue(mockGoalAggregate);
         goalAggregateRepository.save.mockResolvedValue(undefined);
@@ -341,9 +345,13 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when invalid target amount ≤ 0 (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
-          throw GoalErrorFactory.invalidGoal('Target amount must be positive');
-        });
+        mockGoalAggregate.updateGoalDetails = jest
+          .fn()
+          .mockImplementation(() => {
+            throw GoalErrorFactory.invalidGoal(
+              'Target amount must be positive',
+            );
+          });
 
         goalAggregateRepository.findById.mockResolvedValue(mockGoalAggregate);
         goalAggregateRepository.save.mockResolvedValue(undefined);
@@ -364,9 +372,13 @@ describe('UpdateGoalUseCase', () => {
       it('should throw BadRequestException when past due date (GoalEntity.validate)', async () => {
         // Arrange
         const mockGoalAggregate = createMockGoalAggregate();
-        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
-          throw GoalErrorFactory.invalidGoal('Due date must be in the future');
-        });
+        mockGoalAggregate.updateGoalDetails = jest
+          .fn()
+          .mockImplementation(() => {
+            throw GoalErrorFactory.invalidGoal(
+              'Due date must be in the future',
+            );
+          });
 
         goalAggregateRepository.findById.mockResolvedValue(mockGoalAggregate);
         goalAggregateRepository.save.mockResolvedValue(undefined);
@@ -451,9 +463,11 @@ describe('UpdateGoalUseCase', () => {
         const validationError = GoalErrorFactory.invalidGoal(
           'Custom validation error',
         );
-        mockGoalAggregate.updateGoalDetails = jest.fn().mockImplementation(() => {
-          throw validationError;
-        });
+        mockGoalAggregate.updateGoalDetails = jest
+          .fn()
+          .mockImplementation(() => {
+            throw validationError;
+          });
 
         goalAggregateRepository.findById.mockResolvedValue(mockGoalAggregate);
         goalAggregateRepository.findOne.mockResolvedValue(null);
@@ -466,7 +480,9 @@ describe('UpdateGoalUseCase', () => {
 
         // Act & Assert
         await expect(useCase.execute(input)).rejects.toThrow(validationError);
-        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(input.props);
+        expect(mockGoalAggregate.updateGoalDetails).toHaveBeenCalledWith(
+          input.props,
+        );
         expect(goalAggregateRepository.save).not.toHaveBeenCalled();
       });
 
