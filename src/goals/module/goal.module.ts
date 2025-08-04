@@ -6,7 +6,11 @@ import {
   GoalAggregateRepositoryImpl,
 } from '../infrastructure/repositories';
 import { TransactionRepositoryImpl } from '../infrastructure/repositories/transaction.repository';
-import { CreateGoalUseCase, UpdateGoalUseCase } from '../use-cases';
+import {
+  CreateGoalUseCase,
+  GetGoalsUseCase,
+  UpdateGoalUseCase,
+} from '../use-cases';
 import { GoalRepository, GoalAggregateRepository } from '../domain';
 import { TransactionRepository } from '../domain/repositories/transaction.repository';
 
@@ -27,6 +31,7 @@ import { TransactionRepository } from '../domain/repositories/transaction.reposi
       useClass: GoalAggregateRepositoryImpl,
     },
     CreateGoalUseCase,
+    GetGoalsUseCase,
     UpdateGoalUseCase,
   ],
 })
