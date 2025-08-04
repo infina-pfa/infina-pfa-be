@@ -25,6 +25,10 @@ export class BudgetAggregate extends BaseEntity<
     );
   }
 
+  public validate(): void {
+    this.props.budget.validate();
+  }
+
   public get userId(): string {
     return this.props.budget.userId;
   }

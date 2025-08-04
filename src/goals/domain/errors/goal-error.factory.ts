@@ -6,6 +6,13 @@ import {
 import { GoalErrorCode } from './goal-error-codes';
 
 export class GoalErrorFactory {
+  static invalidGoal(message: string): BadRequestException {
+    return new BadRequestException({
+      code: GoalErrorCode.INVALID_GOAL,
+      message,
+    });
+  }
+
   static goalNotFound(): NotFoundException {
     return new NotFoundException({
       code: GoalErrorCode.GOAL_NOT_FOUND,

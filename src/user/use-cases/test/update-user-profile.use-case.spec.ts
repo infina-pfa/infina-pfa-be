@@ -455,7 +455,7 @@ describe('UpdateUserProfileUseCase', () => {
           expect(error).toEqual(UserErrorFactory.userProfileNotFound());
           expect(error.getStatus()).toBe(404);
           expect(error.getResponse()).toEqual({
-            code: 'USER_001',
+            code: 'USER_PROFILE_NOT_FOUND',
             message: 'User profile not found',
           });
         }

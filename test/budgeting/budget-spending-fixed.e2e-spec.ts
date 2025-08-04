@@ -14,6 +14,7 @@ describe('Budget Spending API E2E (Fixed)', () => {
   // Test data
   let johnBudget1: any;
   let johnBudget2: any;
+  let janeBudget: any;
 
   beforeAll(async () => {
     const { app: appInstance, prisma: prismaInstance } =
@@ -83,12 +84,13 @@ describe('Budget Spending API E2E (Fixed)', () => {
       .expect(201);
     johnBudget2 = response2.body;
 
-    // Create Jane's budget (for other user isolation tests but not stored)
-    await request(app.getHttpServer())
+    // Create Jane's budget
+    const response3 = await request(app.getHttpServer())
       .post('/budgets')
       .set(authHeaders.JANE_SMITH)
       .send(createBudgetDto3)
       .expect(201);
+    janeBudget = response3.body;
   });
 
   afterAll(async () => {

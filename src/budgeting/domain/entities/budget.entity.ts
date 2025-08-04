@@ -42,6 +42,12 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     );
   }
 
+  public validate(): void {
+    if (this.props.amount.value <= 0) {
+      throw BudgetErrorFactory.budgetInvalidAmount();
+    }
+  }
+
   public get userId(): string {
     return this.props.userId;
   }

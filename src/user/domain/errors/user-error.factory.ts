@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserErrorCode } from './user-error-codes';
 
 export class UserErrorFactory {
@@ -13,6 +17,13 @@ export class UserErrorFactory {
     return new ConflictException({
       code: UserErrorCode.USER_PROFILE_ALREADY_EXISTS,
       message: 'User profile already exists',
+    });
+  }
+
+  static invalidUser(message: string): BadRequestException {
+    return new BadRequestException({
+      code: UserErrorCode.INVALID_USER,
+      message,
     });
   }
 }

@@ -22,6 +22,8 @@ export abstract class BaseEntity<P extends BaseProps> {
     } as P;
   }
 
+  abstract validate(): void;
+
   public get id(): string {
     return this._id;
   }
