@@ -112,7 +112,9 @@ export class BudgetController {
       year: query.year,
     });
 
-    return TransactionResponseDto.fromTransactionEntities(transactions);
+    return transactions.map((transaction) =>
+      TransactionResponseDto.fromEntity(transaction),
+    );
   }
 
   @Get(':id')
