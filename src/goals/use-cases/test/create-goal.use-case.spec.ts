@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, BadRequestException } from '@nestjs/common';
-import { CreateGoalUseCase, CreateGoalUseCaseInput } from '../create-goal.use-case';
+import {
+  CreateGoalUseCase,
+  CreateGoalUseCaseInput,
+} from '../create-goal.use-case';
 import { GoalAggregateRepository, GoalErrorFactory } from '@/goals/domain';
 import { CurrencyVO } from '@/common/base';
 
@@ -60,7 +63,9 @@ describe('CreateGoalUseCase', () => {
                 userId: validInput.userId,
                 title: validInput.title,
                 description: validInput.description,
-                targetAmount: validInput.targetAmount ? new CurrencyVO(validInput.targetAmount) : undefined,
+                targetAmount: validInput.targetAmount
+                  ? new CurrencyVO(validInput.targetAmount)
+                  : undefined,
                 dueDate: validInput.dueDate,
               }),
             }),
@@ -173,7 +178,7 @@ describe('CreateGoalUseCase', () => {
       expect(result.props.goal.props.targetAmount).toBeUndefined();
       expect(result.props.goal.props.dueDate).toBeUndefined();
       expect(result.props.goal.props.currentAmount.value).toBe(0);
-      expect(result.props.contributions.items).toEqual([]);
+      expect(result.props.transactions.items).toEqual([]);
       expect(goalAggregateRepository.save).toHaveBeenCalled();
     });
 
@@ -211,7 +216,9 @@ describe('CreateGoalUseCase', () => {
       goalAggregateRepository.findOne.mockRejectedValue(repositoryError);
 
       // Act & Assert
-      await expect(useCase.execute(validInput)).rejects.toThrow(repositoryError);
+      await expect(useCase.execute(validInput)).rejects.toThrow(
+        repositoryError,
+      );
       expect(goalAggregateRepository.save).not.toHaveBeenCalled();
     });
 
@@ -222,7 +229,9 @@ describe('CreateGoalUseCase', () => {
       goalAggregateRepository.save.mockRejectedValue(repositoryError);
 
       // Act & Assert
-      await expect(useCase.execute(validInput)).rejects.toThrow(repositoryError);
+      await expect(useCase.execute(validInput)).rejects.toThrow(
+        repositoryError,
+      );
       expect(goalAggregateRepository.findOne).toHaveBeenCalled();
     });
 
@@ -238,19 +247,21 @@ describe('CreateGoalUseCase', () => {
       expect(result).toBeInstanceOf(Object);
       expect(result.props).toBeDefined();
       expect(result.props.goal).toBeDefined();
-      expect(result.props.contributions).toBeDefined();
-      
+      expect(result.props.transactions).toBeDefined();
+
       // Verify goal properties
       expect(result.props.goal.props.userId).toBe(validInput.userId);
       expect(result.props.goal.props.title).toBe(validInput.title);
       expect(result.props.goal.props.description).toBe(validInput.description);
-      expect(result.props.goal.props.targetAmount).toEqual(new CurrencyVO(validInput.targetAmount!));
+      expect(result.props.goal.props.targetAmount).toEqual(
+        new CurrencyVO(validInput.targetAmount!),
+      );
       expect(result.props.goal.props.dueDate).toBe(validInput.dueDate);
       expect(result.props.goal.props.currentAmount).toEqual(new CurrencyVO(0));
-      
+
       // Verify empty contributions list
-      expect(result.props.contributions.items).toEqual([]);
-      
+      expect(result.props.transactions.items).toEqual([]);
+
       // Verify timestamps are set
       expect(result.props.createdAt).toBeInstanceOf(Date);
       expect(result.props.updatedAt).toBeInstanceOf(Date);
@@ -270,7 +281,7 @@ describe('CreateGoalUseCase', () => {
         title: validInput.title,
         userId: validInput.userId,
       });
-      
+
       expect(goalAggregateRepository.save).toHaveBeenCalledTimes(1);
       expect(goalAggregateRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -297,13 +308,18 @@ describe('CreateGoalUseCase', () => {
       // Arrange
       goalAggregateRepository.findOne.mockResolvedValue(null);
       goalAggregateRepository.save.mockResolvedValue(undefined);
-      const largeAmountInput = { ...validInput, targetAmount: Number.MAX_SAFE_INTEGER };
+      const largeAmountInput = {
+        ...validInput,
+        targetAmount: Number.MAX_SAFE_INTEGER,
+      };
 
       // Act
       const result = await useCase.execute(largeAmountInput);
 
       // Assert
-      expect(result.props.goal.props.targetAmount!.value).toBe(Number.MAX_SAFE_INTEGER);
+      expect(result.props.goal.props.targetAmount!.value).toBe(
+        Number.MAX_SAFE_INTEGER,
+      );
       expect(goalAggregateRepository.save).toHaveBeenCalled();
     });
 
