@@ -2,6 +2,7 @@ import { InternalServiceAuthGuard } from '@/common/guards';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -29,6 +30,7 @@ import { MonthlySpendingQueryInternalDto } from './dto/monthly-spending-query.dt
 import { SpendInternalDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetInternalDto } from './dto/update-budget.dto';
+import { DeleteBudgetUseCase, DeleteSpendingUseCase } from '../use-cases';
 
 @ApiTags('Budgets')
 @ApiBearerAuth()
@@ -42,6 +44,8 @@ export class BudgetInternalController {
     private readonly getMonthlySpendingUseCase: GetMonthlySpendingUseCase,
     private readonly updateBudgetUseCase: UpdateBudgetUseCase,
     private readonly spendUseCase: SpendUseCase,
+    private readonly deleteBudgetUseCase: DeleteBudgetUseCase,
+    private readonly deleteSpendingUseCase: DeleteSpendingUseCase,
   ) {}
 
   @Post()
@@ -203,5 +207,30 @@ export class BudgetInternalController {
       description: spendDto.description,
       recurring: spendDto.recurring,
     });
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a budget' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiResponse({ status: 200, description: 'Budget deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async deleteBudget(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.deleteBudgetUseCase.execute({ budgetId: id });
+  }
+
+  @Delete(':id/spending/:spendingId')
+  @ApiOperation({ summary: 'Delete a spending' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiParam({ name: 'spendingId', description: 'Spending ID' })
+  @ApiResponse({ status: 200, description: 'Spending deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Access denied to spending' })
+  @ApiResponse({ status: 404, description: 'Spending not found' })
+  async deleteSpending(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('spendingId', ParseUUIDPipe) spendingId: string,
+  ): Promise<void> {
+    await this.deleteSpendingUseCase.execute({ spendingId });
   }
 }
