@@ -502,17 +502,15 @@ model transactions {
   recurring           Int
   name                String
   description         String?
-  type                transaction_type      @default(income)
   user_id             String?               @db.Uuid
   deleted_at          DateTime?             @db.Timestamptz(6)
+  type                transaction_type      @default(budget_spending)
   budget_transactions budget_transactions[]
   goal_transactions   goal_transactions[]
   users               auth_users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([type], map: "idx_transactions_type")
   @@index([user_id, created_at(sort: Desc)], map: "idx_transactions_user_created")
   @@index([user_id], map: "idx_transactions_user_id")
-  @@index([user_id, type], map: "idx_transactions_user_type")
   @@index([amount], map: "idx_transactions_amount")
   @@index([name], map: "idx_transactions_name")
   @@schema("public")
@@ -627,8 +625,9 @@ enum message_type {
 /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 enum transaction_type {
   income
-  outcome
-  transfer
+  budget_spending
+  goal_contribution
+  goal_withdrawal
 
   @@schema("public")
 }

@@ -81,7 +81,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Grocery Shopping',
               description: 'Weekly groceries',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-10T00:00:00Z'),
               updated_at: new Date('2024-03-10T00:00:00Z'),
             },
@@ -95,7 +95,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Gas Station',
               description: 'Fuel',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-15T00:00:00Z'),
               updated_at: new Date('2024-03-15T00:00:00Z'),
             },
@@ -116,7 +116,7 @@ describe('TransactionRepositoryImpl', () => {
           where: {
             user_id: userId,
             transactions: {
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: {
                 gte: new Date(year, month - 1, 1),
                 lte: new Date(year, month, 0),
@@ -139,7 +139,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 3;
         const year = 2024;
 
-        // Mock only returns outcome transactions because the database query filters by type: 'outcome'
+        // Mock only returns outcome transactions because the database query filters by type: 'budget_spending'
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -150,7 +150,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Outcome Transaction',
               description: 'Budget spending transaction',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-10T00:00:00Z'),
               updated_at: new Date('2024-03-10T00:00:00Z'),
             },
@@ -169,7 +169,7 @@ describe('TransactionRepositoryImpl', () => {
 
         expect(result).toHaveLength(1);
         expect(result[0].props.name).toBe('Outcome Transaction');
-        expect(result[0].props.type).toBe(TransactionType.OUTCOME);
+        expect(result[0].props.type).toBe(TransactionType.BUDGET_SPENDING);
       });
 
       it('should return transactions within date range from database query', async () => {
@@ -177,7 +177,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 3;
         const year = 2024;
 
-        // Mock only returns transactions that match database query: type='outcome' AND within March 2024
+        // Mock only returns transactions that match database query: type='budget_spending' AND within March 2024
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -188,7 +188,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'March 1st Transaction',
               description: 'First day of March',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-01T00:00:00Z'),
               updated_at: new Date('2024-03-01T00:00:00Z'),
             },
@@ -202,7 +202,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'March 31st Transaction',
               description: 'Last day of March',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-31T23:59:59Z'),
               updated_at: new Date('2024-03-31T23:59:59Z'),
             },
@@ -229,7 +229,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 2;
         const year = 2024; // 2024 is a leap year
 
-        // Mock only returns transactions that match database query: type='outcome' AND within February 2024
+        // Mock only returns transactions that match database query: type='budget_spending' AND within February 2024
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -240,7 +240,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Leap Day Transaction',
               description: 'February 29th transaction',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-02-29T12:00:00Z'),
               updated_at: new Date('2024-02-29T12:00:00Z'),
             },
@@ -266,7 +266,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 2;
         const year = 2023; // 2023 is not a leap year
 
-        // Mock only returns transactions that match database query: type='outcome' AND within February 2023
+        // Mock only returns transactions that match database query: type='budget_spending' AND within February 2023
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -277,7 +277,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Feb 28th Transaction',
               description: 'Last day of February in non-leap year',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2023-02-28T23:59:59Z'),
               updated_at: new Date('2023-02-28T23:59:59Z'),
             },
@@ -356,7 +356,7 @@ describe('TransactionRepositoryImpl', () => {
                 recurring: 0,
                 name: `Transaction Month ${month}`,
                 description: `Transaction for month ${month}`,
-                type: 'outcome',
+                type: 'budget_spending',
                 created_at: new Date(`${dayInMonth}T00:00:00Z`),
                 updated_at: new Date(`${dayInMonth}T00:00:00Z`),
               },
@@ -381,7 +381,7 @@ describe('TransactionRepositoryImpl', () => {
             where: {
               user_id: userId,
               transactions: {
-                type: 'outcome',
+                type: 'budget_spending',
                 created_at: {
                   gte: new Date(year, month - 1, 1),
                   lte: new Date(year, month, 0),
@@ -481,7 +481,7 @@ describe('TransactionRepositoryImpl', () => {
                 recurring: 0,
                 name: `Edge Month ${month} Transaction`,
                 description: `Transaction for edge month ${month}`,
-                type: 'outcome',
+                type: 'budget_spending',
                 created_at: new Date(year, month - 1, 15),
                 updated_at: new Date(year, month - 1, 15),
               },
@@ -522,7 +522,7 @@ describe('TransactionRepositoryImpl', () => {
           where: {
             user_id: '',
             transactions: {
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: {
                 gte: new Date(year, month - 1, 1),
                 lte: new Date(year, month, 0),
@@ -555,7 +555,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Valid Transaction',
               description: 'This should be included',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-10T00:00:00Z'),
               updated_at: new Date('2024-03-10T00:00:00Z'),
             },
@@ -594,7 +594,7 @@ describe('TransactionRepositoryImpl', () => {
           where: {
             user_id: userId,
             transactions: {
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: {
                 gte: new Date(year, month - 1, 1),
                 lte: new Date(year, month, 0),
@@ -683,7 +683,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 1,
               name: 'Conversion Test Transaction',
               description: 'Testing entity conversion',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-10T00:00:00Z'),
               updated_at: new Date('2024-03-11T00:00:00Z'),
             },
@@ -710,7 +710,7 @@ describe('TransactionRepositoryImpl', () => {
         expect(transaction.props.recurring).toBe(1);
         expect(transaction.props.name).toBe('Conversion Test Transaction');
         expect(transaction.props.description).toBe('Testing entity conversion');
-        expect(transaction.props.type).toBe(TransactionType.OUTCOME);
+        expect(transaction.props.type).toBe(TransactionType.BUDGET_SPENDING);
         expect(transaction.props.createdAt).toEqual(
           new Date('2024-03-10T00:00:00Z'),
         );
@@ -731,7 +731,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 4;
         const year = 2024;
 
-        // Mock only returns transactions that match database query: type='outcome' AND within April 2024 boundaries
+        // Mock only returns transactions that match database query: type='budget_spending' AND within April 2024 boundaries
         const mockBudgetTransactions = [
           {
             user_id: userId,
@@ -742,7 +742,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Start of Month',
               description: 'Exactly at start of April',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-04-01T00:00:00.000Z'),
               updated_at: new Date('2024-04-01T00:00:00.000Z'),
             },
@@ -756,7 +756,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'End of Month',
               description: 'Exactly at end of April',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-04-30T23:59:59.999Z'),
               updated_at: new Date('2024-04-30T23:59:59.999Z'),
             },
@@ -793,7 +793,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: 'Timezone Transaction',
               description: 'Testing timezone handling',
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-15T14:30:00.000Z'), // UTC time
               updated_at: new Date('2024-03-15T14:30:00.000Z'),
             },
@@ -821,7 +821,7 @@ describe('TransactionRepositoryImpl', () => {
         const month = 3;
         const year = 2024;
 
-        // Mock only returns transactions that match database query: type='outcome' AND within March 2024
+        // Mock only returns transactions that match database query: type='budget_spending' AND within March 2024
         const mockBudgetTransactions = Array.from(
           { length: 100 },
           (_, index) => ({
@@ -833,7 +833,7 @@ describe('TransactionRepositoryImpl', () => {
               recurring: 0,
               name: `Transaction ${index + 1}`,
               description: `Description ${index + 1}`,
-              type: 'outcome',
+              type: 'budget_spending',
               created_at: new Date('2024-03-10T00:00:00Z'),
               updated_at: new Date('2024-03-10T00:00:00Z'),
             },

@@ -4,8 +4,9 @@ import { BudgetErrorFactory } from '../errors/budget-error.factory';
 
 export enum TransactionType {
   INCOME = 'income',
-  OUTCOME = 'outcome',
-  TRANSFER = 'transfer',
+  BUDGET_SPENDING = 'budget_spending',
+  GOAL_CONTRIBUTION = 'goal_contribution',
+  GOAL_WITHDRAWAL = 'goal_withdrawal',
 }
 
 export interface TransactionEntityProps extends BaseProps {

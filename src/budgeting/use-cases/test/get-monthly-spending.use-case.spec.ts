@@ -70,7 +70,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'Grocery Shopping',
             description: 'Weekly groceries',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-10T00:00:00Z'),
             updatedAt: new Date('2024-03-10T00:00:00Z'),
           }),
@@ -80,7 +80,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'Gas Station',
             description: 'Fuel',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-12T00:00:00Z'),
             updatedAt: new Date('2024-03-12T00:00:00Z'),
           }),
@@ -139,7 +139,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: `Transaction ${month}/${year}`,
             description: `Test transaction for ${month}/${year}`,
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date(year, month - 1, 15),
             updatedAt: new Date(year, month - 1, 15),
           });
@@ -176,7 +176,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: `Transaction ${year}`,
             description: `Test transaction for year ${year}`,
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date(year, 5, 15),
             updatedAt: new Date(year, 5, 15),
           });
@@ -213,7 +213,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: `Transaction for ${userId}`,
             description: `Test transaction for ${userId}`,
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-10T00:00:00Z'),
             updatedAt: new Date('2024-03-10T00:00:00Z'),
           });
@@ -248,7 +248,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'First Transaction',
             description: 'First',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-01T00:00:00Z'),
             updatedAt: new Date('2024-03-01T00:00:00Z'),
           }),
@@ -258,7 +258,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'Second Transaction',
             description: 'Second',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-15T00:00:00Z'),
             updatedAt: new Date('2024-03-15T00:00:00Z'),
           }),
@@ -268,7 +268,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'Third Transaction',
             description: 'Third',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-30T00:00:00Z'),
             updatedAt: new Date('2024-03-30T00:00:00Z'),
           }),
@@ -301,7 +301,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: `Transaction ${index + 1}`,
             description: `Description ${index + 1}`,
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-10T00:00:00Z'),
             updatedAt: new Date('2024-03-10T00:00:00Z'),
           }),
@@ -543,7 +543,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'Budget Spending 1',
             description: 'Budget-linked outcome transaction',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-05T00:00:00Z'),
             updatedAt: new Date('2024-03-05T00:00:00Z'),
           }),
@@ -553,7 +553,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'Budget Spending 2',
             description: 'Another budget-linked outcome transaction',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-03-15T00:00:00Z'),
             updatedAt: new Date('2024-03-15T00:00:00Z'),
           }),
@@ -567,7 +567,7 @@ describe('GetMonthlySpendingUseCase', () => {
 
         expect(result).toHaveLength(2);
         result.forEach((transaction) => {
-          expect(transaction.props.type).toBe(TransactionType.OUTCOME);
+          expect(transaction.props.type).toBe(TransactionType.BUDGET_SPENDING);
           expect(transaction.props.userId).toBe('user-business-logic');
         });
       });
@@ -588,7 +588,7 @@ describe('GetMonthlySpendingUseCase', () => {
             recurring: 0,
             name: 'February Transaction',
             description: 'Transaction in February 2024',
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             createdAt: new Date('2024-02-14T00:00:00Z'),
             updatedAt: new Date('2024-02-14T00:00:00Z'),
           }),
@@ -619,7 +619,7 @@ describe('GetMonthlySpendingUseCase', () => {
           recurring: 1,
           name: 'Monthly Subscription',
           description: 'Recurring monthly payment',
-          type: TransactionType.OUTCOME,
+          type: TransactionType.BUDGET_SPENDING,
           createdAt: new Date('2024-04-01T00:00:00Z'),
           updatedAt: new Date('2024-04-01T00:00:00Z'),
         });
@@ -639,7 +639,9 @@ describe('GetMonthlySpendingUseCase', () => {
         expect(resultTransaction.props.description).toBe(
           'Recurring monthly payment',
         );
-        expect(resultTransaction.props.type).toBe(TransactionType.OUTCOME);
+        expect(resultTransaction.props.type).toBe(
+          TransactionType.BUDGET_SPENDING,
+        );
         expect(resultTransaction.props.createdAt).toEqual(
           new Date('2024-04-01T00:00:00Z'),
         );
@@ -666,7 +668,7 @@ describe('GetMonthlySpendingUseCase', () => {
               recurring: 0,
               name: 'User 1 Transaction',
               description: 'Transaction for user 1',
-              type: TransactionType.OUTCOME,
+              type: TransactionType.BUDGET_SPENDING,
               createdAt: mockDate,
               updatedAt: mockDate,
             }),
@@ -678,7 +680,7 @@ describe('GetMonthlySpendingUseCase', () => {
               recurring: 0,
               name: 'User 2 Transaction',
               description: 'Transaction for user 2',
-              type: TransactionType.OUTCOME,
+              type: TransactionType.BUDGET_SPENDING,
               createdAt: mockDate,
               updatedAt: mockDate,
             }),

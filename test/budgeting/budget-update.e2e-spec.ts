@@ -704,7 +704,7 @@ describe('Budget UPDATE Endpoint (e2e)', () => {
             amount: '250.00',
             description: 'Test spending',
             recurring: 0,
-            type: 'outcome',
+            type: 'budget_spending',
             created_at: new Date(),
             updated_at: new Date(),
           },

@@ -84,7 +84,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         amount: amount.toString(),
         description,
         recurring,
-        type: TransactionType.OUTCOME,
+        type: TransactionType.BUDGET_SPENDING,
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -187,7 +187,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         expect(transactions[0].name).toBe('Store A');
         expect(transactions[0].description).toBe('Grocery shopping at Store A');
         expect(transactions[0].amount).toBe(100);
-        expect(transactions[0].type).toBe(TransactionType.OUTCOME);
+        expect(transactions[0].type).toBe(TransactionType.BUDGET_SPENDING);
         expect(transactions[0].recurring).toBe(0);
         expect(transactions[0].createdAt).toBeDefined();
 
@@ -195,7 +195,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         expect(transactions[1].name).toBe('Store B');
         expect(transactions[1].description).toBe('Grocery shopping at Store B');
         expect(transactions[1].amount).toBe(75);
-        expect(transactions[1].type).toBe(TransactionType.OUTCOME);
+        expect(transactions[1].type).toBe(TransactionType.BUDGET_SPENDING);
         expect(transactions[1].recurring).toBe(0);
         expect(transactions[1].createdAt).toBeDefined();
       });
@@ -240,7 +240,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
           'Cinema tickets for weekend movie',
         );
         expect(transactionDto.amount).toBe(50);
-        expect(transactionDto.type).toBe(TransactionType.OUTCOME);
+        expect(transactionDto.type).toBe(TransactionType.BUDGET_SPENDING);
         expect(transactionDto.recurring).toBe(7);
         expect(new Date(transactionDto.createdAt)).toBeInstanceOf(Date);
         expect(new Date(transactionDto.updatedAt)).toBeInstanceOf(Date);
@@ -693,7 +693,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         expect(transaction.name).toBe('Test Transaction');
         expect(transaction.description).toBe('Test description');
         expect(transaction.amount).toBe(100);
-        expect(transaction.type).toBe(TransactionType.OUTCOME);
+        expect(transaction.type).toBe(TransactionType.BUDGET_SPENDING);
         expect(transaction.recurring).toBe(14);
       });
 

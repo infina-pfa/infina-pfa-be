@@ -32,7 +32,7 @@ export class TransactionResponseDto {
   @ApiProperty({
     description: 'Transaction type',
     enum: TransactionType,
-    example: TransactionType.OUTCOME,
+    example: TransactionType.BUDGET_SPENDING,
   })
   type: TransactionType;
 

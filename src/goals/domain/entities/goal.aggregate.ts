@@ -57,9 +57,9 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
     return transactions.reduce(
       (acc, transaction) => {
-        if (transaction.props.type === TransactionType.INCOME) {
+        if (transaction.props.type === TransactionType.GOAL_CONTRIBUTION) {
           return acc.add(transaction.amount);
-        } else if (transaction.props.type === TransactionType.OUTCOME) {
+        } else if (transaction.props.type === TransactionType.GOAL_WITHDRAWAL) {
           return acc.subtract(transaction.amount);
         }
         return acc;
@@ -136,7 +136,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     this.props.transactions.add(
       TransactionEntity.create({
         amount: props.amount,
-        type: TransactionType.OUTCOME,
+        type: TransactionType.GOAL_WITHDRAWAL,
         name: props.name || 'Goal Withdrawal',
         description:
           props.description || 'Withdrawal from ' + this.props.goal.title,

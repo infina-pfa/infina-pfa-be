@@ -1,4 +1,8 @@
-import { TransactionEntity, TransactionRepository } from '@/budgeting/domain';
+import {
+  TransactionEntity,
+  TransactionRepository,
+  TransactionType,
+} from '@/budgeting/domain';
 import { PrismaClient } from '@/common/prisma/prisma-client';
 import { TransactionPrismaRepository } from '@/common/prisma';
 import { TransactionORM } from '@/common/types/orms';
@@ -54,7 +58,7 @@ export class TransactionRepositoryImpl
         where: {
           user_id: userId,
           transactions: {
-            type: 'outcome', // Only spending transactions
+            type: TransactionType.BUDGET_SPENDING, // Only spending transactions
             created_at: {
               gte: new Date(year, month - 1, 1), // Start of the month
               lte: new Date(year, month, 0), // End of the month

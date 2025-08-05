@@ -13,7 +13,7 @@ create type "public"."message_sender" as enum ('ai', 'user', 'system');
 
 create type "public"."message_type" as enum ('text', 'image', 'photo', 'component', 'tool');
 
-create type "public"."transaction_type" as enum ('income', 'outcome', 'transfer');
+create type "public"."transaction_type" as enum ('income', 'budget_spending', 'transfer');
 
 create table "public"."budget_transactions" (
     "id" uuid not null default gen_random_uuid(),

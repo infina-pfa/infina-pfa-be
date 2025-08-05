@@ -65,7 +65,7 @@ export class BudgetAggregate extends BaseEntity<
     this.props.spending.add(
       TransactionEntity.create({
         amount: props.amount,
-        type: TransactionType.OUTCOME,
+        type: TransactionType.BUDGET_SPENDING,
         name: props.name || 'Spending',
         description:
           props.description || 'Spending for ' + this.props.budget.name,

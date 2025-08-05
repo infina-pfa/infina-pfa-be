@@ -75,7 +75,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
     name: string = 'Test Transaction',
     description: string = 'Test transaction description',
     recurring: number = 0,
-    type: TransactionType = TransactionType.OUTCOME,
+    type: TransactionType = TransactionType.BUDGET_SPENDING,
     month: number = 7,
     year: number = 2025,
   ) => {
@@ -145,7 +145,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
 
         expect(transactions).toHaveLength(2);
         expect(
-          transactions.every((t) => t.type === TransactionType.OUTCOME),
+          transactions.every((t) => t.type === TransactionType.BUDGET_SPENDING),
         ).toBe(true);
 
         const transaction1 = transactions.find(
@@ -193,7 +193,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           'Outcome Transaction',
           'This should be returned',
           0,
-          TransactionType.OUTCOME,
+          TransactionType.BUDGET_SPENDING,
         );
 
         // Create income transaction (should be returned as the API returns all transaction types)
@@ -221,7 +221,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           (t) => t.name === 'Outcome Transaction',
         );
         expect(outcomeTransaction).toBeDefined();
-        expect(outcomeTransaction?.type).toBe(TransactionType.OUTCOME);
+        expect(outcomeTransaction?.type).toBe(TransactionType.BUDGET_SPENDING);
       });
 
       it('should handle multiple budgets with transactions in same month', async () => {
@@ -556,7 +556,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           'Structure Test Transaction',
           'Testing response structure',
           7,
-          TransactionType.OUTCOME,
+          TransactionType.BUDGET_SPENDING,
         );
 
         const response = await request(app.getHttpServer())
@@ -591,7 +591,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
         expect(transaction.name).toBe('Structure Test Transaction');
         expect(transaction.description).toBe('Testing response structure');
         expect(transaction.amount).toBe(100);
-        expect(transaction.type).toBe(TransactionType.OUTCOME);
+        expect(transaction.type).toBe(TransactionType.BUDGET_SPENDING);
         expect(transaction.recurring).toBe(7);
 
         // Dates should be valid date strings
@@ -625,7 +625,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           'Consistency Test Transaction',
           'Testing data consistency',
           14,
-          TransactionType.OUTCOME,
+          TransactionType.BUDGET_SPENDING,
         );
 
         const response = await request(app.getHttpServer())
@@ -763,7 +763,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           'July 2025 Transaction',
           'July 2025 transaction',
           0,
-          TransactionType.OUTCOME,
+          TransactionType.BUDGET_SPENDING,
           7,
           2025,
         );
@@ -774,7 +774,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           'August 2025 Transaction',
           'August 2025 transaction',
           0,
-          TransactionType.OUTCOME,
+          TransactionType.BUDGET_SPENDING,
           8,
           2025,
         );
@@ -785,7 +785,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
           'July 2024 Transaction',
           'July 2024 transaction',
           0,
-          TransactionType.OUTCOME,
+          TransactionType.BUDGET_SPENDING,
           7,
           2024,
         );
@@ -849,7 +849,7 @@ describe('Budget GET Spending Endpoints (e2e)', () => {
             amount: '200',
             description: 'This transaction is not linked to any budget',
             recurring: 0,
-            type: TransactionType.OUTCOME,
+            type: TransactionType.BUDGET_SPENDING,
             created_at: new Date(),
             updated_at: new Date(),
           },
