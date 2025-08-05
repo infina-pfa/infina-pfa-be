@@ -54,15 +54,6 @@ export const filterSoftDeleted = Prisma.defineExtension({
         ) {
           _args.where = { ..._args.where, deleted_at: null };
 
-          if ('include' in _args) {
-            Object.keys(_args.include).forEach((key) => {
-              _args.include[key] = {
-                ..._args.include[key],
-                where: { deleted_at: null },
-              };
-            });
-          }
-
           return query(args);
         }
 

@@ -124,6 +124,7 @@ export class BudgetAggregateRepositoryImpl
       include: {
         budget_transactions: {
           include: { transactions: true },
+          where: { transactions: { deleted_at: null } },
         },
       },
     });
@@ -156,7 +157,10 @@ export class BudgetAggregateRepositoryImpl
         icon: props.icon,
       },
       include: {
-        budget_transactions: { include: { transactions: true } },
+        budget_transactions: {
+          include: { transactions: true },
+          where: { transactions: { deleted_at: null } },
+        },
       },
     });
 
@@ -189,7 +193,10 @@ export class BudgetAggregateRepositoryImpl
         updated_at: props.updatedAt,
       },
       include: {
-        budget_transactions: { include: { transactions: true } },
+        budget_transactions: {
+          include: { transactions: true },
+          where: { transactions: { deleted_at: null } },
+        },
       },
       take: options?.pagination?.limit,
       skip: options?.pagination?.page,
