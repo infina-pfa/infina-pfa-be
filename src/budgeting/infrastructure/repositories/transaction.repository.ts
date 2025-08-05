@@ -3,10 +3,8 @@ import {
   TransactionRepository,
   TransactionType,
 } from '@/budgeting/domain';
-import { PrismaClient } from '@/common/prisma/prisma-client';
 import { TransactionPrismaRepository } from '@/common/prisma';
-import { TransactionORM } from '@/common/types/orms';
-import { FindManyOptions } from '@/common/types/query.types';
+import { PrismaClient } from '@/common/prisma/prisma-client';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -18,29 +16,19 @@ export class TransactionRepositoryImpl
     super(prismaClient.transactions);
   }
 
-  async findManyByMonth(
-    props: Partial<TransactionEntity['props']>,
-    options?: FindManyOptions & { month: number; year: number },
-  ): Promise<TransactionEntity[]> {
-    if (options?.month === 0 || options?.year === 0) {
-      return [];
-    }
-
-    const transactions: TransactionORM[] = await this.prismaDelegate.findMany({
-      where: {
-        ...props,
-        ...(options
-          ? {
-              createdAt: {
-                gte: new Date(options.year, options.month - 1, 1),
-                lte: new Date(options.year, options.month, 0),
-              },
-            }
-          : {}),
-      },
+  override async delete(entity: TransactionEntity): Promise<void> {
+    await this.prismaClient.$transaction(async (tx) => {
+      await Promise.all([
+        tx.budget_transactions.deleteMany({
+          where: {
+            transaction_id: entity.id,
+          },
+        }),
+        tx.transactions.delete({
+          where: { id: entity.id },
+        }),
+      ]);
     });
-
-    return transactions.map((transaction) => this.toEntity(transaction));
   }
 
   async findBudgetSpendingByMonth(

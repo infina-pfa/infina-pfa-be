@@ -6,7 +6,6 @@ import { AppModule } from './app.module';
 import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GoalInternalModule, GoalModule } from './goals/module';
@@ -31,7 +30,7 @@ async function bootstrap() {
   );
 
   // Apply global filters - order matters, more specific (HttpExceptionFilter) first
-  app.useGlobalFilters(new HttpExceptionFilter(), new AllExceptionsFilter());
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Infina Personal Finance Advisor APIs')
