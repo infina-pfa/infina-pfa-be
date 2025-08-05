@@ -9,9 +9,10 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { GoalModule } from './goals/module';
+import { GoalInternalModule, GoalModule } from './goals/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
+import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
 
 loadEnvFile('.env');
 
@@ -64,7 +65,11 @@ async function bootstrap() {
     .build();
   const internalDocumentFactory = () =>
     SwaggerModule.createDocument(app, internalConfig, {
-      include: [UserInternalModule],
+      include: [
+        UserInternalModule,
+        BudgetingInternalModule,
+        GoalInternalModule,
+      ],
     });
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);
 

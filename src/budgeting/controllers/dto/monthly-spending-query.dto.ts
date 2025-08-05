@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsInt, Min, Max } from 'class-validator';
+import { IsInt, Min, Max, IsUUID } from 'class-validator';
 
 export class MonthlySpendingQueryDto {
   @ApiProperty({
@@ -26,4 +26,13 @@ export class MonthlySpendingQueryDto {
   @Min(1900, { message: 'Year must be a valid year' })
   @Max(3000, { message: 'Year must be a valid year' })
   year: number;
+}
+
+export class MonthlySpendingQueryInternalDto extends MonthlySpendingQueryDto {
+  @ApiProperty({
+    description: 'User ID who owns this budget',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsUUID()
+  userId: string;
 }

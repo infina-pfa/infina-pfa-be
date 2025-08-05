@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 
 export interface ContributeGoalUseCaseInput {
   goalId: string;
-  userId: string;
+  userId?: string;
   amount: number;
   name?: string;
   description?: string;
@@ -38,7 +38,7 @@ export class ContributeGoalUseCase extends BaseUseCase<
     }
 
     // Validate ownership
-    if (goalAggregate.userId !== input.userId) {
+    if (input.userId && goalAggregate.userId !== input.userId) {
       throw GoalErrorFactory.goalNotFound(); // Don't reveal goal exists for security
     }
 

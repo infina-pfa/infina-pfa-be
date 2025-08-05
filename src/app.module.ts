@@ -6,8 +6,9 @@ import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { InternalServiceAuthGuard } from './common/guards';
 import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 import { PrismaModule } from './common/prisma';
-import { GoalModule } from './goals/module';
+import { GoalInternalModule, GoalModule } from './goals/module';
 import { UserInternalModule, UserModule } from './user';
+import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
 
 @Module({
   imports: [
@@ -18,8 +19,10 @@ import { UserInternalModule, UserModule } from './user';
     PrismaModule,
     BudgetingModule,
     UserModule,
-    UserInternalModule,
     GoalModule,
+    UserInternalModule,
+    BudgetingInternalModule,
+    GoalInternalModule,
   ],
   controllers: [AppController],
   providers: [SupabaseAuthGuard, InternalServiceAuthGuard, AppService],
