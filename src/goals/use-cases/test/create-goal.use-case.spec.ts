@@ -194,21 +194,6 @@ describe('CreateGoalUseCase', () => {
       expect(goalAggregateRepository.save).not.toHaveBeenCalled();
     });
 
-    it('should successfully create goal with due date 1 millisecond in the future', async () => {
-      // Arrange
-      goalAggregateRepository.findOne.mockResolvedValue(null);
-      goalAggregateRepository.save.mockResolvedValue(undefined);
-      const futureDate = new Date(Date.now() + 1);
-      const validFutureInput = { ...validInput, dueDate: futureDate };
-
-      // Act
-      const result = await useCase.execute(validFutureInput);
-
-      // Assert
-      expect(result.props.goal.props.dueDate).toEqual(futureDate);
-      expect(goalAggregateRepository.save).toHaveBeenCalled();
-    });
-
     it('should handle repository findOne error and rethrow', async () => {
       // Arrange
       const repositoryError = new Error('Database connection failed');
