@@ -20,6 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { DeleteBudgetUseCase, DeleteSpendingUseCase } from '../use-cases';
 import { CreateBudgetUseCase } from '../use-cases/create-budget.use-case';
 import { GetBudgetDetailUseCase } from '../use-cases/get-budget-detail.use-case';
 import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
@@ -32,7 +33,6 @@ import { MonthlySpendingQueryDto } from './dto/monthly-spending-query.dto';
 import { SpendDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
-import { DeleteBudgetUseCase } from '../use-cases';
 
 @ApiTags('Budgets')
 @ApiBearerAuth()
@@ -47,6 +47,7 @@ export class BudgetController {
     private readonly updateBudgetUseCase: UpdateBudgetUseCase,
     private readonly spendUseCase: SpendUseCase,
     private readonly deleteBudgetUseCase: DeleteBudgetUseCase,
+    private readonly deleteSpendingUseCase: DeleteSpendingUseCase,
   ) {}
 
   @Post()
@@ -227,5 +228,21 @@ export class BudgetController {
     @CurrentUser() user: AuthUser,
   ): Promise<void> {
     await this.deleteBudgetUseCase.execute({ userId: user.id, budgetId: id });
+  }
+
+  @Delete(':id/spending/:spendingId')
+  @ApiOperation({ summary: 'Delete a spending' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiParam({ name: 'spendingId', description: 'Spending ID' })
+  @ApiResponse({ status: 200, description: 'Spending deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Access denied to spending' })
+  @ApiResponse({ status: 404, description: 'Spending not found' })
+  async deleteSpending(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('spendingId', ParseUUIDPipe) spendingId: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.deleteSpendingUseCase.execute({ userId: user.id, spendingId });
   }
 }

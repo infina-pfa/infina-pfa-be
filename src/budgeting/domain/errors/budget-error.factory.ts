@@ -16,4 +16,11 @@ export class BudgetErrorFactory {
       message: 'Budget amount must be greater than 0',
     });
   }
+
+  static spendingNotFound(): NotFoundException {
+    return new NotFoundException({
+      code: BudgetErrorCode.SPENDING_NOT_FOUND,
+      message: 'Spending not found',
+    });
+  }
 }
