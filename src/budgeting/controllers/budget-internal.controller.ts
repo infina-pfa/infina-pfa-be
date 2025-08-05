@@ -18,6 +18,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import {
+  AddIncomeUseCase,
+  DeleteBudgetUseCase,
+  DeleteSpendingUseCase,
+  GetIncomeByMonthUseCase,
+  RemoveIncomeUseCase,
+  UpdateIncomeUseCase,
+} from '../use-cases';
 import { CreateBudgetUseCase } from '../use-cases/create-budget.use-case';
 import { GetBudgetDetailUseCase } from '../use-cases/get-budget-detail.use-case';
 import { GetBudgetsUseCase } from '../use-cases/get-budgets.user-case';
@@ -26,11 +34,13 @@ import { SpendUseCase } from '../use-cases/spend.use-case';
 import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
 import { BudgetResponseDto } from './dto/budget.dto';
 import { CreateBudgetDto } from './dto/create-budget.dto';
+import { CreateIncomeDto } from './dto/create-income.dto';
+import { MonthlyIncomeQueryDto } from './dto/monthly-income-query.dto';
 import { MonthlySpendingQueryInternalDto } from './dto/monthly-spending-query.dto';
 import { SpendInternalDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetInternalDto } from './dto/update-budget.dto';
-import { DeleteBudgetUseCase, DeleteSpendingUseCase } from '../use-cases';
+import { UpdateIncomeDto } from './dto/update-income.dto';
 
 @ApiTags('Budgets')
 @ApiBearerAuth('x-api-key')
@@ -46,6 +56,10 @@ export class BudgetInternalController {
     private readonly spendUseCase: SpendUseCase,
     private readonly deleteBudgetUseCase: DeleteBudgetUseCase,
     private readonly deleteSpendingUseCase: DeleteSpendingUseCase,
+    private readonly getMonthlyIncomeUseCase: GetIncomeByMonthUseCase,
+    private readonly updateIncomeUseCase: UpdateIncomeUseCase,
+    private readonly removeIncomeUseCase: RemoveIncomeUseCase,
+    private readonly addIncomeUseCase: AddIncomeUseCase,
   ) {}
 
   @Post()
@@ -81,7 +95,7 @@ export class BudgetInternalController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getBudgets(
-    @Query('userId') userId: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
     @Query('month') month: number,
     @Query('year') year: number,
   ): Promise<BudgetResponseDto[]> {
@@ -232,5 +246,94 @@ export class BudgetInternalController {
     @Param('spendingId', ParseUUIDPipe) spendingId: string,
   ): Promise<void> {
     await this.deleteSpendingUseCase.execute({ spendingId });
+  }
+
+  @Get('income/:userId')
+  @ApiOperation({ summary: 'Get monthly income transactions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Monthly income transactions retrieved successfully',
+    type: [TransactionResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getMonthlyIncome(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Query() query: MonthlyIncomeQueryDto,
+  ): Promise<TransactionResponseDto[]> {
+    const income = await this.getMonthlyIncomeUseCase.execute({
+      userId,
+      month: query.month,
+      year: query.year,
+    });
+
+    if (!income) {
+      return [];
+    }
+
+    return income.props.transactions.items.map((transaction) =>
+      TransactionResponseDto.fromEntity(transaction),
+    );
+  }
+
+  @Post('income')
+  @ApiOperation({ summary: 'Add a new income transaction' })
+  @ApiResponse({
+    status: 201,
+    description: 'Income transaction added successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async addIncome(
+    @Body() incomeDto: CreateIncomeDto,
+  ): Promise<TransactionResponseDto> {
+    const income = await this.addIncomeUseCase.execute({
+      userId: incomeDto.userId,
+      amount: incomeDto.amount,
+      recurring: incomeDto.recurring,
+      name: incomeDto.name,
+    });
+    return TransactionResponseDto.fromEntity(
+      income.props.transactions.items[0],
+    );
+  }
+
+  @Patch('income/:id')
+  @ApiOperation({ summary: 'Update an income transaction' })
+  @ApiParam({ name: 'id', description: 'Income ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Income transaction updated successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Income transaction not found' })
+  async updateIncome(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateIncomeDto: UpdateIncomeDto,
+  ): Promise<TransactionResponseDto> {
+    const income = await this.updateIncomeUseCase.execute({
+      id,
+      amount: updateIncomeDto.amount,
+      recurring: updateIncomeDto.recurring,
+      name: updateIncomeDto.name,
+    });
+    return TransactionResponseDto.fromEntity(income);
+  }
+
+  @Delete('income/:id')
+  @ApiOperation({ summary: 'Delete an income transaction' })
+  @ApiParam({ name: 'id', description: 'Income ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Income transaction deleted successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Access denied to income' })
+  @ApiResponse({ status: 404, description: 'Income transaction not found' })
+  async deleteIncome(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('userId') userId: string,
+  ): Promise<void> {
+    await this.removeIncomeUseCase.execute({ id, userId });
   }
 }

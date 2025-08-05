@@ -23,4 +23,11 @@ export class BudgetErrorFactory {
       message: 'Spending not found',
     });
   }
+
+  static incomeNotFound(): NotFoundException {
+    return new NotFoundException({
+      code: BudgetErrorCode.INCOME_NOT_FOUND,
+      message: 'Income not found',
+    });
+  }
 }

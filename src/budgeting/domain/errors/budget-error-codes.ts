@@ -1,8 +1,11 @@
 export enum BudgetErrorCode {
   // Budget errors
-  BUDGET_NOT_FOUND = 'BUDGET_001',
-  BUDGET_INVALID_AMOUNT = 'BUDGET_002',
+  BUDGET_NOT_FOUND = 'BUDGET_NOT_FOUND',
+  BUDGET_INVALID_AMOUNT = 'BUDGET_INVALID_AMOUNT',
 
   // Spending errors
   SPENDING_NOT_FOUND = 'SPENDING_NOT_FOUND',
+
+  // Income errors
+  INCOME_NOT_FOUND = 'INCOME_NOT_FOUND',
 }
