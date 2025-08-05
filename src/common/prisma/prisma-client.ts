@@ -1,12 +1,14 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient as PrismaClientNative } from '../../../generated/prisma';
-import {
-  filterSoftDeleted,
-  softDelete,
-  softDeleteMany,
-} from './extensions/soft-delete.prisma-extension';
 
-@Injectable()
+interface QueryEvent {
+  timestamp: Date;
+  query: string;
+  params: string;
+  duration: number;
+  target: string;
+}
+
 export class PrismaClient
   extends PrismaClientNative
   implements OnModuleInit, OnModuleDestroy
@@ -23,11 +25,17 @@ export class PrismaClient
           url,
         },
       },
+      log: [{ emit: 'event', level: 'query' }],
     });
 
-    this.$extends(softDelete)
-      .$extends(softDeleteMany)
-      .$extends(filterSoftDeleted);
+    // @ts-expect-error - Type definitions don't include the query event
+    this.$on('query', (e: QueryEvent) => {
+      Logger.debug('PRISMA', {
+        query: e.query,
+        duration: `${e.duration}ms`,
+        timestamp: e.timestamp,
+      });
+    });
   }
 
   async onModuleInit() {

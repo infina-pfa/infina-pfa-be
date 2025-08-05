@@ -122,7 +122,9 @@ export class BudgetAggregateRepositoryImpl
     const budgetORM = await this.prismaClient.budgets.findUnique({
       where: { id },
       include: {
-        budget_transactions: { include: { transactions: true } },
+        budget_transactions: {
+          include: { transactions: true },
+        },
       },
     });
 
