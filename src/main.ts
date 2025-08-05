@@ -2,8 +2,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
-import { loadEnvFile } from 'process';
 import { AppModule } from './app.module';
+import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -12,9 +12,6 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { GoalInternalModule, GoalModule } from './goals/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
-import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
-
-loadEnvFile('.env');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
