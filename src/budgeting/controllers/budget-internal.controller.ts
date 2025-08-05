@@ -1,6 +1,4 @@
-import { CurrentUser } from '@/common/decorators';
-import { SupabaseAuthGuard } from '@/common/guards';
-import { AuthUser } from '@/common/types';
+import { InternalServiceAuthGuard } from '@/common/guards';
 import {
   Body,
   Controller,
@@ -27,16 +25,16 @@ import { SpendUseCase } from '../use-cases/spend.use-case';
 import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
 import { BudgetResponseDto } from './dto/budget.dto';
 import { CreateBudgetDto } from './dto/create-budget.dto';
-import { MonthlySpendingQueryDto } from './dto/monthly-spending-query.dto';
-import { SpendDto } from './dto/spend.dto';
+import { MonthlySpendingQueryInternalDto } from './dto/monthly-spending-query.dto';
+import { SpendInternalDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
-import { UpdateBudgetDto } from './dto/update-budget.dto';
+import { UpdateBudgetInternalDto } from './dto/update-budget.dto';
 
 @ApiTags('Budgets')
 @ApiBearerAuth()
-@Controller('budgets')
-@UseGuards(SupabaseAuthGuard)
-export class BudgetController {
+@Controller('internal/budgets')
+@UseGuards(InternalServiceAuthGuard)
+export class BudgetInternalController {
   constructor(
     private readonly createBudgetUseCase: CreateBudgetUseCase,
     private readonly getBudgetsUseCase: GetBudgetsUseCase,
@@ -61,11 +59,10 @@ export class BudgetController {
   })
   async createBudget(
     @Body() createBudgetDto: CreateBudgetDto,
-    @CurrentUser() user: AuthUser,
   ): Promise<BudgetResponseDto> {
     const budget = await this.createBudgetUseCase.execute({
       ...createBudgetDto,
-      userId: user.id,
+      userId: createBudgetDto.userId,
     });
 
     return BudgetResponseDto.fromEntity(budget);
@@ -80,13 +77,13 @@ export class BudgetController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getBudgets(
-    @CurrentUser() user: AuthUser,
+    @Query('userId') userId: string,
     @Query('month') month: number,
     @Query('year') year: number,
   ): Promise<BudgetResponseDto[]> {
-    return (
-      await this.getBudgetsUseCase.execute({ userId: user.id, month, year })
-    ).map((budget) => BudgetResponseDto.fromEntity(budget));
+    return (await this.getBudgetsUseCase.execute({ userId, month, year })).map(
+      (budget) => BudgetResponseDto.fromEntity(budget),
+    );
   }
 
   @Get('spending')
@@ -106,11 +103,10 @@ export class BudgetController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getMonthlySpending(
-    @CurrentUser() user: AuthUser,
-    @Query() query: MonthlySpendingQueryDto,
+    @Query() query: MonthlySpendingQueryInternalDto,
   ): Promise<TransactionResponseDto[]> {
     const transactions = await this.getMonthlySpendingUseCase.execute({
-      userId: user.id,
+      userId: query.userId,
       month: query.month,
       year: query.year,
     });
@@ -139,11 +135,9 @@ export class BudgetController {
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async getBudgetDetail(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: AuthUser,
   ): Promise<BudgetResponseDto> {
     const budget = await this.getBudgetDetailUseCase.execute({
       id,
-      userId: user.id,
     });
 
     return BudgetResponseDto.fromEntity(budget, true);
@@ -162,8 +156,7 @@ export class BudgetController {
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async updateBudget(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateBudgetDto: UpdateBudgetDto,
-    @CurrentUser() user: AuthUser,
+    @Body() updateBudgetDto: UpdateBudgetInternalDto,
   ): Promise<BudgetResponseDto> {
     const updatedBudget = await this.updateBudgetUseCase.execute({
       id,
@@ -180,7 +173,7 @@ export class BudgetController {
         ...(updateBudgetDto.icon !== undefined && {
           icon: updateBudgetDto.icon,
         }),
-        userId: user.id,
+        userId: updateBudgetDto.userId,
       },
     });
 
@@ -200,12 +193,11 @@ export class BudgetController {
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async spend(
     @Param('id') id: string,
-    @Body() spendDto: SpendDto,
-    @CurrentUser() user: AuthUser,
+    @Body() spendDto: SpendInternalDto,
   ): Promise<void> {
     await this.spendUseCase.execute({
       budgetId: id,
-      userId: user.id,
+      userId: spendDto.userId,
       amount: spendDto.amount,
       name: spendDto.name,
       description: spendDto.description,

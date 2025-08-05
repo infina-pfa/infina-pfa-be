@@ -1,24 +1,24 @@
 import { PrismaModule } from '@/common/prisma';
 import { Module } from '@nestjs/common';
-import { GoalController } from '../controllers';
+import { GoalInternalController } from '../controllers';
+import { GoalAggregateRepository, GoalRepository } from '../domain';
+import { TransactionRepository } from '../domain/repositories/transaction.repository';
 import {
-  GoalRepositoryImpl,
   GoalAggregateRepositoryImpl,
+  GoalRepositoryImpl,
 } from '../infrastructure/repositories';
 import { TransactionRepositoryImpl } from '../infrastructure/repositories/transaction.repository';
 import {
+  ContributeGoalUseCase,
   CreateGoalUseCase,
   GetGoalsUseCase,
   UpdateGoalUseCase,
-  ContributeGoalUseCase,
   WithdrawGoalUseCase,
 } from '../use-cases';
-import { GoalRepository, GoalAggregateRepository } from '../domain';
-import { TransactionRepository } from '../domain/repositories/transaction.repository';
 
 @Module({
   imports: [PrismaModule],
-  controllers: [GoalController],
+  controllers: [GoalInternalController],
   providers: [
     {
       provide: GoalRepository,
@@ -39,4 +39,4 @@ import { TransactionRepository } from '../domain/repositories/transaction.reposi
     WithdrawGoalUseCase,
   ],
 })
-export class GoalModule {}
+export class GoalInternalModule {}

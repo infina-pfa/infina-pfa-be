@@ -44,7 +44,9 @@ describe('GetGoalsUseCase', () => {
     const mockDate = new Date('2025-01-01T00:00:00Z');
     const mockUpdateDate = new Date('2025-01-02T00:00:00Z');
 
-    const createMockGoalAggregate = (overrides: Partial<any> = {}): GoalAggregate => {
+    const createMockGoalAggregate = (
+      overrides: Partial<any> = {},
+    ): GoalAggregate => {
       const goalEntity = GoalEntity.create({
         userId: 'user-123',
         title: 'Save for vacation',
@@ -61,7 +63,7 @@ describe('GetGoalsUseCase', () => {
 
       return GoalAggregate.create({
         goal: goalEntity,
-        contributions,
+        transactions: contributions,
       });
     };
 
@@ -139,7 +141,7 @@ describe('GetGoalsUseCase', () => {
       const returnedGoal = result[0];
       expect(returnedGoal).toBeInstanceOf(GoalAggregate);
       expect(returnedGoal.goal).toBeDefined();
-      expect(returnedGoal.contributions).toBeDefined();
+      expect(returnedGoal.transactions).toBeDefined();
       expect(returnedGoal.goal.props.title).toBe('Test Goal');
       expect(returnedGoal.goal.props.description).toBe('Test Description');
       expect(returnedGoal.goal.props.targetAmount!.value).toBe(10000);
@@ -213,7 +215,9 @@ describe('GetGoalsUseCase', () => {
       goalAggregateRepository.findMany.mockRejectedValue(repositoryError);
 
       // Act & Assert
-      await expect(useCase.execute(validInput)).rejects.toThrow(repositoryError);
+      await expect(useCase.execute(validInput)).rejects.toThrow(
+        repositoryError,
+      );
       expect(goalAggregateRepository.findMany).toHaveBeenCalledWith({
         userId: validInput.userId,
       });

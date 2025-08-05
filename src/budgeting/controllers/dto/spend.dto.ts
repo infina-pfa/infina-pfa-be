@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 export class SpendDto {
   @ApiProperty({
@@ -38,4 +38,13 @@ export class SpendDto {
   @IsNumber()
   @IsOptional()
   recurring?: number;
+}
+
+export class SpendInternalDto extends SpendDto {
+  @ApiProperty({
+    description: 'User ID who owns this budget',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsUUID()
+  userId: string;
 }

@@ -9,7 +9,7 @@ import {
 
 type UpdateGoalUseCaseInput = {
   id: string;
-  userId: string;
+  userId?: string;
   props: Omit<
     Partial<GoalEntityProps>,
     'id' | 'userId' | 'createdAt' | 'updatedAt'
@@ -36,7 +36,7 @@ export class UpdateGoalUseCase extends BaseUseCase<
     }
 
     // Security check - verify user ownership (throw GoalErrorFactory.goalNotFound() if not owned)
-    if (goalAggregate.userId !== input.userId) {
+    if (input.userId && goalAggregate.userId !== input.userId) {
       throw GoalErrorFactory.goalNotFound();
     }
 

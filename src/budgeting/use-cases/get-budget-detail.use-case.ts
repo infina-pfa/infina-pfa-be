@@ -8,7 +8,7 @@ import { BudgetAggregate, BudgetAggregateRepository } from '../domain';
 
 @Injectable()
 export class GetBudgetDetailUseCase extends BaseUseCase<
-  { id: string; userId: string },
+  { id: string; userId?: string },
   BudgetAggregate
 > {
   constructor(
@@ -19,7 +19,7 @@ export class GetBudgetDetailUseCase extends BaseUseCase<
 
   async execute(input: {
     id: string;
-    userId: string;
+    userId?: string;
   }): Promise<BudgetAggregate> {
     const budget = await this.budgetAggregateRepository.findById(input.id);
 
@@ -28,7 +28,7 @@ export class GetBudgetDetailUseCase extends BaseUseCase<
     }
 
     // Check if budget belongs to the user
-    if (budget.userId !== input.userId) {
+    if (input.userId && budget.userId !== input.userId) {
       throw new ForbiddenException('Access denied to budget');
     }
 

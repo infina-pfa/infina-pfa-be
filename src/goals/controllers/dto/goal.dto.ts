@@ -53,14 +53,20 @@ export class GoalResponseDto extends BaseDto {
   updatedAt: Date;
 
   @ApiProperty({
+    description: 'Remaining amount needed to reach the target',
+    example: 40000,
+  })
+  remainingAmount: number;
+
+  @ApiProperty({
     description: 'Contributions',
     type: [TransactionResponseDto],
   })
-  contributions: TransactionResponseDto[];
+  transactions: TransactionResponseDto[];
 
   static fromEntity(goalAggregate: GoalAggregate): GoalResponseDto {
     const goal = goalAggregate.goal;
-    const contributions = goalAggregate.contributions;
+    const transactions = goalAggregate.transactions;
     const props = goal.props;
 
     const dto = new GoalResponseDto();
@@ -70,7 +76,8 @@ export class GoalResponseDto extends BaseDto {
     dto.currentAmount = props.currentAmount.value;
     dto.targetAmount = props.targetAmount?.value;
     dto.dueDate = props.dueDate?.toISOString();
-    dto.contributions = contributions.map((contribution) =>
+    dto.remainingAmount = goalAggregate.remainingAmount.value;
+    dto.transactions = transactions.map((contribution) =>
       TransactionResponseDto.fromEntity(contribution),
     );
     dto.createdAt = props.createdAt;

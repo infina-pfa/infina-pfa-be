@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
 } from 'class-validator';
 
@@ -46,4 +47,13 @@ export class UpdateGoalDto {
   @IsDateString()
   @IsOptional()
   dueDate?: string;
+}
+
+export class UpdateGoalInternalDto extends UpdateGoalDto {
+  @ApiProperty({
+    description: 'User ID who owns this goal',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsUUID()
+  userId: string;
 }

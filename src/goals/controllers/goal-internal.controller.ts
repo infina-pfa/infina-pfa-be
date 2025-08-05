@@ -1,7 +1,6 @@
 import { CurrencyVO } from '@/common/base';
-import { CurrentUser } from '@/common/decorators';
-import { SupabaseAuthGuard } from '@/common/guards';
-import { AuthUser, Currency } from '@/common/types';
+import { InternalServiceAuthGuard } from '@/common/guards';
+import { Currency } from '@/common/types';
 import {
   Body,
   Controller,
@@ -10,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -28,17 +28,17 @@ import {
 } from '../use-cases';
 import {
   ContributeGoalDto,
-  CreateGoalDto,
+  CreateGoalInternalDto,
   GoalResponseDto,
-  UpdateGoalDto,
+  UpdateGoalInternalDto,
   WithdrawGoalDto,
 } from './dto';
 
 @ApiTags('Goals')
 @ApiBearerAuth()
-@Controller('goals')
-@UseGuards(SupabaseAuthGuard)
-export class GoalController {
+@Controller('internal/goals')
+@UseGuards(InternalServiceAuthGuard)
+export class GoalInternalController {
   constructor(
     private readonly createGoalUseCase: CreateGoalUseCase,
     private readonly getGoalsUseCase: GetGoalsUseCase,
@@ -61,12 +61,11 @@ export class GoalController {
     description: 'Goal with same title already exists for this user',
   })
   async createGoal(
-    @Body() createGoalDto: CreateGoalDto,
-    @CurrentUser() user: AuthUser,
+    @Body() createGoalDto: CreateGoalInternalDto,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.createGoalUseCase.execute({
       ...createGoalDto,
-      userId: user.id,
+      userId: createGoalDto.userId,
       dueDate: createGoalDto.dueDate
         ? new Date(createGoalDto.dueDate)
         : undefined,
@@ -83,9 +82,9 @@ export class GoalController {
     type: [GoalResponseDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getGoals(@CurrentUser() user: AuthUser): Promise<GoalResponseDto[]> {
+  async getGoals(@Query('userId') userId: string): Promise<GoalResponseDto[]> {
     const goalAggregates = await this.getGoalsUseCase.execute({
-      userId: user.id,
+      userId,
     });
 
     return goalAggregates.map((goalAggregate) =>
@@ -110,12 +109,10 @@ export class GoalController {
   })
   async updateGoal(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateGoalDto: UpdateGoalDto,
-    @CurrentUser() user: AuthUser,
+    @Body() updateGoalDto: UpdateGoalInternalDto,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.updateGoalUseCase.execute({
       id,
-      userId: user.id,
       props: {
         ...updateGoalDto,
         dueDate: updateGoalDto.dueDate
@@ -144,11 +141,9 @@ export class GoalController {
   async contributeToGoal(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() contributeGoalDto: ContributeGoalDto,
-    @CurrentUser() user: AuthUser,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.contributeGoalUseCase.execute({
       goalId: id,
-      userId: user.id,
       amount: contributeGoalDto.amount,
       name: contributeGoalDto.name,
       description: contributeGoalDto.description,
@@ -175,11 +170,9 @@ export class GoalController {
   async withdrawFromGoal(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() withdrawGoalDto: WithdrawGoalDto,
-    @CurrentUser() user: AuthUser,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.withdrawGoalUseCase.execute({
       goalId: id,
-      userId: user.id,
       amount: withdrawGoalDto.amount,
       name: withdrawGoalDto.name,
       description: withdrawGoalDto.description,

@@ -63,7 +63,7 @@ export class CreateGoalUseCase extends BaseUseCase<
     // Create Goal Aggregate with empty contributions
     const goalAggregate = GoalAggregate.create({
       goal,
-      contributions: new GoalTransactionsWatchList([]),
+      transactions: new GoalTransactionsWatchList([]),
     });
 
     // Save to repository
