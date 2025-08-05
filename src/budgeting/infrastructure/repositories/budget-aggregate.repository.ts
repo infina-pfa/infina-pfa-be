@@ -41,19 +41,26 @@ export class BudgetAggregateRepositoryImpl
 
   toORM(entity: BudgetAggregate): {
     budget: BudgetORM;
-    spending: TransactionORM[];
   } {
     return {
       budget: this.budgetRepository.toORM(entity.props.budget) as BudgetORM,
-      spending: entity.props.spending.items.map(
-        (transaction) =>
-          this.transactionRepository.toORM(transaction) as TransactionORM,
-      ),
     };
   }
 
   async save(entity: BudgetAggregate): Promise<void> {
     const budgetORM = this.toORM(entity);
+    const addedSpendingORM = entity.props.spending.addedItems.map(
+      (transaction) =>
+        this.transactionRepository.toORM(transaction) as TransactionORM,
+    );
+    const updatedSpendingORM = entity.props.spending.updatedItems.map(
+      (transaction) =>
+        this.transactionRepository.toORM(transaction) as TransactionORM,
+    );
+    const removedSpendingORM = entity.props.spending.removedItems.map(
+      (transaction) =>
+        this.transactionRepository.toORM(transaction) as TransactionORM,
+    );
 
     return this.prismaClient.$transaction(async (tx) => {
       // 1. Upsert budget
@@ -69,9 +76,9 @@ export class BudgetAggregateRepositoryImpl
       });
 
       // 2. Handle added transactions
-      for (const transaction of budgetORM.spending) {
+      for (const transaction of addedSpendingORM) {
         // Create transaction if not exists
-        const createdTransaction = await tx.transactions.upsert({
+        await tx.transactions.upsert({
           where: { id: transaction.id },
           create: transaction,
           update: transaction,
@@ -81,14 +88,14 @@ export class BudgetAggregateRepositoryImpl
         await tx.budget_transactions.create({
           data: {
             budget_id: entity.id,
-            transaction_id: createdTransaction.id,
+            transaction_id: transaction.id,
             user_id: entity.props.budget.userId,
           },
         });
       }
 
       // 3. Handle updated transactions
-      for (const transaction of budgetORM.spending) {
+      for (const transaction of updatedSpendingORM) {
         await tx.transactions.update({
           where: { id: transaction.id },
           data: transaction,
@@ -96,12 +103,16 @@ export class BudgetAggregateRepositoryImpl
       }
 
       // 4. Handle removed transactions
-      for (const transaction of budgetORM.spending) {
+      if (removedSpendingORM.length > 0) {
         await tx.budget_transactions.deleteMany({
           where: {
             budget_id: entity.id,
-            transaction_id: transaction.id,
+            transaction_id: { in: removedSpendingORM.map((t) => t.id) },
           },
+        });
+
+        await tx.transactions.deleteMany({
+          where: { id: { in: removedSpendingORM.map((t) => t.id) } },
         });
       }
     });

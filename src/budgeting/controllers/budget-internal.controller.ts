@@ -33,7 +33,7 @@ import { UpdateBudgetInternalDto } from './dto/update-budget.dto';
 import { DeleteBudgetUseCase, DeleteSpendingUseCase } from '../use-cases';
 
 @ApiTags('Budgets')
-@ApiBearerAuth()
+@ApiBearerAuth('x-api-key')
 @Controller('internal/budgets')
 @UseGuards(InternalServiceAuthGuard)
 export class BudgetInternalController {

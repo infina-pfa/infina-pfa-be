@@ -39,14 +39,9 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
 
   toORM(entity: GoalAggregate): {
     goal: GoalORM;
-    contributions: TransactionORM[];
   } {
     return {
       goal: this.goalRepository.toORM(entity.props.goal) as GoalORM,
-      contributions: entity.props.transactions.items.map(
-        (transaction) =>
-          this.transactionRepository.toORM(transaction) as TransactionORM,
-      ),
     };
   }
 
@@ -101,11 +96,19 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
       }
 
       // 4. Handle removed transactions
-      for (const transaction of entity.props.transactions.removedItems) {
+      if (entity.props.transactions.removedItems.length > 0) {
         await tx.goal_transactions.deleteMany({
           where: {
             goal_id: entity.id,
-            transaction_id: transaction.id,
+            transaction_id: {
+              in: entity.props.transactions.removedItems.map((t) => t.id),
+            },
+          },
+        });
+
+        await tx.transactions.deleteMany({
+          where: {
+            id: { in: entity.props.transactions.removedItems.map((t) => t.id) },
           },
         });
       }

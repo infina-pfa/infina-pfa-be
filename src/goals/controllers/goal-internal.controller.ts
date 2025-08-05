@@ -35,7 +35,7 @@ import {
 } from './dto';
 
 @ApiTags('Goals')
-@ApiBearerAuth()
+@ApiBearerAuth('x-api-key')
 @Controller('internal/goals')
 @UseGuards(InternalServiceAuthGuard)
 export class GoalInternalController {

@@ -20,7 +20,6 @@ export class InternalServiceAuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
-    console.log('🚀 ~ InternalServiceAuthGuard ~ canActivate ~ token:', token);
 
     if (!token) {
       throw CommonErrorFactory.unauthorizedNoToken();

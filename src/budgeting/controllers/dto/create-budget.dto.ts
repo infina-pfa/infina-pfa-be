@@ -71,7 +71,7 @@ export class CreateBudgetDto {
 
   @ApiProperty({
     description: 'Year',
-    example: 2023,
+    example: 2025,
   })
   @IsNumber()
   @Min(2025)
