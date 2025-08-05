@@ -2,14 +2,15 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { InternalServiceAuthGuard } from './common/guards';
 import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 import { PrismaModule } from './common/prisma';
 import { GoalInternalModule, GoalModule } from './goals/module';
-import { UserInternalModule, UserModule } from './user';
-import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
+import { OnboardingInternalModule } from './onboarding/module/onboarding-internal.module';
 import { OnboardingModule } from './onboarding/module/onboarding.module';
+import { UserInternalModule, UserModule } from './user';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OnboardingModule } from './onboarding/module/onboarding.module';
     UserInternalModule,
     BudgetingInternalModule,
     GoalInternalModule,
+    OnboardingInternalModule,
   ],
   controllers: [AppController],
   providers: [SupabaseAuthGuard, InternalServiceAuthGuard, AppService],

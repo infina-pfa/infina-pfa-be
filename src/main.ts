@@ -9,9 +9,12 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { GoalInternalModule, GoalModule } from './goals/module';
+import {
+  OnboardingInternalModule,
+  OnboardingModule,
+} from './onboarding/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
-import { OnboardingModule } from './onboarding';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -66,6 +69,7 @@ async function bootstrap() {
         UserInternalModule,
         BudgetingInternalModule,
         GoalInternalModule,
+        OnboardingInternalModule,
       ],
     });
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);
