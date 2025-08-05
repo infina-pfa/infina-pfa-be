@@ -9,6 +9,7 @@ import { PrismaModule } from './common/prisma';
 import { GoalInternalModule, GoalModule } from './goals/module';
 import { UserInternalModule, UserModule } from './user';
 import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
+import { OnboardingModule } from './onboarding/module/onboarding.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.m
     BudgetingModule,
     UserModule,
     GoalModule,
+    OnboardingModule,
     UserInternalModule,
     BudgetingInternalModule,
     GoalInternalModule,

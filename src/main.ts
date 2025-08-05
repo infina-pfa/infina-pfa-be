@@ -11,6 +11,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { GoalInternalModule, GoalModule } from './goals/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
+import { OnboardingModule } from './onboarding';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -40,7 +41,7 @@ async function bootstrap() {
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, config, {
-      include: [UserModule, BudgetingModule, GoalModule],
+      include: [UserModule, BudgetingModule, GoalModule, OnboardingModule],
     });
   SwaggerModule.setup('api', app, documentFactory);
 

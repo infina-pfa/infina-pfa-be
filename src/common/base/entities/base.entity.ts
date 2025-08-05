@@ -32,6 +32,14 @@ export abstract class BaseEntity<P extends BaseProps> {
     return Object.freeze(this._props);
   }
 
+  public get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  public get updatedAt(): Date {
+    return this.props.updatedAt;
+  }
+
   update(props: Omit<Partial<P>, 'createdAt' | 'updatedAt' | 'userId'>): void {
     this._props = {
       ...this._props,

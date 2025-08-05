@@ -21,7 +21,8 @@
       "@/common/*": ["src/common/*"],
       "@/budgeting/*": ["src/budgeting/*"],
       "@/user/*": ["src/user/*"],
-      "@/goals/*": ["src/goals/*"]
+      "@/goals/*": ["src/goals/*"],
+      "@/onboarding/*": ["src/onboarding/*"]
     }
   }
 }
