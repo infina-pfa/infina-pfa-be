@@ -1,5 +1,10 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient as PrismaClientNative } from '../../../generated/prisma';
+import {
+  filterSoftDeleted,
+  softDelete,
+  softDeleteMany,
+} from './extensions/soft-delete.prisma-extension';
 
 @Injectable()
 export class PrismaClient
@@ -19,6 +24,10 @@ export class PrismaClient
         },
       },
     });
+
+    this.$extends(softDelete)
+      .$extends(softDeleteMany)
+      .$extends(filterSoftDeleted);
   }
 
   async onModuleInit() {

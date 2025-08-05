@@ -31,7 +31,7 @@ describe('BudgetEntity', () => {
         icon: 'food',
         month: 1,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -47,7 +47,7 @@ describe('BudgetEntity', () => {
       expect(budget.props.icon).toBe('food');
       expect(budget.props.month).toBe(1);
       expect(budget.props.year).toBe(2024);
-      expect(budget.archivedAt).toBeNull();
+      expect(budget.deletedAt).toBeNull();
       expect(budget.id).toBeDefined();
       expect(typeof budget.id).toBe('string');
     });
@@ -63,7 +63,7 @@ describe('BudgetEntity', () => {
         icon: 'transport',
         month: 2,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -78,9 +78,9 @@ describe('BudgetEntity', () => {
       expect(budget.props.category).toBe(BudgetCategory.FIXED);
     });
 
-    it('should create BudgetEntity with default archivedAt as null', () => {
+    it('should create BudgetEntity with default deletedAt as null', () => {
       const amount = new CurrencyVO(200, Currency.EUR);
-      const props: Omit<BudgetEntityProps, 'id' | 'archivedAt'> = {
+      const props: Omit<BudgetEntityProps, 'id' | 'deletedAt'> = {
         name: 'Entertainment Budget',
         amount,
         userId: 'user-789',
@@ -95,7 +95,7 @@ describe('BudgetEntity', () => {
 
       const budget = BudgetEntity.create(props);
 
-      expect(budget.archivedAt).toBeNull();
+      expect(budget.deletedAt).toBeNull();
       expect(budget.isArchived()).toBe(false);
     });
 
@@ -116,7 +116,7 @@ describe('BudgetEntity', () => {
 
       expect(budget.props.createdAt).toEqual(mockDate);
       expect(budget.props.updatedAt).toEqual(mockDate);
-      expect(budget.archivedAt).toBeNull();
+      expect(budget.deletedAt).toBeNull();
     });
 
     it('should handle different budget categories correctly', () => {
@@ -133,7 +133,7 @@ describe('BudgetEntity', () => {
           icon: 'test',
           month: 5,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         };
@@ -157,7 +157,7 @@ describe('BudgetEntity', () => {
           icon: 'test',
           month: 6,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         };
@@ -178,7 +178,7 @@ describe('BudgetEntity', () => {
         icon: 'zero',
         month: 7,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -199,7 +199,7 @@ describe('BudgetEntity', () => {
         icon: 'negative',
         month: 8,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -224,7 +224,7 @@ describe('BudgetEntity', () => {
         icon: 'getter',
         month: 9,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -244,8 +244,8 @@ describe('BudgetEntity', () => {
       expect(budget.amount.currency).toBe(Currency.EUR);
     });
 
-    it('should return correct archivedAt', () => {
-      expect(budget.archivedAt).toBeNull();
+    it('should return correct deletedAt', () => {
+      expect(budget.deletedAt).toBeNull();
     });
   });
 
@@ -261,7 +261,7 @@ describe('BudgetEntity', () => {
         icon: 'original',
         month: 10,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -287,7 +287,7 @@ describe('BudgetEntity', () => {
         icon: 'old-icon',
         month: 11,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -315,7 +315,7 @@ describe('BudgetEntity', () => {
         icon: 'date',
         month: 1,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -338,7 +338,7 @@ describe('BudgetEntity', () => {
         icon: 'immutable',
         month: 5,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -354,7 +354,7 @@ describe('BudgetEntity', () => {
   });
 
   describe('archive', () => {
-    it('should set archivedAt to current date and update timestamp', () => {
+    it('should set deletedAt to current date and update timestamp', () => {
       const amount = new CurrencyVO(700, Currency.USD);
       const props: Omit<BudgetEntityProps, 'id'> = {
         name: 'Archive Test Budget',
@@ -365,7 +365,7 @@ describe('BudgetEntity', () => {
         icon: 'archive',
         month: 6,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -374,14 +374,14 @@ describe('BudgetEntity', () => {
       const archiveDate = new Date('2024-01-03T00:00:00Z');
       jest.setSystemTime(archiveDate);
 
-      budget.archive();
+      budget.delete();
 
-      expect(budget.archivedAt).toEqual(archiveDate);
+      expect(budget.deletedAt).toEqual(archiveDate);
       expect(budget.props.updatedAt).toEqual(archiveDate);
       expect(budget.isArchived()).toBe(true);
     });
 
-    it('should overwrite existing archivedAt date', () => {
+    it('should overwrite existing deletedAt date', () => {
       const existingArchiveDate = new Date('2024-01-01T00:00:00Z');
       const amount = new CurrencyVO(1300, Currency.VND);
       const props: Omit<BudgetEntityProps, 'id'> = {
@@ -393,7 +393,7 @@ describe('BudgetEntity', () => {
         icon: 're-archive',
         month: 7,
         year: 2024,
-        archivedAt: existingArchiveDate,
+        deletedAt: existingArchiveDate,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -402,15 +402,15 @@ describe('BudgetEntity', () => {
       const newArchiveDate = new Date('2024-01-05T00:00:00Z');
       jest.setSystemTime(newArchiveDate);
 
-      budget.archive();
+      budget.delete();
 
-      expect(budget.archivedAt).toEqual(newArchiveDate);
-      expect(budget.archivedAt).not.toEqual(existingArchiveDate);
+      expect(budget.deletedAt).toEqual(newArchiveDate);
+      expect(budget.deletedAt).not.toEqual(existingArchiveDate);
     });
   });
 
   describe('isArchived', () => {
-    it('should return true when archivedAt is set', () => {
+    it('should return true when deletedAt is set', () => {
       const archiveDate = new Date('2024-01-15T00:00:00Z');
       const amount = new CurrencyVO(1400, Currency.EUR);
       const props: Omit<BudgetEntityProps, 'id'> = {
@@ -422,7 +422,7 @@ describe('BudgetEntity', () => {
         icon: 'archived',
         month: 8,
         year: 2024,
-        archivedAt: archiveDate,
+        deletedAt: archiveDate,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -431,7 +431,7 @@ describe('BudgetEntity', () => {
       expect(budget.isArchived()).toBe(true);
     });
 
-    it('should return false when archivedAt is null', () => {
+    it('should return false when deletedAt is null', () => {
       const amount = new CurrencyVO(1500, Currency.USD);
       const props: Omit<BudgetEntityProps, 'id'> = {
         name: 'Active Budget',
@@ -442,7 +442,7 @@ describe('BudgetEntity', () => {
         icon: 'active',
         month: 9,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -451,7 +451,7 @@ describe('BudgetEntity', () => {
       expect(budget.isArchived()).toBe(false);
     });
 
-    it('should return false when archivedAt is undefined', () => {
+    it('should return false when deletedAt is undefined', () => {
       const amount = new CurrencyVO(1600, Currency.VND);
       const props: Omit<BudgetEntityProps, 'id'> = {
         name: 'Undefined Archive Budget',
@@ -462,7 +462,7 @@ describe('BudgetEntity', () => {
         icon: 'undefined',
         month: 10,
         year: 2024,
-        archivedAt: undefined as any,
+        deletedAt: undefined as any,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -484,7 +484,7 @@ describe('BudgetEntity', () => {
         icon: 'id-test',
         month: 11,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -506,7 +506,7 @@ describe('BudgetEntity', () => {
         icon: 'props-test',
         month: 12,
         year: 2024,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -530,7 +530,7 @@ describe('BudgetEntity', () => {
         icon: 'equals-test',
         month: 1,
         year: 2025,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -556,7 +556,7 @@ describe('BudgetEntity', () => {
         icon: 'toobject-test',
         month: 2,
         year: 2025,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -572,7 +572,7 @@ describe('BudgetEntity', () => {
       expect(object).toHaveProperty('icon', 'toobject-test');
       expect(object).toHaveProperty('month', 2);
       expect(object).toHaveProperty('year', 2025);
-      expect(object).toHaveProperty('archivedAt', null);
+      expect(object).toHaveProperty('deletedAt', null);
       expect(object).toHaveProperty('createdAt');
       expect(object).toHaveProperty('updatedAt');
     });
@@ -590,7 +590,7 @@ describe('BudgetEntity', () => {
         icon: 'empty',
         month: 3,
         year: 2025,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -610,7 +610,7 @@ describe('BudgetEntity', () => {
         icon: 'multiple',
         month: 4,
         year: 2025,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
@@ -644,14 +644,14 @@ describe('BudgetEntity', () => {
         icon: 'immutability',
         month: 6,
         year: 2025,
-        archivedAt: null,
+        deletedAt: null,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
       const budget = BudgetEntity.create(props);
 
       budget.update({ name: 'New Name', color: '#FEDCBA' });
-      budget.archive();
+      budget.delete();
 
       expect(budget.userId).toBe('original-user-id');
       expect(budget.amount.value).toBe(2200);

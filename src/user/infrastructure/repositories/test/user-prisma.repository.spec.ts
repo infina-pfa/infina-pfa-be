@@ -71,6 +71,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: mockDate,
         updated_at: updateDate,
+        deleted_at: null,
       });
     });
 
@@ -98,6 +99,7 @@ describe('UserPrismaRepository', () => {
         language: Language.VI,
         created_at: mockDate,
         updated_at: mockDate,
+        deleted_at: null,
       });
     });
 
@@ -125,6 +127,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: mockDate,
         updated_at: mockDate,
+        deleted_at: null,
       });
     });
 
@@ -240,6 +243,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: mockDate,
         updated_at: updateDate,
+        deleted_at: null,
       };
 
       const result = repository.toEntity(userORM);
@@ -269,6 +273,7 @@ describe('UserPrismaRepository', () => {
         language: Language.VI,
         created_at: mockDate,
         updated_at: mockDate,
+        deleted_at: null,
       };
 
       const result = repository.toEntity(userORM);
@@ -293,6 +298,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: mockDate,
         updated_at: mockDate,
+        deleted_at: null,
       };
 
       const result = repository.toEntity(userORM);
@@ -317,6 +323,7 @@ describe('UserPrismaRepository', () => {
           language: Language.VI,
           created_at: mockDate,
           updated_at: mockDate,
+          deleted_at: null,
         };
 
         const result = repository.toEntity(userORM);
@@ -339,6 +346,7 @@ describe('UserPrismaRepository', () => {
           language,
           created_at: mockDate,
           updated_at: mockDate,
+          deleted_at: null,
         };
 
         const result = repository.toEntity(userORM);
@@ -366,6 +374,7 @@ describe('UserPrismaRepository', () => {
           language: Language.VI,
           created_at: mockDate,
           updated_at: mockDate,
+          deleted_at: null,
         };
 
         const result = repository.toEntity(userORM);
@@ -385,6 +394,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: '2024-01-01T00:00:00Z' as any, // Simulating string from DB
         updated_at: '2024-01-02T00:00:00Z' as any, // Simulating string from DB
+        deleted_at: null,
       };
 
       const result = repository.toEntity(userORM);
@@ -410,6 +420,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: mockDate,
         updated_at: updateDate,
+        deleted_at: null,
       };
 
       const result = repository.toEntity(userORM);
@@ -471,6 +482,7 @@ describe('UserPrismaRepository', () => {
         language: Language.VI,
         created_at: mockDate,
         updated_at: updateDate,
+        deleted_at: null,
       };
 
       const entity = repository.toEntity(originalORM);
@@ -489,6 +501,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         createdAt: mockDate,
         updatedAt: updateDate,
+        deletedAt: null,
       });
 
       const orm = repository.toORM(originalEntity);
@@ -561,6 +574,7 @@ describe('UserPrismaRepository', () => {
         language: Language.EN,
         created_at: mockDate,
         updated_at: mockDate,
+        deleted_at: null,
       };
 
       prismaClient.public_users.findFirst.mockResolvedValue(mockORM as any);
@@ -594,6 +608,7 @@ describe('UserPrismaRepository', () => {
         language: Language.VI,
         created_at: mockDate,
         updated_at: mockDate,
+        deleted_at: null,
       };
 
       prismaClient.public_users.findUnique.mockResolvedValue(mockORM as any);
@@ -619,6 +634,7 @@ describe('UserPrismaRepository', () => {
           language: Language.EN,
           created_at: mockDate,
           updated_at: mockDate,
+          deleted_at: null,
         },
         {
           id: 'test-find-many-2',
@@ -630,6 +646,7 @@ describe('UserPrismaRepository', () => {
           language: Language.EN,
           created_at: mockDate,
           updated_at: updateDate,
+          deleted_at: null,
         },
       ];
 

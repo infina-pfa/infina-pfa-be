@@ -15,16 +15,21 @@ export interface TransactionEntityProps extends BaseProps {
   name: string;
   description: string;
   type: TransactionType;
+  deletedAt?: Date | null;
 }
 
 export class TransactionEntity extends BaseEntity<TransactionEntityProps> {
   public static create(
-    props: OptionalProp<TransactionEntityProps, 'createdAt' | 'updatedAt'>,
+    props: OptionalProp<
+      TransactionEntityProps,
+      'createdAt' | 'updatedAt' | 'deletedAt'
+    >,
     id?: string,
   ): TransactionEntity {
     return new TransactionEntity(
       {
         ...props,
+        deletedAt: props.deletedAt ?? null,
       },
       id,
     );

@@ -20,6 +20,7 @@ export interface UserEntityProps extends BaseProps {
   onboardingCompletedAt: Date | null;
   currency: Currency;
   language: Language;
+  deletedAt?: Date | null;
 }
 
 export class UserEntity extends BaseEntity<UserEntityProps> {
@@ -30,6 +31,7 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
     return new UserEntity(
       {
         ...props,
+        deletedAt: props.deletedAt ?? null,
       },
       id,
     );

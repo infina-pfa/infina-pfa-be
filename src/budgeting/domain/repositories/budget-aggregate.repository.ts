@@ -12,4 +12,5 @@ export abstract class BudgetAggregateRepository {
     props: Partial<Readonly<BudgetEntityProps>>,
     options?: FindManyOptions,
   ): Promise<BudgetAggregate[]>;
+  abstract delete(budgetAggregate: BudgetAggregate): Promise<void>;
 }

@@ -282,7 +282,7 @@ describe('CreateBudgetUseCase', () => {
             icon: 'existing',
             month: 7,
             year: 2024,
-            archivedAt: null,
+            deletedAt: null,
             createdAt: mockDate,
             updatedAt: mockDate,
           } as any,

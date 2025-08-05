@@ -16,14 +16,14 @@ export interface BudgetEntityProps extends BaseProps {
   icon: string;
   month: number;
   year: number;
-  archivedAt: Date | null;
+  deletedAt: Date | null;
 }
 
 export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
   public static create(
     props: OptionalProps<
       Omit<BudgetEntityProps, 'id'>,
-      'createdAt' | 'updatedAt' | 'archivedAt'
+      'createdAt' | 'updatedAt' | 'deletedAt'
     >,
     id?: string,
   ): BudgetEntity {
@@ -34,7 +34,7 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     return new BudgetEntity(
       {
         ...props,
-        archivedAt: props.archivedAt ?? null,
+        deletedAt: props.deletedAt ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
@@ -73,16 +73,16 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     this.updated();
   }
 
-  public archive(): void {
-    this._props.archivedAt = new Date();
+  public delete(): void {
+    this._props.deletedAt = new Date();
     this.updated();
   }
 
   public isArchived(): boolean {
-    return !!this.props.archivedAt;
+    return !!this.props.deletedAt;
   }
 
-  get archivedAt(): Date | null {
-    return this.props.archivedAt;
+  get deletedAt(): Date | null {
+    return this.props.deletedAt;
   }
 }

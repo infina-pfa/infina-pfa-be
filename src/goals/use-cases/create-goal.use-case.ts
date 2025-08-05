@@ -58,6 +58,7 @@ export class CreateGoalUseCase extends BaseUseCase<
         ? new CurrencyVO(input.targetAmount)
         : undefined,
       dueDate: input.dueDate,
+      deletedAt: null,
     });
 
     // Create Goal Aggregate with empty contributions

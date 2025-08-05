@@ -30,6 +30,7 @@ export class GoalPrismaRepository
       due_date: props.dueDate || null,
       created_at: props.createdAt,
       updated_at: props.updatedAt,
+      deleted_at: props.deletedAt || null,
     };
   }
 
@@ -46,6 +47,7 @@ export class GoalPrismaRepository
         dueDate: data.due_date || undefined,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
+        deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       },
       data.id,
     );

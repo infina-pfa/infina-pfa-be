@@ -35,7 +35,7 @@ export class BudgetPrismaRepository
       icon: props.icon,
       created_at: props.createdAt,
       updated_at: props.updatedAt,
-      archived_at: props.archivedAt || null,
+      deleted_at: props.deletedAt || null,
     };
   }
 
@@ -52,7 +52,7 @@ export class BudgetPrismaRepository
         icon: data.icon,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
-        archivedAt: data.archived_at || null,
+        deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       },
       data.id,
     );
@@ -61,13 +61,13 @@ export class BudgetPrismaRepository
   public override async findOne(
     props: Partial<Readonly<BudgetEntityProps>>,
   ): Promise<BudgetEntity | null> {
-    return super.findOne({ ...props, archivedAt: null });
+    return super.findOne({ ...props });
   }
 
   public override async findMany(
     props: Partial<Readonly<BudgetEntityProps>>,
     options?: FindManyOptions,
   ): Promise<BudgetEntity[]> {
-    return super.findMany({ ...props, archivedAt: null }, options);
+    return super.findMany({ ...props }, options);
   }
 }

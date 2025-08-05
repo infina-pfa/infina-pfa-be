@@ -50,7 +50,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
     category: BudgetCategory = BudgetCategory.FIXED,
     color: string = '#FF5733',
     icon: string = 'shopping-cart',
-    archivedAt?: Date,
+    deletedAt?: Date,
   ) => {
     return await prisma.budgets.create({
       data: {
@@ -64,7 +64,7 @@ describe('Budget GET DETAIL Endpoint (e2e)', () => {
         year,
         created_at: new Date(),
         updated_at: new Date(),
-        archived_at: archivedAt || null,
+        archived_at: deletedAt || null,
       },
     });
   };

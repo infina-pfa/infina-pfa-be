@@ -9,13 +9,14 @@ export interface GoalEntityProps extends BaseProps {
   targetAmount?: CurrencyVO;
   currentAmount: CurrencyVO;
   dueDate?: Date;
+  deletedAt?: Date | null;
 }
 
 export class GoalEntity extends BaseEntity<GoalEntityProps> {
   public static create(
     props: OptionalProps<
       Omit<GoalEntityProps, 'id'>,
-      'createdAt' | 'updatedAt' | 'currentAmount'
+      'createdAt' | 'updatedAt' | 'currentAmount' | 'deletedAt'
     >,
     id?: string,
   ): GoalEntity {
@@ -25,6 +26,7 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
         currentAmount: props.currentAmount ?? new CurrencyVO(0),
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
+        deletedAt: props.deletedAt ?? null,
       },
       id,
     );

@@ -5,6 +5,7 @@ import { GetBudgetsUseCase } from './get-budgets.user-case';
 import { GetMonthlySpendingUseCase } from './get-monthly-spending.use-case';
 import { SpendUseCase } from './spend.use-case';
 import { UpdateBudgetUseCase } from './update-budget.use-case';
+import { DeleteBudgetUseCase } from './delete-budget.use-case';
 
 export const budgetingUseCases: Provider[] = [
   CreateBudgetUseCase,
@@ -13,6 +14,7 @@ export const budgetingUseCases: Provider[] = [
   GetBudgetDetailUseCase,
   GetMonthlySpendingUseCase,
   SpendUseCase,
+  DeleteBudgetUseCase,
 ];
 
 export {
@@ -22,4 +24,5 @@ export {
   GetBudgetDetailUseCase,
   GetMonthlySpendingUseCase,
   SpendUseCase,
+  DeleteBudgetUseCase,
 };

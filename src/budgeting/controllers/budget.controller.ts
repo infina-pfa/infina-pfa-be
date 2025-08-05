@@ -4,6 +4,7 @@ import { AuthUser } from '@/common/types';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -31,6 +32,7 @@ import { MonthlySpendingQueryDto } from './dto/monthly-spending-query.dto';
 import { SpendDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
+import { DeleteBudgetUseCase } from '../use-cases';
 
 @ApiTags('Budgets')
 @ApiBearerAuth()
@@ -44,6 +46,7 @@ export class BudgetController {
     private readonly getMonthlySpendingUseCase: GetMonthlySpendingUseCase,
     private readonly updateBudgetUseCase: UpdateBudgetUseCase,
     private readonly spendUseCase: SpendUseCase,
+    private readonly deleteBudgetUseCase: DeleteBudgetUseCase,
   ) {}
 
   @Post()
@@ -211,5 +214,18 @@ export class BudgetController {
       description: spendDto.description,
       recurring: spendDto.recurring,
     });
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a budget' })
+  @ApiParam({ name: 'id', description: 'Budget ID' })
+  @ApiResponse({ status: 200, description: 'Budget deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Budget not found' })
+  async deleteBudget(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.deleteBudgetUseCase.execute({ userId: user.id, budgetId: id });
   }
 }

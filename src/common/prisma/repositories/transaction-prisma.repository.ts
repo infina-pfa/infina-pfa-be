@@ -32,6 +32,7 @@ export abstract class TransactionPrismaRepository
       type: props.type as unknown as transaction_type,
       created_at: props.createdAt,
       updated_at: props.updatedAt,
+      deleted_at: props.deletedAt || null,
     };
   }
 
@@ -46,6 +47,7 @@ export abstract class TransactionPrismaRepository
         type: data.type as unknown as TransactionType,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
+        deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       },
       data.id,
     );

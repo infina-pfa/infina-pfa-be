@@ -133,7 +133,6 @@ export class BudgetAggregateRepositoryImpl
       where: {
         user_id: props.userId,
         amount: props.amount?.value,
-        archived_at: props.archivedAt,
         created_at: props.createdAt,
         updated_at: props.updatedAt,
         name: props.name,
@@ -173,7 +172,6 @@ export class BudgetAggregateRepositoryImpl
         color: props.color,
         icon: props.icon,
         amount: props.amount?.value,
-        archived_at: props.archivedAt,
         created_at: props.createdAt,
         updated_at: props.updatedAt,
       },
@@ -196,5 +194,24 @@ export class BudgetAggregateRepositoryImpl
         ),
       }),
     );
+  }
+
+  async delete(budgetAggregate: BudgetAggregate): Promise<void> {
+    const budget = budgetAggregate.props.budget;
+    const transactions = budgetAggregate.props.spending.items;
+
+    await this.prismaClient.$transaction(async (tx) => {
+      await tx.budgets.delete({
+        where: { id: budget.id },
+      });
+
+      await tx.budget_transactions.deleteMany({
+        where: { budget_id: budget.id },
+      });
+
+      await tx.transactions.deleteMany({
+        where: { id: { in: transactions.map((t) => t.id) } },
+      });
+    });
   }
 }

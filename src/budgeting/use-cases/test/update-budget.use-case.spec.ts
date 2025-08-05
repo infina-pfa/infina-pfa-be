@@ -66,7 +66,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'food',
           month: 1,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -111,7 +111,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'transport',
           month: 2,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -148,7 +148,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'entertainment',
           month: 3,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -187,7 +187,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'bills',
           month: 4,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -225,7 +225,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'multi',
           month: 6,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -271,7 +271,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'partial',
           month: 8,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -335,7 +335,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'food',
           month: 1,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -376,7 +376,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'food',
           month: 1,
           year: 2024,
-          archivedAt: archivedDate,
+          deletedAt: archivedDate,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -437,7 +437,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'food',
           month: 1,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -480,7 +480,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'integration',
           month: 9,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -521,7 +521,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'aggregate',
           month: 10,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -564,7 +564,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'return',
           month: 11,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -603,7 +603,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'empty',
           month: 12,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -641,7 +641,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'no-props',
           month: 1,
           year: 2025,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -679,7 +679,7 @@ describe('UpdateBudgetUseCase', () => {
           icon: 'immutable',
           month: 2,
           year: 2025,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });

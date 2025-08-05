@@ -30,6 +30,7 @@ export class UserPrismaRepository
       updated_at: new Date(props.updatedAt),
       currency: props.currency,
       language: props.language,
+      deleted_at: null,
     };
   }
 
@@ -46,6 +47,7 @@ export class UserPrismaRepository
         language: data.language as Language,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
+        deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
       },
       data.id,
     );

@@ -66,7 +66,7 @@ describe('SpendUseCase', () => {
           icon: 'food',
           month: 1,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -117,7 +117,7 @@ describe('SpendUseCase', () => {
           icon: 'transport',
           month: 2,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -162,7 +162,7 @@ describe('SpendUseCase', () => {
             icon: 'amount-test',
             month: 3,
             year: 2024,
-            archivedAt: null,
+            deletedAt: null,
             createdAt: mockDate,
             updatedAt: mockDate,
           });
@@ -205,7 +205,7 @@ describe('SpendUseCase', () => {
             icon: 'recurring-test',
             month: 4,
             year: 2024,
-            archivedAt: null,
+            deletedAt: null,
             createdAt: mockDate,
             updatedAt: mockDate,
           });
@@ -258,7 +258,7 @@ describe('SpendUseCase', () => {
             icon: 'text-test',
             month: 5,
             year: 2024,
-            archivedAt: null,
+            deletedAt: null,
             createdAt: mockDate,
             updatedAt: mockDate,
           });
@@ -300,7 +300,7 @@ describe('SpendUseCase', () => {
           icon: 'zero',
           month: 6,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -337,7 +337,7 @@ describe('SpendUseCase', () => {
           icon: 'large',
           month: 7,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -417,7 +417,7 @@ describe('SpendUseCase', () => {
           icon: 'save-error',
           month: 8,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -459,7 +459,7 @@ describe('SpendUseCase', () => {
           icon: 'integration',
           month: 9,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -499,7 +499,7 @@ describe('SpendUseCase', () => {
           icon: 'currency',
           month: 10,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -538,7 +538,7 @@ describe('SpendUseCase', () => {
           icon: 'void',
           month: 11,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -575,7 +575,7 @@ describe('SpendUseCase', () => {
           icon: 'negative',
           month: 12,
           year: 2024,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -612,7 +612,7 @@ describe('SpendUseCase', () => {
           icon: 'decimal',
           month: 1,
           year: 2025,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });
@@ -649,7 +649,7 @@ describe('SpendUseCase', () => {
           icon: 'special',
           month: 2,
           year: 2025,
-          archivedAt: null,
+          deletedAt: null,
           createdAt: mockDate,
           updatedAt: mockDate,
         });

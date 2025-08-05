@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
@@ -71,7 +71,7 @@ async function bootstrap() {
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);
 
   await app.listen(process.env.PORT ?? 3000, () => {
-    console.log(`Server is running on port ${process.env.PORT ?? 3000}`);
+    Logger.log(`Server is running on port ${process.env.PORT ?? 3000}`);
   });
 }
 bootstrap();

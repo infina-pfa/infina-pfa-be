@@ -346,6 +346,7 @@ model budget_transactions {
   user_id        String       @db.Uuid
   budget_id      String       @db.Uuid
   transaction_id String       @db.Uuid
+  deleted_at     DateTime?    @db.Timestamptz(6)
   budgets        budgets      @relation(fields: [budget_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transactions   transactions @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users          auth_users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -354,6 +355,8 @@ model budget_transactions {
   @@index([budget_id], map: "idx_budget_transactions_budget_id")
   @@index([transaction_id], map: "idx_budget_transactions_transaction_id")
   @@index([user_id], map: "idx_budget_transactions_user_id")
+  @@index([created_at(sort: Desc)], map: "idx_budget_transactions_created_at")
+  @@index([user_id, budget_id], map: "idx_budget_transactions_user_budget")
   @@schema("public")
 }
 
@@ -371,12 +374,14 @@ model budgets {
   icon                String                @default("other")
   category            String                @default("fixed")
   amount              Decimal               @default(0) @db.Decimal
-  archived_at         DateTime?             @db.Timestamptz(6)
+  deleted_at          DateTime?             @db.Timestamptz(6)
   budget_transactions budget_transactions[]
   users               auth_users            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([user_id], map: "idx_budgets_user_id")
   @@index([user_id, year, month], map: "idx_budgets_user_month_year")
+  @@index([category], map: "idx_budgets_category")
+  @@index([user_id, name, year, month], map: "idx_budgets_user_name_year_month")
   @@schema("public")
 }
 
@@ -388,10 +393,13 @@ model conversations {
   updated_at DateTime   @default(now()) @db.Timestamptz(6)
   user_id    String     @db.Uuid
   name       String
+  deleted_at DateTime?  @db.Timestamptz(6)
   users      auth_users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   messages   messages[]
 
   @@index([user_id], map: "idx_conversations_user_id")
+  @@index([created_at(sort: Desc)], map: "idx_conversations_created_at")
+  @@index([name], map: "idx_conversations_name")
   @@schema("public")
 }
 
@@ -404,6 +412,7 @@ model goal_transactions {
   goal_id        String       @db.Uuid
   transaction_id String       @db.Uuid
   user_id        String       @db.Uuid
+  deleted_at     DateTime?    @db.Timestamptz(6)
   goals          goals        @relation(fields: [goal_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   transactions   transactions @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users          auth_users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -412,6 +421,7 @@ model goal_transactions {
   @@index([goal_id], map: "idx_goal_transactions_goal_id")
   @@index([transaction_id], map: "idx_goal_transactions_transaction_id")
   @@index([user_id], map: "idx_goal_transactions_user_id")
+  @@index([user_id, goal_id], map: "idx_goal_transactions_user_goal")
   @@schema("public")
 }
 
@@ -427,11 +437,14 @@ model goals {
   current_amount    Decimal             @default(0) @db.Decimal
   target_amount     Decimal?            @db.Decimal
   user_id           String              @db.Uuid
+  deleted_at        DateTime?           @db.Timestamptz(6)
   goal_transactions goal_transactions[]
   users             auth_users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([due_date], map: "idx_goals_due_date")
   @@index([user_id], map: "idx_goals_user_id")
+  @@index([title], map: "idx_goals_title")
+  @@index([user_id, current_amount, target_amount], map: "idx_goals_user_amount")
   @@schema("public")
 }
 
@@ -447,6 +460,7 @@ model messages {
   type            message_type   @default(text)
   sender          message_sender @default(user)
   metadata        Json?          @db.Json
+  deleted_at      DateTime?      @db.Timestamptz(6)
   conversations   conversations  @relation(fields: [conversation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users           auth_users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -454,6 +468,8 @@ model messages {
   @@index([conversation_id], map: "idx_messages_conversation_id")
   @@index([sender, type], map: "idx_messages_sender_type")
   @@index([user_id], map: "idx_messages_user_id")
+  @@index([content], map: "idx_messages_content")
+  @@index([user_id, conversation_id], map: "idx_messages_user_conversation")
   @@schema("public")
 }
 
@@ -468,6 +484,7 @@ model onboarding_profiles {
   updated_at   DateTime   @default(now()) @db.Timestamptz(6)
   expense      Decimal?   @db.Decimal
   income       Decimal?   @db.Decimal
+  deleted_at   DateTime?  @db.Timestamptz(6)
   users        auth_users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([is_completed], map: "idx_onboarding_profiles_completed")
@@ -488,6 +505,7 @@ model transactions {
   description         String?
   type                transaction_type      @default(income)
   user_id             String?               @db.Uuid
+  deleted_at          DateTime?             @db.Timestamptz(6)
   budget_transactions budget_transactions[]
   goal_transactions   goal_transactions[]
   users               auth_users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -496,6 +514,8 @@ model transactions {
   @@index([user_id, created_at(sort: Desc)], map: "idx_transactions_user_created")
   @@index([user_id], map: "idx_transactions_user_id")
   @@index([user_id, type], map: "idx_transactions_user_type")
+  @@index([amount], map: "idx_transactions_amount")
+  @@index([name], map: "idx_transactions_name")
   @@schema("public")
 }
 
@@ -510,9 +530,11 @@ model public_users {
   financial_stage         String?
   language                language   @default(vi)
   currency                currency   @default(vnd)
+  deleted_at              DateTime?  @db.Timestamptz(6)
   users                   auth_users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([user_id], map: "idx_users_user_id")
+  @@index([name], map: "idx_users_name")
   @@map("users")
   @@schema("public")
 }
@@ -527,8 +549,12 @@ model onboarding_messages {
   metadata     Json?
   created_at   DateTime       @default(now()) @db.Timestamptz(6)
   updated_at   DateTime       @default(now()) @db.Timestamptz(6)
+  deleted_at   DateTime?      @db.Timestamptz(6)
   users        auth_users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "onboarding_chat_user_id_fkey")
 
+  @@index([created_at(sort: Desc)], map: "idx_onboarding_messages_created_at")
+  @@index([user_id, created_at(sort: Desc)], map: "idx_onboarding_messages_user_created")
+  @@index([user_id], map: "idx_onboarding_messages_user_id")
   @@schema("public")
 }
 
