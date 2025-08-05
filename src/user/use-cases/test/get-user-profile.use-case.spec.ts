@@ -46,7 +46,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'John Doe',
           userId: 'auth-user-123',
           financialStage: FinancialStage.START_INVESTING,
-          onboardingCompletedAt: new Date('2024-01-15T00:00:00Z'),
+
           currency: Currency.USD,
           language: Language.EN,
           createdAt: mockDate,
@@ -74,7 +74,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Jane Smith',
           userId: 'auth-user-456',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -91,20 +91,19 @@ describe('GetUserProfileUseCase', () => {
         expect(result).toBe(expectedUser);
         expect(result.name).toBe('Jane Smith');
         expect(result.financialStage).toBeNull();
-        expect(result.onboardingCompletedAt).toBeNull();
+
         expect(result.currency).toBe(Currency.VND);
         expect(result.language).toBe(Language.VI);
-        expect(result.isOnboardingCompleted()).toBe(false);
       });
 
       it('should return user profile with completed onboarding', async () => {
         const userId = 'auth-user-onboarded';
-        const onboardingDate = new Date('2024-01-10T00:00:00Z');
+
         const expectedUser = UserEntity.create({
           name: 'Onboarded User',
           userId: 'auth-user-onboarded',
           financialStage: FinancialStage.START_SAVING,
-          onboardingCompletedAt: onboardingDate,
+
           currency: Currency.EUR,
           language: Language.EN,
           createdAt: mockDate,
@@ -115,8 +114,11 @@ describe('GetUserProfileUseCase', () => {
 
         const result = await useCase.execute(userId);
 
-        expect(result.onboardingCompletedAt).toEqual(onboardingDate);
-        expect(result.isOnboardingCompleted()).toBe(true);
+        expect(result).toBe(expectedUser);
+        expect(result.name).toBe('Onboarded User');
+        expect(result.financialStage).toBe(FinancialStage.START_SAVING);
+        expect(result.currency).toBe(Currency.EUR);
+        expect(result.language).toBe(Language.EN);
       });
 
       it('should handle different financial stages correctly', async () => {
@@ -133,7 +135,7 @@ describe('GetUserProfileUseCase', () => {
             name: `User ${stage || 'null'}`,
             userId,
             financialStage: stage,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
@@ -160,7 +162,7 @@ describe('GetUserProfileUseCase', () => {
             name: `User ${currency}`,
             userId,
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency,
             language: Language.VI,
             createdAt: mockDate,
@@ -186,7 +188,7 @@ describe('GetUserProfileUseCase', () => {
             name: `User ${language}`,
             userId,
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language,
             createdAt: mockDate,
@@ -269,7 +271,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Params User',
           userId: 'auth-user-params',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -292,7 +294,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Single Call User',
           userId: 'auth-user-single-call',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -366,7 +368,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Long UserId User',
           userId,
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -387,7 +389,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Special Chars User',
           userId,
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -406,12 +408,12 @@ describe('GetUserProfileUseCase', () => {
     describe('Return Value Validation', () => {
       it('should return UserEntity instance with all expected properties', async () => {
         const userId = 'auth-user-complete';
-        const onboardingDate = new Date('2024-01-20T00:00:00Z');
+
         const expectedUser = UserEntity.create({
           name: 'Complete User',
           userId: 'auth-user-complete',
           financialStage: FinancialStage.START_INVESTING,
-          onboardingCompletedAt: onboardingDate,
+
           currency: Currency.EUR,
           language: Language.EN,
           createdAt: mockDate,
@@ -428,7 +430,7 @@ describe('GetUserProfileUseCase', () => {
         expect(result.name).toBe('Complete User');
         expect(result.userId).toBe('auth-user-complete');
         expect(result.financialStage).toBe(FinancialStage.START_INVESTING);
-        expect(result.onboardingCompletedAt).toEqual(onboardingDate);
+
         expect(result.currency).toBe(Currency.EUR);
         expect(result.language).toBe(Language.EN);
         expect(result.props.createdAt).toEqual(mockDate);
@@ -443,7 +445,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Instance User',
           userId: 'auth-user-instance',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -464,7 +466,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Methods User',
           userId: 'auth-user-methods',
           financialStage: FinancialStage.DEBT,
-          onboardingCompletedAt: new Date(),
+
           currency: Currency.USD,
           language: Language.EN,
           createdAt: mockDate,
@@ -477,10 +479,8 @@ describe('GetUserProfileUseCase', () => {
 
         expect(typeof result.updateName).toBe('function');
         expect(typeof result.setFinancialStage).toBe('function');
-        expect(typeof result.completeOnboarding).toBe('function');
         expect(typeof result.updateCurrency).toBe('function');
         expect(typeof result.updateLanguage).toBe('function');
-        expect(typeof result.isOnboardingCompleted).toBe('function');
         expect(typeof result.equals).toBe('function');
         expect(typeof result.toObject).toBe('function');
       });
@@ -493,7 +493,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'Efficiency User',
           userId: 'auth-user-efficiency',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -513,7 +513,7 @@ describe('GetUserProfileUseCase', () => {
           name: 'No Ops User',
           userId: 'auth-user-no-ops',
           financialStage: FinancialStage.START_SAVING,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,

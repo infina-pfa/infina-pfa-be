@@ -34,7 +34,6 @@ export class CreateUserProfileUseCase extends BaseUseCase<
       name: profileData.name,
       userId: userId,
       financialStage: profileData.financialStage || null,
-      onboardingCompletedAt: null, // Initially not completed
       currency: profileData.currency || Currency.VND,
       language: profileData.language || Language.VI,
       createdAt: new Date(),

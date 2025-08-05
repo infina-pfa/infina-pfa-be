@@ -17,13 +17,6 @@ export class UserProfileResponseDto {
   financialStage: string | null;
 
   @ApiProperty({
-    example: '2024-01-15T10:30:00Z',
-    description: 'When user completed onboarding',
-    nullable: true,
-  })
-  onboardingCompletedAt: Date | null;
-
-  @ApiProperty({
     example: '2024-01-01T00:00:00Z',
     description: 'Account creation date',
   })
@@ -48,21 +41,13 @@ export class UserProfileResponseDto {
   language: Language;
 
   static fromEntity(entity: UserEntity): UserProfileResponseDto {
-    const {
-      name,
-      financialStage,
-      onboardingCompletedAt,
-      currency,
-      language,
-      createdAt,
-      updatedAt,
-    } = entity.props;
+    const { name, financialStage, currency, language, createdAt, updatedAt } =
+      entity.props;
 
     return {
       id: entity.id,
       name,
       financialStage,
-      onboardingCompletedAt,
       currency,
       language,
       createdAt,

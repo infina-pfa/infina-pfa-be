@@ -17,7 +17,6 @@ export interface UserEntityProps extends BaseProps {
   name: string;
   userId: string;
   financialStage: FinancialStage | null;
-  onboardingCompletedAt: Date | null;
   currency: Currency;
   language: Language;
   deletedAt?: Date | null;
@@ -59,11 +58,6 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
     this.updated();
   }
 
-  public completeOnboarding(): void {
-    this._props.onboardingCompletedAt = new Date();
-    this.updated();
-  }
-
   public updateCurrency(currency: Currency): void {
     this._props.currency = currency;
     this.updated();
@@ -72,10 +66,6 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
   public updateLanguage(language: Language): void {
     this._props.language = language;
     this.updated();
-  }
-
-  public isOnboardingCompleted(): boolean {
-    return !!this.props.onboardingCompletedAt;
   }
 
   get name(): string {
@@ -88,10 +78,6 @@ export class UserEntity extends BaseEntity<UserEntityProps> {
 
   get financialStage(): string | null | undefined {
     return this.props.financialStage;
-  }
-
-  get onboardingCompletedAt(): Date | null | undefined {
-    return this.props.onboardingCompletedAt;
   }
 
   get currency(): string {

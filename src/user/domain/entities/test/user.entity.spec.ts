@@ -19,7 +19,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: FinancialStage.START_INVESTING,
-        onboardingCompletedAt: new Date(),
         currency: Currency.USD,
         language: Language.EN,
         createdAt: mockDate,
@@ -31,7 +30,6 @@ describe('UserEntity', () => {
       expect(user.name).toBe('John Doe');
       expect(user.userId).toBe('auth-user-123');
       expect(user.financialStage).toBe(FinancialStage.START_INVESTING);
-      expect(user.onboardingCompletedAt).toEqual(new Date());
       expect(user.currency).toBe(Currency.USD);
       expect(user.language).toBe(Language.EN);
       expect(user.id).toBeDefined();
@@ -43,7 +41,6 @@ describe('UserEntity', () => {
         name: 'Jane Smith',
         userId: 'auth-user-456',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -57,7 +54,6 @@ describe('UserEntity', () => {
       expect(user.name).toBe('Jane Smith');
       expect(user.userId).toBe('auth-user-456');
       expect(user.financialStage).toBeNull();
-      expect(user.onboardingCompletedAt).toBeNull();
     });
 
     it('should create UserEntity with null financial stage and onboarding date', () => {
@@ -65,7 +61,6 @@ describe('UserEntity', () => {
         name: 'Test User',
         userId: 'auth-user-789',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.EUR,
         language: Language.EN,
         createdAt: mockDate,
@@ -75,8 +70,6 @@ describe('UserEntity', () => {
       const user = UserEntity.create(props);
 
       expect(user.financialStage).toBeNull();
-      expect(user.onboardingCompletedAt).toBeNull();
-      expect(user.isOnboardingCompleted()).toBe(false);
     });
   });
 
@@ -86,7 +79,6 @@ describe('UserEntity', () => {
         name: 'Old Name',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -108,7 +100,6 @@ describe('UserEntity', () => {
         name: 'Original Name',
         userId: 'auth-user-123',
         financialStage: FinancialStage.DEBT,
-        onboardingCompletedAt: null,
         currency: Currency.USD,
         language: Language.EN,
         createdAt: mockDate,
@@ -132,7 +123,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -162,7 +152,6 @@ describe('UserEntity', () => {
           name: 'John Doe',
           userId: 'auth-user-123',
           financialStage: null,
-          onboardingCompletedAt: null,
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -176,61 +165,12 @@ describe('UserEntity', () => {
     });
   });
 
-  describe('completeOnboarding', () => {
-    it('should set onboardingCompletedAt to current date and update timestamp', () => {
-      const props: Omit<UserEntityProps, 'id'> = {
-        name: 'John Doe',
-        userId: 'auth-user-123',
-        financialStage: FinancialStage.START_SAVING,
-        onboardingCompletedAt: null,
-        currency: Currency.VND,
-        language: Language.VI,
-        createdAt: mockDate,
-        updatedAt: mockDate,
-      };
-      const user = UserEntity.create(props);
-
-      const completionDate = new Date('2024-01-03T00:00:00Z');
-      jest.setSystemTime(completionDate);
-
-      user.completeOnboarding();
-
-      expect(user.onboardingCompletedAt).toEqual(completionDate);
-      expect(user.props.updatedAt).toEqual(completionDate);
-      expect(user.isOnboardingCompleted()).toBe(true);
-    });
-
-    it('should overwrite existing onboarding completion date', () => {
-      const existingDate = new Date('2024-01-01T00:00:00Z');
-      const props: Omit<UserEntityProps, 'id'> = {
-        name: 'John Doe',
-        userId: 'auth-user-123',
-        financialStage: FinancialStage.START_SAVING,
-        onboardingCompletedAt: existingDate,
-        currency: Currency.VND,
-        language: Language.VI,
-        createdAt: mockDate,
-        updatedAt: mockDate,
-      };
-      const user = UserEntity.create(props);
-
-      const newCompletionDate = new Date('2024-01-05T00:00:00Z');
-      jest.setSystemTime(newCompletionDate);
-
-      user.completeOnboarding();
-
-      expect(user.onboardingCompletedAt).toEqual(newCompletionDate);
-      expect(user.onboardingCompletedAt).not.toEqual(existingDate);
-    });
-  });
-
   describe('updateCurrency', () => {
     it('should update the currency and updatedAt timestamp', () => {
       const props: Omit<UserEntityProps, 'id'> = {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -255,7 +195,6 @@ describe('UserEntity', () => {
           name: 'John Doe',
           userId: 'auth-user-123',
           financialStage: null,
-          onboardingCompletedAt: null,
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -275,7 +214,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -300,7 +238,6 @@ describe('UserEntity', () => {
           name: 'John Doe',
           userId: 'auth-user-123',
           financialStage: null,
-          onboardingCompletedAt: null,
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -320,15 +257,12 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: FinancialStage.START_SAVING,
-        onboardingCompletedAt: new Date(),
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
-      const user = UserEntity.create(props);
-
-      expect(user.isOnboardingCompleted()).toBe(true);
+      UserEntity.create(props);
     });
 
     it('should return false when onboardingCompletedAt is null', () => {
@@ -336,15 +270,12 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: FinancialStage.START_SAVING,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
-      const user = UserEntity.create(props);
-
-      expect(user.isOnboardingCompleted()).toBe(false);
+      UserEntity.create(props);
     });
 
     it('should return false when onboardingCompletedAt is undefined', () => {
@@ -352,15 +283,12 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: FinancialStage.START_SAVING,
-        onboardingCompletedAt: undefined as any,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
         updatedAt: mockDate,
       };
-      const user = UserEntity.create(props);
-
-      expect(user.isOnboardingCompleted()).toBe(false);
+      UserEntity.create(props);
     });
   });
 
@@ -372,7 +300,6 @@ describe('UserEntity', () => {
         name: 'Test User',
         userId: 'auth-user-456',
         financialStage: FinancialStage.DEBT,
-        onboardingCompletedAt: new Date('2024-01-15T00:00:00Z'),
         currency: Currency.EUR,
         language: Language.EN,
         createdAt: mockDate,
@@ -393,12 +320,6 @@ describe('UserEntity', () => {
       expect(user.financialStage).toBe(FinancialStage.DEBT);
     });
 
-    it('should return correct onboardingCompletedAt', () => {
-      expect(user.onboardingCompletedAt).toEqual(
-        new Date('2024-01-15T00:00:00Z'),
-      );
-    });
-
     it('should return correct currency', () => {
       expect(user.currency).toBe(Currency.EUR);
     });
@@ -414,7 +335,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -432,7 +352,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: FinancialStage.START_SAVING,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -452,7 +371,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -474,7 +392,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'auth-user-123',
         financialStage: FinancialStage.START_INVESTING,
-        onboardingCompletedAt: new Date('2024-01-15T00:00:00Z'),
         currency: Currency.USD,
         language: Language.EN,
         createdAt: mockDate,
@@ -491,7 +408,6 @@ describe('UserEntity', () => {
         'financialStage',
         FinancialStage.START_INVESTING,
       );
-      expect(object).toHaveProperty('onboardingCompletedAt');
       expect(object).toHaveProperty('currency', Currency.USD);
       expect(object).toHaveProperty('language', Language.EN);
       expect(object).toHaveProperty('createdAt');
@@ -506,7 +422,6 @@ describe('UserEntity', () => {
         name: '',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -522,7 +437,6 @@ describe('UserEntity', () => {
         name: 'Original Name',
         userId: 'auth-user-123',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -535,13 +449,11 @@ describe('UserEntity', () => {
       user.setFinancialStage(FinancialStage.START_INVESTING);
       user.updateCurrency(Currency.USD);
       user.updateLanguage(Language.EN);
-      user.completeOnboarding();
 
       expect(user.name).toBe('New Name');
       expect(user.financialStage).toBe(FinancialStage.START_INVESTING);
       expect(user.currency).toBe(Currency.USD);
       expect(user.language).toBe(Language.EN);
-      expect(user.isOnboardingCompleted()).toBe(true);
     });
 
     it('should maintain userId immutability', () => {
@@ -549,7 +461,6 @@ describe('UserEntity', () => {
         name: 'John Doe',
         userId: 'original-user-id',
         financialStage: null,
-        onboardingCompletedAt: null,
         currency: Currency.VND,
         language: Language.VI,
         createdAt: mockDate,
@@ -560,7 +471,6 @@ describe('UserEntity', () => {
       // Try various updates - userId should remain unchanged
       user.updateName('New Name');
       user.setFinancialStage(FinancialStage.DEBT);
-      user.completeOnboarding();
 
       expect(user.userId).toBe('original-user-id');
     });

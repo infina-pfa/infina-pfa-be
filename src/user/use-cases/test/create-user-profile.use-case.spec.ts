@@ -67,7 +67,7 @@ describe('CreateUserProfileUseCase', () => {
           name: 'John Doe',
           userId: 'auth-user-123',
           financialStage: FinancialStage.START_INVESTING,
-          onboardingCompletedAt: null,
+
           currency: Currency.USD,
           language: Language.EN,
           createdAt: mockDate,
@@ -105,7 +105,6 @@ describe('CreateUserProfileUseCase', () => {
           name: 'Jane Smith',
           userId: 'auth-user-456',
           financialStage: null,
-          onboardingCompletedAt: null,
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -145,7 +144,6 @@ describe('CreateUserProfileUseCase', () => {
           name: 'Test User',
           userId: 'auth-user-789',
           financialStage: FinancialStage.DEBT,
-          onboardingCompletedAt: null,
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -164,7 +162,7 @@ describe('CreateUserProfileUseCase', () => {
             financialStage: FinancialStage.DEBT,
             currency: Currency.VND, // Default applied
             language: Language.VI, // Default applied
-            onboardingCompletedAt: null, // Initially not completed
+            // Initially not completed
           }),
         );
         expect(result).toBe(expectedUser);
@@ -184,7 +182,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Onboarding User',
             userId: 'auth-user-onboarding',
             financialStage: FinancialStage.START_SAVING,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
@@ -195,9 +193,7 @@ describe('CreateUserProfileUseCase', () => {
         await useCase.execute(input);
 
         expect(userRepository.create).toHaveBeenCalledWith(
-          expect.objectContaining({
-            onboardingCompletedAt: null,
-          }),
+          expect.objectContaining({}),
         );
       });
 
@@ -222,7 +218,7 @@ describe('CreateUserProfileUseCase', () => {
               name: `User ${stage}`,
               userId,
               financialStage: stage,
-              onboardingCompletedAt: null,
+
               currency: Currency.VND,
               language: Language.VI,
               createdAt: mockDate,
@@ -259,7 +255,7 @@ describe('CreateUserProfileUseCase', () => {
               name: `User ${currency}`,
               userId,
               financialStage: null,
-              onboardingCompletedAt: null,
+
               currency,
               language: Language.VI,
               createdAt: mockDate,
@@ -296,7 +292,7 @@ describe('CreateUserProfileUseCase', () => {
               name: `User ${language}`,
               userId,
               financialStage: null,
-              onboardingCompletedAt: null,
+
               currency: Currency.VND,
               language,
               createdAt: mockDate,
@@ -329,7 +325,7 @@ describe('CreateUserProfileUseCase', () => {
           name: 'Existing User',
           userId: 'auth-user-existing',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -361,7 +357,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'New User',
             userId: 'auth-user-check',
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
@@ -396,7 +392,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Structure Test',
             userId: 'auth-user-structure',
             financialStage: FinancialStage.START_INVESTING,
-            onboardingCompletedAt: null,
+
             currency: Currency.EUR,
             language: Language.EN,
             createdAt: mockDate,
@@ -412,7 +408,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Structure Test',
             userId: 'auth-user-structure',
             financialStage: FinancialStage.START_INVESTING,
-            onboardingCompletedAt: null,
+
             currency: Currency.EUR,
             language: Language.EN,
             createdAt: expect.any(Date),
@@ -435,7 +431,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Timestamp User',
             userId: 'auth-user-timestamp',
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
@@ -463,7 +459,7 @@ describe('CreateUserProfileUseCase', () => {
           name: 'Success User',
           userId: 'auth-user-success',
           financialStage: null,
-          onboardingCompletedAt: null,
+
           currency: Currency.VND,
           language: Language.VI,
           createdAt: mockDate,
@@ -531,7 +527,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Null Stage User',
             userId: 'auth-user-null-stage',
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
@@ -565,7 +561,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Undefined Props User',
             userId: 'auth-user-undefined',
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
@@ -598,7 +594,7 @@ describe('CreateUserProfileUseCase', () => {
             name: 'Empty UserId User',
             userId: '',
             financialStage: null,
-            onboardingCompletedAt: null,
+
             currency: Currency.VND,
             language: Language.VI,
             createdAt: mockDate,
