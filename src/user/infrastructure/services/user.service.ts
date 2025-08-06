@@ -11,9 +11,9 @@ export class UserServiceImpl implements UserService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  handleUserSignedUp(userId: string): void {
+  handleUserSignedUp(userId: string, name: string): void {
     console.log('SEND User signed up', userId);
-    this.eventEmitter.emit(UserEvent.USER_SIGNED_UP, { userId });
+    this.eventEmitter.emit(UserEvent.USER_SIGNED_UP, { userId, name });
   }
 
   @OnEvent(UserEvent.USER_SIGNED_UP)
