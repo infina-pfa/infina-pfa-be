@@ -1,4 +1,6 @@
 import {
+  BudgetRepository,
+  BudgetTransaction,
   TransactionEntity,
   TransactionRepository,
   TransactionType,
@@ -12,7 +14,10 @@ export class TransactionRepositoryImpl
   extends TransactionPrismaRepository
   implements TransactionRepository
 {
-  constructor(private readonly prismaClient: PrismaClient) {
+  constructor(
+    private readonly prismaClient: PrismaClient,
+    private readonly budgetRepository: BudgetRepository,
+  ) {
     super(prismaClient.transactions);
   }
 
@@ -35,7 +40,7 @@ export class TransactionRepositoryImpl
     userId: string,
     month: number,
     year: number,
-  ): Promise<TransactionEntity[]> {
+  ): Promise<BudgetTransaction[]> {
     if (month < 1 || month > 12 || year <= 0) {
       return [];
     }
@@ -50,10 +55,22 @@ export class TransactionRepositoryImpl
           lte: new Date(year, month, 0), // End of the month
         },
       },
+      include: {
+        budget_transactions: {
+          include: {
+            budgets: true,
+          },
+        },
+      },
     });
 
-    return budgetTransactions.map((budgetTransaction) =>
-      this.toEntity(budgetTransaction),
-    );
+    return budgetTransactions.map((budgetTransaction) => {
+      return {
+        transaction: this.toEntity(budgetTransaction),
+        budget: this.budgetRepository.toEntity(
+          budgetTransaction.budget_transactions[0].budgets,
+        ),
+      };
+    });
   }
 }

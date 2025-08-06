@@ -72,7 +72,7 @@ export class BudgetController {
       userId: user.id,
     });
 
-    return BudgetResponseDto.fromEntity(budget);
+    return BudgetResponseDto.fromAggregate(budget);
   }
 
   @Get()
@@ -90,7 +90,7 @@ export class BudgetController {
   ): Promise<BudgetResponseDto[]> {
     return (
       await this.getBudgetsUseCase.execute({ userId: user.id, month, year })
-    ).map((budget) => BudgetResponseDto.fromEntity(budget));
+    ).map((budget) => BudgetResponseDto.fromAggregate(budget));
   }
 
   @Get('spending')
@@ -125,7 +125,10 @@ export class BudgetController {
     }
 
     return transactions.map((transaction) =>
-      TransactionResponseDto.fromEntity(transaction),
+      TransactionResponseDto.fromEntity(
+        transaction.transaction,
+        transaction.budget,
+      ),
     );
   }
 
@@ -150,7 +153,7 @@ export class BudgetController {
       userId: user.id,
     });
 
-    return BudgetResponseDto.fromEntity(budget, true);
+    return BudgetResponseDto.fromAggregate(budget, true);
   }
 
   @Patch(':id')
@@ -191,7 +194,7 @@ export class BudgetController {
       },
     });
 
-    return BudgetResponseDto.fromEntity(updatedBudget);
+    return BudgetResponseDto.fromAggregate(updatedBudget);
   }
 
   @Post(':id/spend')
@@ -219,7 +222,7 @@ export class BudgetController {
       recurring: spendDto.recurring,
     });
 
-    return BudgetResponseDto.fromEntity(budget, true);
+    return BudgetResponseDto.fromAggregate(budget, true);
   }
 
   @Delete(':id')

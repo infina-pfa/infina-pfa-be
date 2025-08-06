@@ -4,7 +4,7 @@ import { PrismaClient } from '../../generated/prisma';
 import { Currency, Language } from '../../src/common/types/user';
 import { CreateUserProfileDto } from '../../src/user/controllers/dto/create-user-profile.dto';
 import { FinancialStage } from '../../src/user/domain/entities/user.entity';
-import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
+import { UserProfileResponseDto } from '../../src/user/controllers/dto/user-profile.dto';
 import { AppSetup } from '../setup/app.setup';
 import { TestDatabaseManager } from '../setup/database.setup';
 import { AuthTestUtils, TestUser } from '../utils/auth.utils';
@@ -63,7 +63,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
         expect(body.financialStage).toBe(FinancialStage.START_INVESTING);
         expect(body.currency).toBe(Currency.EUR);
         expect(body.language).toBe(Language.EN);
-        expect(body.onboardingCompletedAt).toBeNull();
         expect(body.createdAt).toBeDefined();
         expect(body.updatedAt).toBeDefined();
 
@@ -77,7 +76,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
         expect(userInDb?.financial_stage).toBe(FinancialStage.START_INVESTING);
         expect(userInDb?.currency).toBe(Currency.EUR);
         expect(userInDb?.language).toBe(Language.EN);
-        expect(userInDb?.onboarding_completed_at).toBeNull();
       });
 
       it('should create user profile with minimal required data', async () => {
@@ -98,7 +96,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
         expect(body.financialStage).toBeNull();
         expect(body.currency).toBe(Currency.VND); // Default
         expect(body.language).toBe(Language.VI); // Default
-        expect(body.onboardingCompletedAt).toBeNull();
         expect(body.createdAt).toBeDefined();
         expect(body.updatedAt).toBeDefined();
 
@@ -132,7 +129,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
         expect(body.financialStage).toBe(FinancialStage.DEBT);
         expect(body.currency).toBe(Currency.VND); // Default applied
         expect(body.language).toBe(Language.VI); // Default applied
-        expect(body.onboardingCompletedAt).toBeNull(); // Initially not completed
 
         // Verify defaults in database
         const userInDb = await prisma.public_users.findUnique({
@@ -141,7 +137,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
 
         expect(userInDb?.currency).toBe(Currency.VND);
         expect(userInDb?.language).toBe(Language.VI);
-        expect(userInDb?.onboarding_completed_at).toBeNull();
       });
     });
 
@@ -288,29 +283,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
           .expect(409);
 
         expect(response.body).toHaveProperty('message');
-      });
-
-      it('should set onboarding as incomplete initially', async () => {
-        const createData: CreateUserProfileDto = {
-          name: 'Onboarding Test',
-          financialStage: FinancialStage.START_SAVING,
-        };
-
-        const response = await request(app.getHttpServer())
-          .post('/users/profile')
-          .set(authHeaders.JOHN_DOE)
-          .send(createData)
-          .expect(201);
-
-        const body = response.body as UserProfileResponseDto;
-        expect(body.onboardingCompletedAt).toBeNull();
-
-        // Verify in database
-        const userInDb = await prisma.public_users.findUnique({
-          where: { user_id: testUsers.JOHN_DOE.id },
-        });
-
-        expect(userInDb?.onboarding_completed_at).toBeNull();
       });
 
       it('should handle different financial stages correctly', async () => {
@@ -514,7 +486,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
           body.financialStage === null ||
             typeof body.financialStage === 'string',
         ).toBe(true);
-        expect(body.onboardingCompletedAt).toBeNull();
 
         // Verify values
         expect(body.name).toBe('Structure Test');
@@ -552,9 +523,6 @@ describe('User Profile CREATE Endpoints (e2e)', () => {
         expect(body.financialStage).toBe(userInDb?.financial_stage);
         expect(body.currency).toBe(userInDb?.currency);
         expect(body.language).toBe(userInDb?.language);
-        expect(body.onboardingCompletedAt).toBe(
-          userInDb?.onboarding_completed_at,
-        );
       });
 
       it('should set correct timestamps on creation', async () => {

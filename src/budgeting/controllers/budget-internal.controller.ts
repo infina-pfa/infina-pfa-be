@@ -83,7 +83,7 @@ export class BudgetInternalController {
       userId: createBudgetDto.userId,
     });
 
-    return BudgetResponseDto.fromEntity(budget);
+    return BudgetResponseDto.fromAggregate(budget);
   }
 
   @Get()
@@ -100,7 +100,7 @@ export class BudgetInternalController {
     @Param('year') year: number,
   ): Promise<BudgetResponseDto[]> {
     return (await this.getBudgetsUseCase.execute({ userId, month, year })).map(
-      (budget) => BudgetResponseDto.fromEntity(budget),
+      (budget) => BudgetResponseDto.fromAggregate(budget),
     );
   }
 
@@ -135,7 +135,10 @@ export class BudgetInternalController {
     }
 
     return transactions.map((transaction) =>
-      TransactionResponseDto.fromEntity(transaction),
+      TransactionResponseDto.fromEntity(
+        transaction.transaction,
+        transaction.budget,
+      ),
     );
   }
 
@@ -156,7 +159,7 @@ export class BudgetInternalController {
       id,
     });
 
-    return BudgetResponseDto.fromEntity(budget, true);
+    return BudgetResponseDto.fromAggregate(budget, true);
   }
 
   @Patch(':id')
@@ -196,7 +199,7 @@ export class BudgetInternalController {
       },
     });
 
-    return BudgetResponseDto.fromEntity(updatedBudget);
+    return BudgetResponseDto.fromAggregate(updatedBudget);
   }
 
   @Post(':id/spend')
@@ -223,7 +226,7 @@ export class BudgetInternalController {
       recurring: spendDto.recurring,
     });
 
-    return BudgetResponseDto.fromEntity(budget, true);
+    return BudgetResponseDto.fromAggregate(budget, true);
   }
 
   @Delete(':id')

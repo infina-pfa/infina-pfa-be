@@ -3,6 +3,8 @@ import {
   TransactionType,
 } from '@/budgeting/domain/entities/transactions.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { BudgetResponseDto } from './budget.dto';
+import { BudgetEntity } from '@/budgeting/domain';
 
 export class TransactionResponseDto {
   @ApiProperty({
@@ -54,7 +56,16 @@ export class TransactionResponseDto {
   })
   updatedAt: Date;
 
-  static fromEntity(transaction: TransactionEntity): TransactionResponseDto {
+  @ApiProperty({
+    description: 'Budget',
+    type: BudgetResponseDto,
+  })
+  budget: BudgetResponseDto;
+
+  static fromEntity(
+    transaction: TransactionEntity,
+    budget?: BudgetEntity,
+  ): TransactionResponseDto {
     const dto = new TransactionResponseDto();
     dto.id = transaction.id;
     dto.name = transaction.props.name;
@@ -64,6 +75,9 @@ export class TransactionResponseDto {
     dto.recurring = transaction.props.recurring;
     dto.createdAt = transaction.props.createdAt;
     dto.updatedAt = transaction.props.updatedAt;
+    dto.budget = budget
+      ? BudgetResponseDto.fromEntity(budget)
+      : new BudgetResponseDto();
     return dto;
   }
 }

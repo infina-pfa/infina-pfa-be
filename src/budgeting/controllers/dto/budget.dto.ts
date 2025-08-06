@@ -1,4 +1,8 @@
-import { BudgetAggregate, BudgetCategory } from '@/budgeting/domain';
+import {
+  BudgetAggregate,
+  BudgetCategory,
+  BudgetEntity,
+} from '@/budgeting/domain';
 import { BaseDto } from '@/common/base';
 import { ApiProperty } from '@nestjs/swagger';
 import { TransactionResponseDto } from './transaction.dto';
@@ -78,7 +82,7 @@ export class BudgetResponseDto extends BaseDto {
   })
   transactions?: TransactionResponseDto[];
 
-  public static fromEntity(
+  public static fromAggregate(
     entity: BudgetAggregate,
     includeTransactions = false,
   ): BudgetResponseDto {
@@ -97,6 +101,16 @@ export class BudgetResponseDto extends BaseDto {
       );
     }
 
+    return dto;
+  }
+
+  public static fromEntity(entity: BudgetEntity): BudgetResponseDto {
+    const dto = new BudgetResponseDto();
+    dto.id = entity.id;
+    dto.name = entity.props.name;
+    dto.amount = entity.amount.value;
+    dto.userId = entity.userId;
+    dto.category = entity.props.category;
     return dto;
   }
 }

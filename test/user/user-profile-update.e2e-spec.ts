@@ -4,7 +4,7 @@ import { PrismaClient } from '../../generated/prisma';
 import { Currency, Language } from '../../src/common/types/user';
 import { UpdateUserProfileDto } from '../../src/user/controllers/dto/update-user-profile.dto';
 import { FinancialStage } from '../../src/user/domain/entities/user.entity';
-import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
+import { UserProfileResponseDto } from '../../src/user/controllers/dto/user-profile.dto';
 import { AppSetup } from '../setup/app.setup';
 import { TestDatabaseManager } from '../setup/database.setup';
 import { AuthTestUtils, TestUser } from '../utils/auth.utils';

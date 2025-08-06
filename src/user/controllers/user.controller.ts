@@ -7,7 +7,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserProfileResponseDto } from '../dto/user-profile.dto';
+import { UserProfileResponseDto } from './dto/user-profile.dto';
 import { GetUserProfileUseCase } from '../use-cases/get-user-profile.use-case';
 import { UpdateUserProfileUseCase } from '../use-cases/update-user-profile.use-case';
 import { CreateUserProfileUseCase } from '../use-cases/create-user-profile.use-case';

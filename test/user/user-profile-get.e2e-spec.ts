@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { PrismaClient } from '../../generated/prisma';
-import { UserProfileResponseDto } from '../../src/user/dto/user-profile.dto';
+import { UserProfileResponseDto } from '../../src/user/controllers/dto/user-profile.dto';
 import { AppSetup } from '../setup/app.setup';
 import { TestDatabaseManager } from '../setup/database.setup';
 import { AuthTestUtils, TestUser } from '../utils/auth.utils';
