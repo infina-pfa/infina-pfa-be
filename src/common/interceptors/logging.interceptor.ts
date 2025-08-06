@@ -9,11 +9,6 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Request, Response } from 'express';
 
-interface ErrorWithStack {
-  message: string;
-  stack?: string;
-}
-
 interface RequestData {
   method: string;
   url: string;
@@ -59,12 +54,12 @@ export class LoggingInterceptor implements NestInterceptor {
             `Response: ${url} ${method} ${response.statusCode} - ${responseTime}ms`,
           );
         },
-        error: (error: ErrorWithStack) => {
-          const responseTime = Date.now() - now;
-          this.logger.error(
-            `Error in ${url} ${method} ${response.statusCode} - ${responseTime}ms: ${error.message}`,
-          );
-        },
+        // error: (error: ErrorWithStack) => {
+        //   const responseTime = Date.now() - now;
+        //   this.logger.error(
+        //     `Error in ${url} ${method} ${response.statusCode} - ${responseTime}ms: ${error.message}`,
+        //   );
+        // },
       }),
     );
   }

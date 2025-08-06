@@ -1,5 +1,6 @@
 import {
   ArgumentsHost,
+  BadRequestException,
   Catch,
   ExceptionFilter,
   HttpException,
@@ -26,7 +27,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
 
     let errorResponse: ErrorResponse = {
       statusCode:
@@ -47,9 +48,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         path: request.url,
       };
-
-      response.status(HttpStatus.BAD_REQUEST).json(errorResponse);
-      return;
+      status = HttpStatus.BAD_REQUEST;
     }
 
     if (exception instanceof HttpException) {
@@ -62,10 +61,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         path: request.url,
       };
+      status = exception?.getStatus();
+    }
+
+    if (exception instanceof BadRequestException) {
+      const response = exception.getResponse() as { message: string[] };
+      errorResponse = {
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: response.message.join(', '),
+        code: 'bad_request',
+        error: exception.name,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      };
+      status = HttpStatus.BAD_REQUEST;
     }
 
     logger.error(
-      `[${errorResponse.statusCode}] ${errorResponse.code} - ${errorResponse.path} - ${JSON.stringify(exception.stack)}`,
+      `[${errorResponse.statusCode}] ${errorResponse.code} \n- MESSAGE: ${errorResponse.message} \n- PATH: ${errorResponse.path} \n- STACK: ${JSON.stringify(exception.stack)}`,
     );
 
     response.status(status).json(errorResponse);
