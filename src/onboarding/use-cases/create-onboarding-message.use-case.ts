@@ -4,6 +4,7 @@ import {
   OnboardingMessageEntity,
   OnboardingMessageRepository,
   MessageSender,
+  OnboardingErrorFactory,
 } from '@/onboarding/domain';
 
 export type CreateOnboardingMessageUseCaseInput = {
@@ -28,6 +29,16 @@ export class CreateOnboardingMessageUseCase extends BaseUseCase<
   async execute(
     input: CreateOnboardingMessageUseCaseInput,
   ): Promise<OnboardingMessageEntity> {
+    // Validate content
+    if (!input.content || input.content.trim().length === 0) {
+      throw OnboardingErrorFactory.messageInvalidContent();
+    }
+
+    // Validate sender
+    if (!Object.values(MessageSender).includes(input.sender)) {
+      throw OnboardingErrorFactory.messageInvalidSender();
+    }
+
     const message = OnboardingMessageEntity.create({
       userId: input.userId,
       sender: input.sender,

@@ -1,5 +1,6 @@
 import { BaseEntity, BaseProps } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
+import { OnboardingErrorFactory } from '../errors';
 
 export enum MessageSender {
   AI = 'ai',
@@ -38,14 +39,11 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
   }
 
   public validate(): void {
-    if (!this.props.userId) {
-      throw new Error('User ID is required');
-    }
     if (!this.props.content || this.props.content.trim().length === 0) {
-      throw new Error('Content is required');
+      throw OnboardingErrorFactory.messageInvalidContent();
     }
     if (!Object.values(MessageSender).includes(this.props.sender)) {
-      throw new Error('Invalid message sender');
+      throw OnboardingErrorFactory.messageInvalidSender();
     }
   }
 
@@ -75,7 +73,7 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
 
   public updateContent(content: string): void {
     if (!content || content.trim().length === 0) {
-      throw new Error('Content cannot be empty');
+      throw OnboardingErrorFactory.messageInvalidContent();
     }
     this._props.content = content.trim();
     this.updated();

@@ -1,5 +1,6 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
+import { OnboardingErrorFactory } from '../errors';
 
 export interface OnboardingProfileEntityProps extends BaseProps {
   userId: string;
@@ -43,8 +44,16 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
   }
 
   public validate(): void {
-    if (!this.props.userId) {
-      throw new Error('User ID is required');
+    if (this.props.expense && this.props.expense.value < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+
+    if (this.props.income && this.props.income.value < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+
+    if (this.props.pyfAmount && this.props.pyfAmount.value < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
     }
   }
 

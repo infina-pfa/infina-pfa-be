@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { CurrencyVO } from '@/common/base';
 import {
   OnboardingProfileEntity,
   OnboardingProfileRepository,
+  OnboardingErrorFactory,
 } from '@/onboarding/domain';
 
 export type UpdateOnboardingProfileUseCaseInput = {
@@ -28,12 +29,23 @@ export class UpdateOnboardingProfileUseCase extends BaseUseCase<
   async execute(
     input: UpdateOnboardingProfileUseCaseInput,
   ): Promise<OnboardingProfileEntity> {
+    // Validate input amounts
+    if (input.expense !== undefined && input.expense < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+    if (input.income !== undefined && input.income < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+    if (input.pyfAmount !== undefined && input.pyfAmount < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+
     const profile = await this.onboardingProfileRepository.findOne({
       userId: input.userId,
     });
 
     if (!profile) {
-      throw new NotFoundException('Onboarding profile not found');
+      throw OnboardingErrorFactory.profileNotFound();
     }
 
     // Update financial information

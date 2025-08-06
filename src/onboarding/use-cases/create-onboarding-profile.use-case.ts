@@ -1,9 +1,10 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { CurrencyVO } from '@/common/base';
 import {
   OnboardingProfileEntity,
   OnboardingProfileRepository,
+  OnboardingErrorFactory,
 } from '@/onboarding/domain';
 
 export type CreateOnboardingProfileUseCaseInput = {
@@ -28,13 +29,24 @@ export class CreateOnboardingProfileUseCase extends BaseUseCase<
   async execute(
     input: CreateOnboardingProfileUseCaseInput,
   ): Promise<OnboardingProfileEntity> {
+    // Validate input amounts
+    if (input.expense !== undefined && input.expense < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+    if (input.income !== undefined && input.income < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+    if (input.pyfAmount !== undefined && input.pyfAmount < 0) {
+      throw OnboardingErrorFactory.profileInvalidAmount();
+    }
+
     // Check if user already has an onboarding profile
     const existingProfile = await this.onboardingProfileRepository.findOne({
       userId: input.userId,
     });
 
     if (existingProfile) {
-      throw new ConflictException('User already has an onboarding profile');
+      throw OnboardingErrorFactory.profileAlreadyExists();
     }
 
     const profile = OnboardingProfileEntity.create({

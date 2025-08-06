@@ -43,6 +43,10 @@ export class OnboardingProfileController {
     status: 409,
     description: 'User already has an onboarding profile',
   })
+  @ApiResponse({
+    status: 422,
+    description: 'Financial amounts must be greater than or equal to 0',
+  })
   async createProfile(
     @Body() createProfileDto: CreateOnboardingProfileDto,
     @CurrentUser() user: AuthUser,
@@ -84,6 +88,10 @@ export class OnboardingProfileController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Onboarding profile not found' })
+  @ApiResponse({
+    status: 422,
+    description: 'Financial amounts must be greater than or equal to 0',
+  })
   async updateProfile(
     @Body() updateProfileDto: UpdateOnboardingProfileDto,
     @CurrentUser() user: AuthUser,

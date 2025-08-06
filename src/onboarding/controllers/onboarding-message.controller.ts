@@ -36,7 +36,10 @@ export class OnboardingMessageController {
     description: 'Onboarding message created successfully',
     type: OnboardingMessageResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid message content or sender',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createMessage(
     @Body() createMessageDto: CreateOnboardingMessageDto,

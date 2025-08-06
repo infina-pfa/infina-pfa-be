@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import {
   OnboardingProfileEntity,
   OnboardingProfileRepository,
+  OnboardingErrorFactory,
 } from '@/onboarding/domain';
 
 export type GetOnboardingProfileUseCaseInput = {
@@ -28,7 +29,7 @@ export class GetOnboardingProfileUseCase extends BaseUseCase<
     });
 
     if (!profile) {
-      throw new NotFoundException('Onboarding profile not found');
+      throw OnboardingErrorFactory.profileNotFound();
     }
 
     return profile;
