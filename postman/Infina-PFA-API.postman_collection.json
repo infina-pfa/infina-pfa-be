@@ -1,0 +1,1554 @@
+{
+  "info": {
+    "name": "Infina Personal Finance Advisor API",
+    "description": "API documentation for Infina Personal Finance Advisor Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Public APIs",
+      "item": [
+        {
+          "name": "Health Check",
+          "item": [
+            {
+              "name": "Get Health Status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/",
+                  "host": ["{{base_url}}"],
+                  "path": [""]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "User",
+          "item": [
+            {
+              "name": "Get User Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "profile"]
+                }
+              }
+            },
+            {
+              "name": "Create User Profile",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+1234567890\",\n  \"address\": \"123 Main St\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalCode\": \"10001\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"occupation\": \"Software Engineer\",\n  \"annualIncome\": 100000,\n  \"currency\": \"USD\",\n  \"profilePictureUrl\": \"https://example.com/profile.jpg\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "profile"]
+                }
+              }
+            },
+            {
+              "name": "Update User Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"phoneNumber\": \"+0987654321\",\n  \"address\": \"456 Second St\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\",\n  \"occupation\": \"Senior Software Engineer\",\n  \"annualIncome\": 150000\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "profile"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budgets",
+          "item": [
+            {
+              "name": "Create Budget",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": \"FOOD\",\n  \"amount\": 500,\n  \"month\": 1,\n  \"year\": 2025,\n  \"description\": \"Monthly food budget\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/budgets",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets"]
+                }
+              }
+            },
+            {
+              "name": "Get All Budgets",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/budgets?month=1&year=2025",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets"],
+                  "query": [
+                    {
+                      "key": "month",
+                      "value": "1"
+                    },
+                    {
+                      "key": "year",
+                      "value": "2025"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Monthly Spending",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/budgets/spending?month=1&year=2025",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets", "spending"],
+                  "query": [
+                    {
+                      "key": "month",
+                      "value": "1"
+                    },
+                    {
+                      "key": "year",
+                      "value": "2025"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Budget by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/budgets/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Budget",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 600,\n  \"description\": \"Updated monthly food budget\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/budgets/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Record Spending",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 50,\n  \"description\": \"Grocery shopping\",\n  \"date\": \"2025-01-15\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/budgets/:id/spend",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets", ":id", "spend"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Budget",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/budgets/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Spending",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/budgets/:id/spending/:spendingId",
+                  "host": ["{{base_url}}"],
+                  "path": ["budgets", ":id", "spending", ":spendingId"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    },
+                    {
+                      "key": "spendingId",
+                      "value": "spending-id-here"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Goals",
+          "item": [
+            {
+              "name": "Create Goal",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Emergency Fund\",\n  \"targetAmount\": 10000,\n  \"currentAmount\": 0,\n  \"targetDate\": \"2025-12-31\",\n  \"category\": \"EMERGENCY_FUND\",\n  \"description\": \"Build emergency fund for 6 months expenses\",\n  \"priority\": \"HIGH\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/goals",
+                  "host": ["{{base_url}}"],
+                  "path": ["goals"]
+                }
+              }
+            },
+            {
+              "name": "Get All Goals",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/goals",
+                  "host": ["{{base_url}}"],
+                  "path": ["goals"]
+                }
+              }
+            },
+            {
+              "name": "Update Goal",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Emergency Fund Updated\",\n  \"targetAmount\": 15000,\n  \"targetDate\": \"2026-06-30\",\n  \"description\": \"Increased emergency fund target\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/goals/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["goals", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "goal-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Contribute to Goal",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 500,\n  \"note\": \"Monthly contribution\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/goals/:id/contribute",
+                  "host": ["{{base_url}}"],
+                  "path": ["goals", ":id", "contribute"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "goal-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Withdraw from Goal",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 100,\n  \"reason\": \"Emergency expense\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/goals/:id/withdraw",
+                  "host": ["{{base_url}}"],
+                  "path": ["goals", ":id", "withdraw"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "goal-id-here"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "AI Advisor",
+          "item": [
+            {
+              "name": "Create Conversation",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Financial Planning Advice\",\n  \"type\": \"GENERAL_ADVICE\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/ai-advisor/conversations",
+                  "host": ["{{base_url}}"],
+                  "path": ["ai-advisor", "conversations"]
+                }
+              }
+            },
+            {
+              "name": "Get Conversation by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/ai-advisor/conversations/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["ai-advisor", "conversations", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "conversation-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create Message",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"How can I save more money each month?\",\n  \"role\": \"user\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/ai-advisor/conversations/:id/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["ai-advisor", "conversations", ":id", "messages"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "conversation-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Messages",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/ai-advisor/conversations/:id/messages?limit=20&offset=0",
+                  "host": ["{{base_url}}"],
+                  "path": ["ai-advisor", "conversations", ":id", "messages"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "conversation-id-here"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Onboarding",
+          "item": [
+            {
+              "name": "Create Onboarding Profile",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentStep\": 1,\n  \"totalSteps\": 5,\n  \"welcomeCompleted\": false,\n  \"profileSetupCompleted\": false,\n  \"financialGoalsSet\": false,\n  \"budgetsCreated\": false,\n  \"notificationsEnabled\": false,\n  \"preferredLanguage\": \"en\",\n  \"timezone\": \"America/New_York\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/onboarding/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "profile"]
+                }
+              }
+            },
+            {
+              "name": "Get Onboarding Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/onboarding/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "profile"]
+                }
+              }
+            },
+            {
+              "name": "Update Onboarding Profile",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentStep\": 2,\n  \"welcomeCompleted\": true,\n  \"profileSetupCompleted\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/onboarding/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "profile"]
+                }
+              }
+            },
+            {
+              "name": "Create Onboarding Message",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"stepNumber\": 1,\n  \"messageType\": \"WELCOME\",\n  \"content\": \"Welcome to Infina Personal Finance Advisor!\",\n  \"actionRequired\": true,\n  \"actionType\": \"PROFILE_SETUP\",\n  \"isRead\": false\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/onboarding/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "messages"]
+                }
+              }
+            },
+            {
+              "name": "Get Onboarding Messages",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/onboarding/messages",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "messages"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Webhooks",
+          "item": [
+            {
+              "name": "User Signed Up Webhook",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-from-supabase\",\n  \"email\": \"user@example.com\",\n  \"createdAt\": \"2025-01-15T10:00:00Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/webhook/user-signed-up",
+                  "host": ["{{base_url}}"],
+                  "path": ["webhook", "user-signed-up"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Internal APIs",
+      "item": [
+        {
+          "name": "User Internal",
+          "item": [
+            {
+              "name": "Get User Profile by ID",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/users/profile/:userId",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "users", "profile", ":userId"],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create User Profile for User",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+1234567890\",\n  \"address\": \"123 Main St\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"country\": \"USA\",\n  \"postalCode\": \"10001\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"occupation\": \"Software Engineer\",\n  \"annualIncome\": 100000,\n  \"currency\": \"USD\",\n  \"profilePictureUrl\": \"https://example.com/profile.jpg\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/users/profile/:userId",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "users", "profile", ":userId"],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update User Profile for User",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"phoneNumber\": \"+0987654321\",\n  \"address\": \"456 Second St\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\",\n  \"occupation\": \"Senior Software Engineer\",\n  \"annualIncome\": 150000\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/users/profile/:userId",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "users", "profile", ":userId"],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget Internal",
+          "item": [
+            {
+              "name": "Create Budget Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"category\": \"FOOD\",\n  \"amount\": 500,\n  \"month\": 1,\n  \"year\": 2025,\n  \"description\": \"Monthly food budget\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets"]
+                }
+              }
+            },
+            {
+              "name": "Get All Budgets Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets?userId=user-id-here&month=1&year=2025",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    },
+                    {
+                      "key": "month",
+                      "value": "1"
+                    },
+                    {
+                      "key": "year",
+                      "value": "2025"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Monthly Spending Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/spending?userId=user-id-here&month=1&year=2025",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", "spending"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    },
+                    {
+                      "key": "month",
+                      "value": "1"
+                    },
+                    {
+                      "key": "year",
+                      "value": "2025"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Budget by ID Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/:id?userId=user-id-here",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", ":id"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Budget Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"amount\": 600,\n  \"description\": \"Updated monthly food budget\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Record Spending Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"amount\": 50,\n  \"description\": \"Grocery shopping\",\n  \"date\": \"2025-01-15\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/:id/spend",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", ":id", "spend"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Budget Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/:id?userId=user-id-here",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", ":id"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Spending Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/:id/spending/:spendingId?userId=user-id-here",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", ":id", "spending", ":spendingId"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "budget-id-here"
+                    },
+                    {
+                      "key": "spendingId",
+                      "value": "spending-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Monthly Income",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/income/:userId?month=1&year=2025",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", "income", ":userId"],
+                  "query": [
+                    {
+                      "key": "month",
+                      "value": "1"
+                    },
+                    {
+                      "key": "year",
+                      "value": "2025"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Add Income",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"amount\": 5000,\n  \"source\": \"SALARY\",\n  \"description\": \"Monthly salary\",\n  \"date\": \"2025-01-01\",\n  \"isRecurring\": true,\n  \"frequency\": \"MONTHLY\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/income",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", "income"]
+                }
+              }
+            },
+            {
+              "name": "Update Income",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"amount\": 5500,\n  \"description\": \"Updated monthly salary\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/income/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", "income", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "income-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Income",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/budgets/income/:id?userId=user-id-here",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "budgets", "income", ":id"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "income-id-here"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Goals Internal",
+          "item": [
+            {
+              "name": "Create Goal Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"name\": \"Emergency Fund\",\n  \"targetAmount\": 10000,\n  \"currentAmount\": 0,\n  \"targetDate\": \"2025-12-31\",\n  \"category\": \"EMERGENCY_FUND\",\n  \"description\": \"Build emergency fund for 6 months expenses\",\n  \"priority\": \"HIGH\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/goals",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "goals"]
+                }
+              }
+            },
+            {
+              "name": "Get All Goals Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/internal/goals?userId=user-id-here",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "goals"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Goal Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"name\": \"Emergency Fund Updated\",\n  \"targetAmount\": 15000,\n  \"targetDate\": \"2026-06-30\",\n  \"description\": \"Increased emergency fund target\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/goals/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "goals", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "goal-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Contribute to Goal Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"amount\": 500,\n  \"note\": \"Monthly contribution\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/goals/:id/contribute",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "goals", ":id", "contribute"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "goal-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Withdraw from Goal Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"amount\": 100,\n  \"reason\": \"Emergency expense\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/internal/goals/:id/withdraw",
+                  "host": ["{{base_url}}"],
+                  "path": ["internal", "goals", ":id", "withdraw"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "goal-id-here"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Onboarding Internal",
+          "item": [
+            {
+              "name": "Get Onboarding Profile Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/onboarding/profile?userId=user-id-here",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "profile"],
+                  "query": [
+                    {
+                      "key": "userId",
+                      "value": "user-id-here"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Onboarding Profile Internal",
+              "request": {
+                "auth": {
+                  "type": "apikey",
+                  "apikey": [
+                    {
+                      "key": "key",
+                      "value": "x-api-key"
+                    },
+                    {
+                      "key": "value",
+                      "value": "{{internal_api_key}}"
+                    },
+                    {
+                      "key": "in",
+                      "value": "header"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"user-id-here\",\n  \"currentStep\": 2,\n  \"welcomeCompleted\": true,\n  \"profileSetupCompleted\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/onboarding/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["onboarding", "profile"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
