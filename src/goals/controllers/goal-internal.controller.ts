@@ -6,7 +6,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -108,7 +107,7 @@ export class GoalInternalController {
     description: 'Goal with same title already exists for this user',
   })
   async updateGoal(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() updateGoalDto: UpdateGoalInternalDto,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.updateGoalUseCase.execute({
@@ -139,7 +138,7 @@ export class GoalInternalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Goal not found' })
   async contributeToGoal(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() contributeGoalDto: ContributeGoalDto,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.contributeGoalUseCase.execute({
@@ -168,7 +167,7 @@ export class GoalInternalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Goal not found' })
   async withdrawFromGoal(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() withdrawGoalDto: WithdrawGoalDto,
   ): Promise<GoalResponseDto> {
     const goalAggregate = await this.withdrawGoalUseCase.execute({

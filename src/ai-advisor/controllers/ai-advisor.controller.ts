@@ -1,15 +1,7 @@
 import { CurrentUser } from '@/common/decorators';
 import { SupabaseAuthGuard } from '@/common/guards';
 import { AuthUser } from '@/common/types';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -74,7 +66,7 @@ export class AiAdvisorController {
   @ApiResponse({ status: 403, description: 'Access denied to conversation' })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   async getConversation(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: AuthUser,
   ): Promise<ConversationDto> {
     const conversation = await this.getConversationUseCase.execute({
@@ -97,7 +89,7 @@ export class AiAdvisorController {
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   async createMessage(
     @Body() createMessageDto: CreateMessageDto,
-    @Param('id', ParseUUIDPipe) conversationId: string,
+    @Param('id') conversationId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<MessageDto> {
     const message = await this.createMessageUseCase.execute({
@@ -123,7 +115,7 @@ export class AiAdvisorController {
   @ApiResponse({ status: 403, description: 'Access denied to conversation' })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   async getMessages(
-    @Param('id', ParseUUIDPipe) conversationId: string,
+    @Param('id') conversationId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<MessageDto[]> {
     const messages = await this.getMessagesUseCase.execute({

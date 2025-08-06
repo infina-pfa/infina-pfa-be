@@ -7,7 +7,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -142,7 +141,7 @@ export class BudgetController {
   @ApiResponse({ status: 403, description: 'Access denied to budget' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async getBudgetDetail(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: AuthUser,
   ): Promise<BudgetResponseDto> {
     const budget = await this.getBudgetDetailUseCase.execute({
@@ -165,7 +164,7 @@ export class BudgetController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async updateBudget(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() updateBudgetDto: UpdateBudgetDto,
     @CurrentUser() user: AuthUser,
   ): Promise<BudgetResponseDto> {
@@ -224,7 +223,7 @@ export class BudgetController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async deleteBudget(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: AuthUser,
   ): Promise<void> {
     await this.deleteBudgetUseCase.execute({ userId: user.id, budgetId: id });
@@ -239,8 +238,8 @@ export class BudgetController {
   @ApiResponse({ status: 403, description: 'Access denied to spending' })
   @ApiResponse({ status: 404, description: 'Spending not found' })
   async deleteSpending(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('spendingId', ParseUUIDPipe) spendingId: string,
+    @Param('id') id: string,
+    @Param('spendingId') spendingId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<void> {
     await this.deleteSpendingUseCase.execute({ userId: user.id, spendingId });

@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -95,9 +94,9 @@ export class BudgetInternalController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getBudgets(
-    @Param('userId', ParseUUIDPipe) userId: string,
-    @Query('month') month: number,
-    @Query('year') year: number,
+    @Param('userId') userId: string,
+    @Param('month') month: number,
+    @Param('year') year: number,
   ): Promise<BudgetResponseDto[]> {
     return (await this.getBudgetsUseCase.execute({ userId, month, year })).map(
       (budget) => BudgetResponseDto.fromEntity(budget),
@@ -151,9 +150,7 @@ export class BudgetInternalController {
   @ApiResponse({ status: 401, description: 'User not authenticated' })
   @ApiResponse({ status: 403, description: 'Access denied to budget' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
-  async getBudgetDetail(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<BudgetResponseDto> {
+  async getBudgetDetail(@Param('id') id: string): Promise<BudgetResponseDto> {
     const budget = await this.getBudgetDetailUseCase.execute({
       id,
     });
@@ -173,7 +170,7 @@ export class BudgetInternalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
   async updateBudget(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() updateBudgetDto: UpdateBudgetInternalDto,
   ): Promise<BudgetResponseDto> {
     const updatedBudget = await this.updateBudgetUseCase.execute({
@@ -229,7 +226,7 @@ export class BudgetInternalController {
   @ApiResponse({ status: 200, description: 'Budget deleted successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Budget not found' })
-  async deleteBudget(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async deleteBudget(@Param('id') id: string): Promise<void> {
     await this.deleteBudgetUseCase.execute({ budgetId: id });
   }
 
@@ -242,8 +239,8 @@ export class BudgetInternalController {
   @ApiResponse({ status: 403, description: 'Access denied to spending' })
   @ApiResponse({ status: 404, description: 'Spending not found' })
   async deleteSpending(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('spendingId', ParseUUIDPipe) spendingId: string,
+    @Param('id') id: string,
+    @Param('spendingId') spendingId: string,
   ): Promise<void> {
     await this.deleteSpendingUseCase.execute({ spendingId });
   }
@@ -257,7 +254,7 @@ export class BudgetInternalController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getMonthlyIncome(
-    @Param('userId', ParseUUIDPipe) userId: string,
+    @Param('userId') userId: string,
     @Query() query: MonthlyIncomeQueryDto,
   ): Promise<TransactionResponseDto[]> {
     const income = await this.getMonthlyIncomeUseCase.execute({
@@ -308,7 +305,7 @@ export class BudgetInternalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Income transaction not found' })
   async updateIncome(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() updateIncomeDto: UpdateIncomeDto,
   ): Promise<TransactionResponseDto> {
     const income = await this.updateIncomeUseCase.execute({
@@ -331,7 +328,7 @@ export class BudgetInternalController {
   @ApiResponse({ status: 403, description: 'Access denied to income' })
   @ApiResponse({ status: 404, description: 'Income transaction not found' })
   async deleteIncome(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Query('userId') userId: string,
   ): Promise<void> {
     await this.removeIncomeUseCase.execute({ id, userId });
