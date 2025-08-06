@@ -15,6 +15,7 @@ import {
 } from './onboarding/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
+import { AiAdvisorModule } from './ai-advisor/module/ai-advisor.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -44,7 +45,13 @@ async function bootstrap() {
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, config, {
-      include: [UserModule, BudgetingModule, GoalModule, OnboardingModule],
+      include: [
+        UserModule,
+        BudgetingModule,
+        GoalModule,
+        OnboardingModule,
+        AiAdvisorModule,
+      ],
     });
   SwaggerModule.setup('api', app, documentFactory);
 

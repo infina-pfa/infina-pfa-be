@@ -85,7 +85,7 @@ export class AiAdvisorController {
     return ConversationDto.fromEntity(conversation);
   }
 
-  @Post('messages')
+  @Post('conversations/:id/messages')
   @ApiOperation({ summary: 'Create a new message in a conversation' })
   @ApiResponse({
     status: 201,
@@ -97,11 +97,12 @@ export class AiAdvisorController {
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   async createMessage(
     @Body() createMessageDto: CreateMessageDto,
+    @Param('id', ParseUUIDPipe) conversationId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<MessageDto> {
     const message = await this.createMessageUseCase.execute({
       userId: user.id,
-      conversationId: createMessageDto.conversationId,
+      conversationId,
       content: createMessageDto.content,
       metadata: createMessageDto.metadata,
     });

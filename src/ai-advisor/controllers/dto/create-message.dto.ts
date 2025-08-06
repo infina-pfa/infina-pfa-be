@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsNotEmpty,
-  IsUUID,
-  IsOptional,
-  IsObject,
-} from 'class-validator';
+import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export enum MessageSender {
   AI = 'ai',
@@ -22,13 +16,6 @@ export enum MessageType {
 }
 
 export class CreateMessageDto {
-  @ApiProperty({
-    description: 'ID of the conversation this message belongs to',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @IsUUID()
-  conversationId: string;
-
   @ApiProperty({
     description: 'Content of the message',
     example: 'How can I create a budget for this month?',
