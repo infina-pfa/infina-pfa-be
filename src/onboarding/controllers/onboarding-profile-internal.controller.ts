@@ -17,7 +17,7 @@ import {
 
 @ApiTags('Onboarding Profiles')
 @ApiBearerAuth('x-api-key')
-@Controller('onboarding/profile')
+@Controller('internal/onboarding/profile')
 @UseGuards(InternalServiceAuthGuard)
 export class OnboardingProfileInternalController {
   constructor(
