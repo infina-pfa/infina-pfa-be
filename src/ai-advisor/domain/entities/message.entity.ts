@@ -64,6 +64,24 @@ export class MessageEntity extends BaseEntity<MessageEntityProps> {
     );
   }
 
+  public static createAiMessage(
+    props: Omit<
+      MessageEntityProps,
+      'id' | 'sender' | 'type' | 'createdAt' | 'updatedAt' | 'deletedAt'
+    >,
+    id?: string,
+  ): MessageEntity {
+    return this.create(
+      {
+        ...props,
+        sender: MessageSender.AI,
+        type: MessageType.TEXT,
+        metadata: { ...props.metadata },
+      },
+      id,
+    );
+  }
+
   public validate(): void {
     if (!this.props.conversationId) {
       throw new Error('Conversation ID is required');

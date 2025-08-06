@@ -17,7 +17,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Response } from 'express';
 import { AiAdvisorService } from '../domain';
 import {
   CreateConversationUseCase,
@@ -27,8 +26,9 @@ import {
 } from '../use-cases';
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageDto } from './dto/message.dto';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { Response } from 'express';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth()
@@ -104,28 +104,31 @@ export class AiAdvisorController {
     @CurrentUser() user: AuthUser,
     @Res() res: Response,
   ): Promise<void> {
-    const readableStream = await this.aiAdvisorService.stream(
-      user.id,
-      conversationId,
-      createMessageDto.content,
-    );
-    const reader = readableStream.getReader();
-    const decoder = new TextDecoder();
-
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    while (true) {
-      const { done, value } = (await reader.read()) as {
-        done: boolean;
-        value: Uint8Array;
-      };
-      if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      console.log('🚀 ~ AiAdvisorController ~ streamMessage ~ chunk:', chunk);
-      res.write(chunk);
-    }
+    await this.aiAdvisorService.stream(
+      user.id,
+      conversationId,
+      createMessageDto.content,
+      {
+        onData: (chunk) => {
+          res.write(chunk);
+          this.aiAdvisorService.handleStreamChunk(
+            user.id,
+            conversationId,
+            chunk,
+          );
+        },
+        onEnd: () => {
+          res.end();
+        },
+        onError: (error) => {
+          res.status(500).send(error.message);
+        },
+      },
+    );
   }
 
   @Get('conversations/:id/messages')

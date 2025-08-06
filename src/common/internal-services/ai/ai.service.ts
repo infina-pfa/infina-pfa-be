@@ -24,7 +24,12 @@ export class AiInternalService {
     message: string,
     history: AiStreamConversationMessage[],
     flowType: AiStreamFlowType,
-  ): Promise<ReadableStream> {
+    callbacks?: {
+      onData?: (chunk: Buffer) => void;
+      onEnd?: () => void;
+      onError?: (error: Error) => void;
+    },
+  ): Promise<void> {
     const response = await this.client.post(
       '/chat/stream',
       {
@@ -34,6 +39,9 @@ export class AiInternalService {
         flow_type: flowType,
       },
       {
+        headers: {
+          'Content-Type': 'application/json',
+        },
         responseType: 'stream',
       },
     );
@@ -41,20 +49,16 @@ export class AiInternalService {
     // Convert Node.js Readable stream to Web API ReadableStream
     const nodeStream = response.data as Readable;
 
-    return new ReadableStream({
-      start(controller) {
-        nodeStream.on('data', (chunk: Buffer) => {
-          controller.enqueue(new Uint8Array(chunk));
-        });
+    nodeStream.on('data', (chunk: Buffer) => {
+      callbacks?.onData?.(chunk);
+    });
 
-        nodeStream.on('end', () => {
-          controller.close();
-        });
+    nodeStream.on('end', () => {
+      callbacks?.onEnd?.();
+    });
 
-        nodeStream.on('error', (error: Error) => {
-          controller.error(error);
-        });
-      },
+    nodeStream.on('error', (error: Error) => {
+      callbacks?.onError?.(error);
     });
   }
 }

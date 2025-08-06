@@ -3,5 +3,16 @@ export abstract class AiAdvisorService {
     userId: string,
     conversationId: string,
     message: string,
-  ): Promise<ReadableStream>;
+    callbacks?: {
+      onData?: (chunk: Buffer) => void;
+      onEnd?: () => void;
+      onError?: (error: Error) => void;
+    },
+  ): Promise<void>;
+
+  abstract handleStreamChunk(
+    userId: string,
+    conversationId: string,
+    chunk: Buffer,
+  ): void;
 }

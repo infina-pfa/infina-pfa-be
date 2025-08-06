@@ -292,7 +292,7 @@ export interface StreamEventHandler {
   onMCPResult?: (event: MCPResultEvent) => void;
   onMCPApproval?: (event: MCPApprovalEvent) => void;
   onMCPListTools?: (event: MCPListToolsEvent) => void;
-  onStatus?: (event: StatusEvent) => void;
+  onStatus?: (event: StatusEvent) => Promise<void> | void;
   onError?: (event: ErrorEvent) => void;
   onUsage?: (event: UsageEvent) => void;
   onComplete?: (event: CompleteEvent) => void;
@@ -361,4 +361,14 @@ export function createStreamEventHandler(
     onUsage: handlers.onUsage || (() => {}),
     onComplete: handlers.onComplete || (() => {}),
   };
+}
+
+export function parseStreamEvent(chunk: string): StreamEvent[] {
+  const lines = chunk.split('\n\n').filter((line) => line.trim() !== '');
+  const events: StreamEvent[] = [];
+  for (const line of lines) {
+    const data = line.slice(6).trim();
+    events.push(JSON.parse(data) as StreamEvent);
+  }
+  return events;
 }

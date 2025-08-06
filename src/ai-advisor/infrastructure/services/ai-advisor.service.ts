@@ -8,6 +8,7 @@ import {
   AiInternalService,
   AiStreamConversationMessageRole,
   AiStreamFlowType,
+  parseStreamEvent,
 } from '@/common/internal-services';
 import { Injectable } from '@nestjs/common';
 
@@ -24,7 +25,12 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
     userId: string,
     conversationId: string,
     message: string,
-  ): Promise<ReadableStream> {
+    callbacks?: {
+      onData?: (chunk: Buffer) => void;
+      onEnd?: () => void;
+      onError?: (error: Error) => void;
+    },
+  ): Promise<void> {
     const messages = await this.messageRepository.findMany({
       conversationId,
       userId,
@@ -49,8 +55,30 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
         content: message.content,
       })),
       AiStreamFlowType.CHAT,
+      callbacks,
     );
 
     return stream;
+  }
+
+  handleStreamChunk(
+    userId: string,
+    conversationId: string,
+    chunk: Buffer,
+  ): void {
+    const events = parseStreamEvent(chunk.toString('utf-8'));
+    for (const event of events) {
+      if (event.type === 'status') {
+        const { status_type, message } = event.data;
+        if (status_type === 'completed') {
+          const aiMessage = MessageEntity.createAiMessage({
+            userId,
+            conversationId,
+            content: message,
+          });
+          this.messageRepository.create(aiMessage);
+        }
+      }
+    }
   }
 }
