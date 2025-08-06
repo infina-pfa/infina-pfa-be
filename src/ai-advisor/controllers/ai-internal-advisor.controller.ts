@@ -1,5 +1,5 @@
 import { CurrentUser } from '@/common/decorators';
-import { SupabaseAuthGuard } from '@/common/guards';
+import { InternalServiceAuthGuard, SupabaseAuthGuard } from '@/common/guards';
 import { AuthUser } from '@/common/types';
 import {
   Body,
@@ -7,6 +7,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -32,9 +33,9 @@ import { MessageDto } from './dto/message.dto';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth()
-@Controller('ai-advisor')
-@UseGuards(SupabaseAuthGuard)
-export class AiAdvisorController {
+@Controller('internal/ai-advisor')
+@UseGuards(InternalServiceAuthGuard)
+export class AiInternalAdvisorController {
   constructor(
     private readonly createConversationUseCase: CreateConversationUseCase,
     private readonly getConversationUseCase: GetConversationUseCase,
@@ -88,7 +89,7 @@ export class AiAdvisorController {
     return ConversationDto.fromEntity(conversation);
   }
 
-  @Post('conversations/:id/stream')
+  @Post('conversations/:id/stream/:user_id')
   @ApiOperation({ summary: 'Create a new message in a conversation' })
   @ApiResponse({
     status: 201,
@@ -101,11 +102,11 @@ export class AiAdvisorController {
   async streamMessage(
     @Body() createMessageDto: CreateMessageDto,
     @Param('id') conversationId: string,
-    @CurrentUser() user: AuthUser,
+    @Param('user_id') userId: string,
     @Res() res: Response,
   ): Promise<void> {
     const readableStream = await this.aiAdvisorService.stream(
-      user.id,
+      userId,
       conversationId,
       createMessageDto.content,
     );
