@@ -40,6 +40,7 @@ import { SpendInternalDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetInternalDto } from './dto/update-budget.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
+import { CurrencyVO } from '@/common/base';
 
 @ApiTags('Budgets')
 @ApiBearerAuth('x-api-key')
@@ -188,6 +189,9 @@ export class BudgetInternalController {
         ...(updateBudgetDto.icon !== undefined && {
           icon: updateBudgetDto.icon,
         }),
+        ...(updateBudgetDto.amount !== undefined && {
+          amount: new CurrencyVO(updateBudgetDto.amount),
+        }),
         userId: updateBudgetDto.userId,
       },
     });
@@ -209,8 +213,8 @@ export class BudgetInternalController {
   async spend(
     @Param('id') id: string,
     @Body() spendDto: SpendInternalDto,
-  ): Promise<void> {
-    await this.spendUseCase.execute({
+  ): Promise<BudgetResponseDto> {
+    const budget = await this.spendUseCase.execute({
       budgetId: id,
       userId: spendDto.userId,
       amount: spendDto.amount,
@@ -218,6 +222,8 @@ export class BudgetInternalController {
       description: spendDto.description,
       recurring: spendDto.recurring,
     });
+
+    return BudgetResponseDto.fromEntity(budget, true);
   }
 
   @Delete(':id')

@@ -3,9 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
+  Min,
 } from 'class-validator';
 
 export class UpdateBudgetDto {
@@ -46,6 +48,16 @@ export class UpdateBudgetDto {
   @IsOptional()
   @IsString()
   icon?: string;
+
+  @ApiProperty({
+    description: 'Budget amount',
+    example: 500,
+    minimum: 0.01,
+  })
+  @IsNumber()
+  @IsOptional()
+  @Min(0.01, { message: 'Budget amount must be greater than 0' })
+  amount: number;
 }
 
 export class UpdateBudgetInternalDto extends UpdateBudgetDto {

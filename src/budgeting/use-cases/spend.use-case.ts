@@ -1,7 +1,11 @@
 import { CurrencyVO } from '@/common/base';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { Injectable } from '@nestjs/common';
-import { BudgetAggregateRepository, BudgetErrorFactory } from '../domain';
+import {
+  BudgetAggregate,
+  BudgetAggregateRepository,
+  BudgetErrorFactory,
+} from '../domain';
 
 type SpendUseCaseInput = {
   budgetId: string;
@@ -13,14 +17,17 @@ type SpendUseCaseInput = {
 };
 
 @Injectable()
-export class SpendUseCase extends BaseUseCase<SpendUseCaseInput, void> {
+export class SpendUseCase extends BaseUseCase<
+  SpendUseCaseInput,
+  BudgetAggregate
+> {
   constructor(
     private readonly budgetAggregateRepository: BudgetAggregateRepository,
   ) {
     super();
   }
 
-  async execute(input: SpendUseCaseInput): Promise<void> {
+  async execute(input: SpendUseCaseInput): Promise<BudgetAggregate> {
     const budgetAggregate = await this.budgetAggregateRepository.findById(
       input.budgetId,
     );
@@ -37,5 +44,7 @@ export class SpendUseCase extends BaseUseCase<SpendUseCaseInput, void> {
     });
 
     await this.budgetAggregateRepository.save(budgetAggregate);
+
+    return budgetAggregate;
   }
 }

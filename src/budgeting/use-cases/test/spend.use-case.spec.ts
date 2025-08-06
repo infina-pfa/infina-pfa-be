@@ -560,7 +560,7 @@ describe('SpendUseCase', () => {
 
         const result = await useCase.execute(input);
 
-        expect(result).toBeUndefined();
+        expect(result).toBeDefined();
       });
     });
 

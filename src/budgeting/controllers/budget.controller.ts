@@ -32,6 +32,7 @@ import { MonthlySpendingQueryDto } from './dto/monthly-spending-query.dto';
 import { SpendDto } from './dto/spend.dto';
 import { TransactionResponseDto } from './dto/transaction.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
+import { CurrencyVO } from '@/common/base';
 
 @ApiTags('Budgets')
 @ApiBearerAuth()
@@ -183,6 +184,9 @@ export class BudgetController {
         ...(updateBudgetDto.icon !== undefined && {
           icon: updateBudgetDto.icon,
         }),
+        ...(updateBudgetDto.amount !== undefined && {
+          amount: new CurrencyVO(updateBudgetDto.amount),
+        }),
         userId: user.id,
       },
     });
@@ -205,8 +209,8 @@ export class BudgetController {
     @Param('id') id: string,
     @Body() spendDto: SpendDto,
     @CurrentUser() user: AuthUser,
-  ): Promise<void> {
-    await this.spendUseCase.execute({
+  ): Promise<BudgetResponseDto> {
+    const budget = await this.spendUseCase.execute({
       budgetId: id,
       userId: user.id,
       amount: spendDto.amount,
@@ -214,6 +218,8 @@ export class BudgetController {
       description: spendDto.description,
       recurring: spendDto.recurring,
     });
+
+    return BudgetResponseDto.fromEntity(budget, true);
   }
 
   @Delete(':id')
