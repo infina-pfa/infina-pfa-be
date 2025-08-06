@@ -4,4 +4,5 @@ export enum UserEvent {
 
 export type UserSignedUpEventPayload = {
   userId: string;
+  name: string;
 };

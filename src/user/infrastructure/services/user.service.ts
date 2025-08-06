@@ -1,11 +1,15 @@
 import { UserEvent, UserSignedUpEventPayload } from '@/common/events';
-import { UserService } from '@/user/domain';
+import { Currency, Language } from '@/common/types';
+import { UserEntity, UserRepository, UserService } from '@/user/domain';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
-  constructor(private readonly eventEmitter: EventEmitter2) {}
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   handleUserSignedUp(userId: string): void {
     console.log('SEND User signed up', userId);
@@ -13,7 +17,15 @@ export class UserServiceImpl implements UserService {
   }
 
   @OnEvent(UserEvent.USER_SIGNED_UP)
-  handleUserSignedUpEvent(payload: UserSignedUpEventPayload) {
-    console.log('User signed up', payload);
+  async handleUserSignedUpEvent(payload: UserSignedUpEventPayload) {
+    const user = UserEntity.create({
+      userId: payload.userId,
+      name: payload.name,
+      financialStage: null,
+      currency: Currency.VND,
+      language: Language.VI,
+    });
+
+    await this.userRepository.create(user);
   }
 }

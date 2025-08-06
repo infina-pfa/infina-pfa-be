@@ -1,5 +1,7 @@
 import { UserSignedUpEventPayload } from '@/common/events';
 
 export abstract class UserEventHandler {
-  abstract createOnboardingProfile(payload: UserSignedUpEventPayload): void;
+  abstract createOnboardingProfile(
+    payload: UserSignedUpEventPayload,
+  ): Promise<void>;
 }

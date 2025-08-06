@@ -1,6 +1,7 @@
 import { BaseEntity, BaseProps } from '@/common/base';
 import { Currency, Language } from '@/common/types/user';
 import { UserErrorFactory } from '../errors/user-error.factory';
+import { OptionalProps } from '@/common/utils';
 
 export enum BudgetingStyle {
   DETAIL_TRACKER = 'detail_tracker',
@@ -19,18 +20,23 @@ export interface UserEntityProps extends BaseProps {
   financialStage: FinancialStage | null;
   currency: Currency;
   language: Language;
-  deletedAt?: Date | null;
+  deletedAt: Date | null;
 }
 
 export class UserEntity extends BaseEntity<UserEntityProps> {
   public static create(
-    props: Omit<UserEntityProps, 'id'>,
+    props: OptionalProps<
+      Omit<UserEntityProps, 'id'>,
+      'createdAt' | 'updatedAt' | 'deletedAt'
+    >,
     id?: string,
   ): UserEntity {
     return new UserEntity(
       {
         ...props,
         deletedAt: props.deletedAt ?? null,
+        createdAt: props.createdAt ?? new Date(),
+        updatedAt: props.updatedAt ?? new Date(),
       },
       id,
     );
