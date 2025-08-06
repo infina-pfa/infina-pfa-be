@@ -14,7 +14,9 @@ export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
 
   abstract findById(id: string): Promise<E | null>;
 
-  abstract findOne(props: Partial<E['props']>): Promise<E | null>;
+  abstract findOne(
+    props: Partial<E['props']> & { id?: string },
+  ): Promise<E | null>;
 
   abstract createMany(entities: E[]): Promise<number>;
 

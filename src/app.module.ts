@@ -11,6 +11,7 @@ import { GoalInternalModule, GoalModule } from './goals/module';
 import { OnboardingInternalModule } from './onboarding/module/onboarding-internal.module';
 import { OnboardingModule } from './onboarding/module/onboarding.module';
 import { UserInternalModule, UserModule } from './user';
+import { AiAdvisorModule } from './ai-advisor/module/ai-advisor.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserInternalModule, UserModule } from './user';
     UserModule,
     GoalModule,
     OnboardingModule,
+    AiAdvisorModule,
     UserInternalModule,
     BudgetingInternalModule,
     GoalInternalModule,

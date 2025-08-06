@@ -22,7 +22,8 @@
       "@/budgeting/*": ["src/budgeting/*"],
       "@/user/*": ["src/user/*"],
       "@/goals/*": ["src/goals/*"],
-      "@/onboarding/*": ["src/onboarding/*"]
+      "@/onboarding/*": ["src/onboarding/*"],
+      "@/ai-advisor/*": ["src/ai-advisor/*"]
     }
   }
 }
