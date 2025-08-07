@@ -6,16 +6,16 @@ import {
   IsOptional,
   IsObject,
 } from 'class-validator';
-import { MessageSender } from '@/onboarding/domain';
+import { OnboardingMessageSender } from '@/onboarding/domain';
 
 export class CreateOnboardingMessageDto {
   @ApiProperty({
     description: 'Who sent the message',
-    enum: MessageSender,
-    example: MessageSender.USER,
+    enum: OnboardingMessageSender,
+    example: OnboardingMessageSender.USER,
   })
-  @IsEnum(MessageSender)
-  sender: MessageSender;
+  @IsEnum(OnboardingMessageSender)
+  sender: OnboardingMessageSender;
 
   @ApiProperty({
     description: 'Content of the message',

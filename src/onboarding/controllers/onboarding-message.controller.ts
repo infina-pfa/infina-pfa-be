@@ -1,7 +1,7 @@
 import { CurrentUser } from '@/common/decorators';
 import { SupabaseAuthGuard } from '@/common/guards';
 import { AuthUser } from '@/common/types';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -9,11 +9,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { MessageSender } from '../domain';
-import {
-  CreateOnboardingMessageUseCase,
-  GetOnboardingMessagesUseCase,
-} from '../use-cases';
+import { Response } from 'express';
+import { OnboardingAiAdvisorService, OnboardingMessageSender } from '../domain';
+import { GetOnboardingMessagesUseCase } from '../use-cases';
 import {
   CreateOnboardingMessageDto,
   OnboardingMessageResponseDto,
@@ -25,11 +23,11 @@ import {
 @UseGuards(SupabaseAuthGuard)
 export class OnboardingMessageController {
   constructor(
-    private readonly createOnboardingMessageUseCase: CreateOnboardingMessageUseCase,
+    private readonly onboardingAiAdvisorService: OnboardingAiAdvisorService,
     private readonly getOnboardingMessagesUseCase: GetOnboardingMessagesUseCase,
   ) {}
 
-  @Post()
+  @Post('stream')
   @ApiOperation({ summary: 'Create a new onboarding message' })
   @ApiResponse({
     status: 201,
@@ -44,13 +42,28 @@ export class OnboardingMessageController {
   async createMessage(
     @Body() createMessageDto: CreateOnboardingMessageDto,
     @CurrentUser() user: AuthUser,
-  ): Promise<OnboardingMessageResponseDto> {
-    const message = await this.createOnboardingMessageUseCase.execute({
-      ...createMessageDto,
-      userId: user.id,
-    });
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-    return OnboardingMessageResponseDto.fromEntity(message);
+    await this.onboardingAiAdvisorService.stream(
+      user.id,
+      createMessageDto.content,
+      {
+        onData: (chunk) => {
+          res.write(chunk);
+          this.onboardingAiAdvisorService.handleStreamChunk(user.id, chunk);
+        },
+        onEnd: () => {
+          res.end();
+        },
+        onError: (error) => {
+          res.status(500).send(error.message);
+        },
+      },
+    );
   }
 
   @Get()
@@ -58,7 +71,7 @@ export class OnboardingMessageController {
   @ApiQuery({
     name: 'sender',
     required: false,
-    enum: MessageSender,
+    enum: OnboardingMessageSender,
     description: 'Filter messages by sender',
   })
   @ApiQuery({

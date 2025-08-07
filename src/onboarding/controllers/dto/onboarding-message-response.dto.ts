@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MessageSender, OnboardingMessageEntity } from '@/onboarding/domain';
+import {
+  OnboardingMessageSender,
+  OnboardingMessageEntity,
+} from '@/onboarding/domain';
 
 export class OnboardingMessageResponseDto {
   @ApiProperty({
@@ -16,10 +19,10 @@ export class OnboardingMessageResponseDto {
 
   @ApiProperty({
     description: 'Who sent the message',
-    enum: MessageSender,
-    example: MessageSender.USER,
+    enum: OnboardingMessageSender,
+    example: OnboardingMessageSender.USER,
   })
-  sender: MessageSender;
+  sender: OnboardingMessageSender;
 
   @ApiProperty({
     description: 'Content of the message',

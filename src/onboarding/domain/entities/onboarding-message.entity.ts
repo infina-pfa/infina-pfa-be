@@ -2,7 +2,7 @@ import { BaseEntity, BaseProps } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
 import { OnboardingErrorFactory } from '../errors';
 
-export enum MessageSender {
+export enum OnboardingMessageSender {
   AI = 'ai',
   USER = 'user',
   SYSTEM = 'system',
@@ -10,7 +10,7 @@ export enum MessageSender {
 
 export interface OnboardingMessageEntityProps extends BaseProps {
   userId: string;
-  sender: MessageSender;
+  sender: OnboardingMessageSender;
   content: string;
   componentId: string | null;
   metadata: Record<string, any> | null;
@@ -42,7 +42,7 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
     if (!this.props.content || this.props.content.trim().length === 0) {
       throw OnboardingErrorFactory.messageInvalidContent();
     }
-    if (!Object.values(MessageSender).includes(this.props.sender)) {
+    if (!Object.values(OnboardingMessageSender).includes(this.props.sender)) {
       throw OnboardingErrorFactory.messageInvalidSender();
     }
   }
@@ -51,7 +51,7 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
     return this.props.userId;
   }
 
-  public get sender(): MessageSender {
+  public get sender(): OnboardingMessageSender {
     return this.props.sender;
   }
 
@@ -94,14 +94,14 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
   }
 
   public isFromUser(): boolean {
-    return this.props.sender === MessageSender.USER;
+    return this.props.sender === OnboardingMessageSender.USER;
   }
 
   public isFromAI(): boolean {
-    return this.props.sender === MessageSender.AI;
+    return this.props.sender === OnboardingMessageSender.AI;
   }
 
   public isFromSystem(): boolean {
-    return this.props.sender === MessageSender.SYSTEM;
+    return this.props.sender === OnboardingMessageSender.SYSTEM;
   }
 }

@@ -3,13 +3,13 @@ import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import {
   OnboardingMessageEntity,
   OnboardingMessageRepository,
-  MessageSender,
+  OnboardingMessageSender,
   OnboardingErrorFactory,
 } from '@/onboarding/domain';
 
 export type CreateOnboardingMessageUseCaseInput = {
   userId: string;
-  sender: MessageSender;
+  sender: OnboardingMessageSender;
   content: string;
   componentId?: string;
   metadata?: Record<string, any>;
@@ -35,7 +35,7 @@ export class CreateOnboardingMessageUseCase extends BaseUseCase<
     }
 
     // Validate sender
-    if (!Object.values(MessageSender).includes(input.sender)) {
+    if (!Object.values(OnboardingMessageSender).includes(input.sender)) {
       throw OnboardingErrorFactory.messageInvalidSender();
     }
 

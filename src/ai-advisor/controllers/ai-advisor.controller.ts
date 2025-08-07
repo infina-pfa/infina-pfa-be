@@ -17,18 +17,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import { AiAdvisorService } from '../domain';
 import {
   CreateConversationUseCase,
-  CreateMessageUseCase,
   GetConversationUseCase,
   GetMessagesUseCase,
 } from '../use-cases';
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { MessageDto } from './dto/message.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { Response } from 'express';
+import { MessageDto } from './dto/message.dto';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth()
@@ -38,7 +37,6 @@ export class AiAdvisorController {
   constructor(
     private readonly createConversationUseCase: CreateConversationUseCase,
     private readonly getConversationUseCase: GetConversationUseCase,
-    private readonly createMessageUseCase: CreateMessageUseCase,
     private readonly aiAdvisorService: AiAdvisorService,
     private readonly getMessagesUseCase: GetMessagesUseCase,
   ) {}

@@ -1,7 +1,7 @@
 import {
   OnboardingMessageEntity,
   OnboardingMessageEntityProps,
-  MessageSender,
+  OnboardingMessageSender,
 } from '@/onboarding/domain';
 import { PrismaRepository } from './prisma.repository';
 import { PrismaClient } from '../prisma-client';
@@ -41,7 +41,7 @@ export class OnboardingMessagePrismaRepository
     return OnboardingMessageEntity.create(
       {
         userId: data.user_id,
-        sender: data.sender as MessageSender,
+        sender: data.sender as OnboardingMessageSender,
         content: data.content,
         componentId: data.component_id,
         metadata: data.metadata as Record<string, any> | null,
