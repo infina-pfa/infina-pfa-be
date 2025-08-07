@@ -5,6 +5,7 @@ import {
   OnboardingProfileEntity,
   OnboardingProfileRepository,
   OnboardingErrorFactory,
+  BudgetingStyle,
 } from '@/onboarding/domain';
 
 export type UpdateOnboardingProfileUseCaseInput = {
@@ -13,6 +14,7 @@ export type UpdateOnboardingProfileUseCaseInput = {
   income?: number;
   pyfAmount?: number;
   metadata?: Record<string, any>;
+  budgetingStyle?: BudgetingStyle;
 };
 
 @Injectable()
@@ -61,6 +63,10 @@ export class UpdateOnboardingProfileUseCase extends BaseUseCase<
           ? new CurrencyVO(input.pyfAmount)
           : undefined,
       );
+    }
+
+    if (input.budgetingStyle !== undefined) {
+      profile.updateBudgetingStyle(input.budgetingStyle);
     }
 
     // Update metadata

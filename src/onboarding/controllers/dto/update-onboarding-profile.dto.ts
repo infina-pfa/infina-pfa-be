@@ -1,10 +1,12 @@
+import { BudgetingStyle } from '@/onboarding/domain';
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsOptional,
+  IsBoolean,
+  IsEnum,
   IsNumber,
   IsObject,
+  IsOptional,
   Min,
-  IsBoolean,
 } from 'class-validator';
 
 export class UpdateOnboardingProfileDto {
@@ -61,4 +63,13 @@ export class UpdateOnboardingProfileDto {
   @IsOptional()
   @IsBoolean()
   markAsCompleted?: boolean;
+
+  @ApiProperty({
+    description: 'Budgeting style',
+    example: 'detail_tracker',
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(BudgetingStyle)
+  budgetingStyle?: BudgetingStyle;
 }

@@ -102,6 +102,11 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
     return !!this.props.completedAt;
   }
 
+  public updateBudgetingStyle(budgetingStyle: BudgetingStyle): void {
+    this._props.budgetingStyle = budgetingStyle;
+    this.updated();
+  }
+
   public updateFinancialInfo(
     expense?: CurrencyVO,
     income?: CurrencyVO,
