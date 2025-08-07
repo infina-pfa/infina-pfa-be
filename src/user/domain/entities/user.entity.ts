@@ -3,11 +3,6 @@ import { Currency, Language } from '@/common/types/user';
 import { UserErrorFactory } from '../errors/user-error.factory';
 import { OptionalProps } from '@/common/utils';
 
-export enum BudgetingStyle {
-  DETAIL_TRACKER = 'detail_tracker',
-  GOAL_FOCUSED = 'goal_focused',
-}
-
 export enum FinancialStage {
   DEBT = 'debt',
   START_SAVING = 'start_saving',

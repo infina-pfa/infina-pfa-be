@@ -1,6 +1,6 @@
 import { OnboardingProfileORM } from '@/common/types/orms';
 import { Decimal, PrismaDelegate } from '@/common/types/prisma';
-import { OnboardingProfileEntity } from '@/onboarding/domain';
+import { BudgetingStyle, OnboardingProfileEntity } from '@/onboarding/domain';
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from '../../base/repositories/base.repository';
 import { CurrencyVO } from '../../base/value-objects';
@@ -28,6 +28,7 @@ export class OnboardingProfilePrismaRepository
       expense: props.expense ? new Decimal(props.expense.value) : null,
       income: props.income ? new Decimal(props.income.value) : null,
       pyf_amount: props.pyfAmount ? new Decimal(props.pyfAmount.value) : null,
+      budgeting_style: props.budgetingStyle,
       created_at: props.createdAt,
       updated_at: props.updatedAt,
       deleted_at: props.deletedAt,
@@ -45,6 +46,7 @@ export class OnboardingProfilePrismaRepository
         pyfAmount: data.pyf_amount
           ? new CurrencyVO(data.pyf_amount.toNumber())
           : null,
+        budgetingStyle: data.budgeting_style as BudgetingStyle | null,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
         deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,

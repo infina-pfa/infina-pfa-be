@@ -1,4 +1,4 @@
-import { OnboardingProfileEntity } from '@/onboarding/domain';
+import { BudgetingStyle, OnboardingProfileEntity } from '@/onboarding/domain';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class OnboardingProfileResponseDto {
@@ -36,6 +36,13 @@ export class OnboardingProfileResponseDto {
   pyfAmount: number | null;
 
   @ApiProperty({
+    description: 'Budgeting style',
+    example: 'detail_tracker',
+    nullable: true,
+  })
+  budgetingStyle: BudgetingStyle | null;
+
+  @ApiProperty({
     description: 'Additional metadata',
     example: { financialGoals: ['retirement'], riskTolerance: 'moderate' },
     nullable: true,
@@ -48,12 +55,6 @@ export class OnboardingProfileResponseDto {
     nullable: true,
   })
   completedAt: Date | null;
-
-  @ApiProperty({
-    description: 'Whether the onboarding is completed',
-    example: false,
-  })
-  isCompleted: boolean;
 
   @ApiProperty({
     description: 'Profile creation timestamp',
@@ -76,11 +77,32 @@ export class OnboardingProfileResponseDto {
       expense: entity.expense?.value || null,
       income: entity.income?.value || null,
       pyfAmount: entity.pyfAmount?.value || null,
+      budgetingStyle: entity.props.budgetingStyle || null,
       metadata: entity.metadata,
       completedAt: entity.completedAt,
-      isCompleted: entity.isCompleted(),
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+    };
+  }
+}
+
+export class OnboardingInternalProfileResponseDto extends OnboardingProfileResponseDto {
+  @ApiProperty({
+    description: 'Remaining free to spend this week',
+    example: 100,
+    nullable: true,
+  })
+  remainingFreeToSpendThisWeek: number | null;
+
+  static fromEntityAndExtra(
+    entity: OnboardingProfileEntity,
+    extraData: {
+      remainingFreeToSpendThisWeek: number;
+    },
+  ): OnboardingInternalProfileResponseDto {
+    return {
+      ...OnboardingProfileResponseDto.fromEntity(entity),
+      remainingFreeToSpendThisWeek: extraData.remainingFreeToSpendThisWeek,
     };
   }
 }

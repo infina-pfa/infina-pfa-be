@@ -2,6 +2,11 @@ import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
 import { OnboardingErrorFactory } from '../errors';
 
+export enum BudgetingStyle {
+  DETAIL_TRACKER = 'detail_tracker',
+  GOAL_FOCUSED = 'goal_focused',
+}
+
 export interface OnboardingProfileEntityProps extends BaseProps {
   userId: string;
   metadata: Record<string, any> | null;
@@ -10,6 +15,7 @@ export interface OnboardingProfileEntityProps extends BaseProps {
   income: CurrencyVO | null;
   deletedAt: Date | null;
   pyfAmount: CurrencyVO | null;
+  budgetingStyle: BudgetingStyle | null;
 }
 
 export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityProps> {
@@ -24,6 +30,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
       | 'expense'
       | 'income'
       | 'pyfAmount'
+      | 'budgetingStyle'
     >,
     id?: string,
   ): OnboardingProfileEntity {
@@ -36,6 +43,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
         income: props.income ?? null,
         deletedAt: props.deletedAt ?? null,
         pyfAmount: props.pyfAmount ?? null,
+        budgetingStyle: props.budgetingStyle ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },

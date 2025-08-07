@@ -11,9 +11,11 @@ import {
   UpdateOnboardingProfileUseCase,
 } from '../use-cases';
 import {
+  OnboardingInternalProfileResponseDto,
   OnboardingProfileResponseDto,
   UpdateOnboardingProfileDto,
 } from './dto';
+import { UserFinancialInfoService } from '../domain';
 
 @ApiTags('Onboarding Profiles')
 @ApiBearerAuth('x-api-key')
@@ -23,6 +25,7 @@ export class OnboardingProfileInternalController {
   constructor(
     private readonly updateOnboardingProfileUseCase: UpdateOnboardingProfileUseCase,
     private readonly getOnboardingProfileUseCase: GetOnboardingProfileUseCase,
+    private readonly userFinancialInfoService: UserFinancialInfoService,
   ) {}
 
   @Get()
@@ -30,18 +33,23 @@ export class OnboardingProfileInternalController {
   @ApiResponse({
     status: 200,
     description: 'Onboarding profile retrieved successfully',
-    type: OnboardingProfileResponseDto,
+    type: OnboardingInternalProfileResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Onboarding profile not found' })
   async getProfile(
     @Query('userId') userId: string,
-  ): Promise<OnboardingProfileResponseDto> {
+  ): Promise<OnboardingInternalProfileResponseDto> {
     const profile = await this.getOnboardingProfileUseCase.execute({
       userId,
     });
 
-    return OnboardingProfileResponseDto.fromEntity(profile);
+    const remainingFreeToSpendThisWeek =
+      await this.userFinancialInfoService.getThisWeekAllowance(userId);
+
+    return OnboardingInternalProfileResponseDto.fromEntityAndExtra(profile, {
+      remainingFreeToSpendThisWeek,
+    });
   }
 
   @Patch()
