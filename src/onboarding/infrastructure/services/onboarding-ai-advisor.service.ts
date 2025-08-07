@@ -64,7 +64,7 @@ export class OnboardingAiAdvisorServiceImpl
     for (const event of events) {
       if (event.type === 'status') {
         const { status_type, message } = event.data;
-        if (status_type === 'completed') {
+        if (status_type === 'text_completed') {
           const aiMessage = OnboardingMessageEntity.create({
             userId,
             sender: OnboardingMessageSender.AI,

@@ -1,0 +1,65 @@
+import { InternalServiceAuthGuard } from '@/common/guards';
+import { Body, Controller, Param, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Response } from 'express';
+import { OnboardingAiAdvisorService } from '../domain';
+import { GetOnboardingMessagesUseCase } from '../use-cases';
+import {
+  CreateOnboardingMessageDto,
+  OnboardingMessageResponseDto,
+} from './dto';
+
+@ApiTags('Onboarding Messages')
+@ApiBearerAuth()
+@Controller('/internal/onboarding/messages')
+@UseGuards(InternalServiceAuthGuard)
+export class OnboardingMessageInternalController {
+  constructor(
+    private readonly onboardingAiAdvisorService: OnboardingAiAdvisorService,
+    private readonly getOnboardingMessagesUseCase: GetOnboardingMessagesUseCase,
+  ) {}
+
+  @Post('stream/:userId')
+  @ApiOperation({ summary: 'Create a new onboarding message' })
+  @ApiResponse({
+    status: 201,
+    description: 'Onboarding message created successfully',
+    type: OnboardingMessageResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid message content or sender',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async createMessage(
+    @Body() createMessageDto: CreateOnboardingMessageDto,
+    @Param('userId') userId: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    await this.onboardingAiAdvisorService.stream(
+      userId,
+      createMessageDto.content,
+      {
+        onData: (chunk) => {
+          res.write(chunk);
+          this.onboardingAiAdvisorService.handleStreamChunk(userId, chunk);
+        },
+        onEnd: () => {
+          res.end();
+        },
+        onError: (error) => {
+          res.status(500).send(error.message);
+        },
+      },
+    );
+  }
+}

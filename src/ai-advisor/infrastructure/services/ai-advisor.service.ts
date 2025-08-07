@@ -70,7 +70,7 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
     for (const event of events) {
       if (event.type === 'status') {
         const { status_type, message } = event.data;
-        if (status_type === 'completed') {
+        if (status_type === 'text_completed') {
           const aiMessage = MessageEntity.createAiMessage({
             userId,
             conversationId,
@@ -78,6 +78,18 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
           });
           this.messageRepository.create(aiMessage);
         }
+      }
+      if (event.type === 'function_call' && event.data.handle_by_client) {
+        const { function_args } = event.data;
+        const aiMessage = MessageEntity.createAiMessage({
+          userId,
+          content: '',
+          conversationId,
+          metadata: {
+            function_args,
+          },
+        });
+        this.messageRepository.create(aiMessage);
       }
     }
   }

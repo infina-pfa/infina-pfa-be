@@ -18,7 +18,7 @@ export type StreamEventType =
 export type StatusType =
   | 'started'
   | 'processing'
-  | 'completed'
+  | 'text_completed'
   | 'cancelled'
   | 'failed'
   | 'preparing_tool'
