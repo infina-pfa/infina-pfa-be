@@ -65,3 +65,5 @@ test/coverage
 .env.production
 .env.staging
 .serena
+
+/documentation

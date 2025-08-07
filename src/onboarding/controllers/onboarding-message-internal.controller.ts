@@ -8,7 +8,6 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { OnboardingAiAdvisorService } from '../domain';
-import { GetOnboardingMessagesUseCase } from '../use-cases';
 import {
   CreateOnboardingMessageDto,
   OnboardingMessageResponseDto,
@@ -21,7 +20,6 @@ import {
 export class OnboardingMessageInternalController {
   constructor(
     private readonly onboardingAiAdvisorService: OnboardingAiAdvisorService,
-    private readonly getOnboardingMessagesUseCase: GetOnboardingMessagesUseCase,
   ) {}
 
   @Post('stream/:userId')
