@@ -15,7 +15,7 @@ import {
 } from './dto';
 
 @ApiTags('Onboarding Messages')
-@ApiBearerAuth()
+@ApiBearerAuth('x-api-key')
 @Controller('/internal/onboarding/messages')
 @UseGuards(InternalServiceAuthGuard)
 export class OnboardingMessageInternalController {
