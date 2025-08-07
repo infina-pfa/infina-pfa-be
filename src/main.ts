@@ -2,6 +2,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
+import { AiAdvisorInternalModule } from './ai-advisor/module/ai-advisor-internal.module';
+import { AiAdvisorModule } from './ai-advisor/module/ai-advisor.module';
 import { AppModule } from './app.module';
 import { BudgetingInternalModule } from './budgeting/module/budgeting-internal.module';
 import { BudgetingModule } from './budgeting/module/budgeting.module';
@@ -15,7 +17,6 @@ import {
 } from './onboarding/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
-import { AiAdvisorModule } from './ai-advisor/module/ai-advisor.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -76,6 +77,7 @@ async function bootstrap() {
         BudgetingInternalModule,
         GoalInternalModule,
         OnboardingInternalModule,
+        AiAdvisorInternalModule,
       ],
     });
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);

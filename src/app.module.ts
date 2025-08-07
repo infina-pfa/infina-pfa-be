@@ -13,6 +13,7 @@ import { OnboardingInternalModule } from './onboarding/module/onboarding-interna
 import { OnboardingModule } from './onboarding/module/onboarding.module';
 import { UserInternalModule, UserModule } from './user';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AiAdvisorInternalModule } from './ai-advisor/module/ai-advisor-internal.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     GoalModule,
     OnboardingModule,
     AiAdvisorModule,
+    AiAdvisorInternalModule,
     UserInternalModule,
     BudgetingInternalModule,
     GoalInternalModule,
