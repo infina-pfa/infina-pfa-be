@@ -44,6 +44,7 @@ This document describes the Onboarding API endpoints for managing user onboardin
 **Response Includes:**
 - User ID
 - Income, Expense, PYF Amount
+- **budgetingStyle** - User's preferred budgeting approach ("detail_tracker" or "goal_focused")
 - Metadata (financial goals, risk tolerance, etc.)
 - Completed status and timestamp
 - Created/Updated timestamps
@@ -67,15 +68,21 @@ This document describes the Onboarding API endpoints for managing user onboardin
   "income": "number",            // Monthly income amount (min: 0)
   "pyfAmount": "number",         // Pay Yourself First amount (min: 0)
   "metadata": {},                // Additional metadata
-  "markAsCompleted": "boolean"   // Mark onboarding as completed
+  "markAsCompleted": "boolean",  // Mark onboarding as completed
+  "budgetingStyle": "string"     // "detail_tracker" or "goal_focused"
 }
 ```
 
 **Database Tables Affected:**
-- `onboarding_profiles` - Updates profile record
+- `onboarding_profiles` - Updates profile record including budgeting_style column
 - Sets `completed_at` timestamp if `markAsCompleted` is true
 
 **External Services:** None
+
+**Notes:**
+- **budgetingStyle** options:
+  - `detail_tracker` - User prefers detailed budget tracking
+  - `goal_focused` - User focuses on financial goals
 
 ---
 
@@ -144,15 +151,31 @@ This document describes the Onboarding API endpoints for managing user onboardin
 ### 6. Get Onboarding Profile (Internal)
 **Endpoint:** `GET /internal/onboarding/profile`
 
-**Purpose:** Retrieves any user's onboarding profile (for internal services)
+**Purpose:** Retrieves any user's onboarding profile with additional financial calculations (for internal services)
 
 **Query Parameters:**
 - `userId` (UUID) - Target user's ID
 
 **Authentication:** X-API-Key header
 
+**Response Includes:**
+- All standard profile fields (income, expense, pyfAmount, metadata)
+- **remainingFreeToSpendThisWeek** - Calculated weekly allowance based on flexible budgets
+
+**Calculation Logic:**
+- Fetches all "flexible" category budgets for current month
+- Calculates total flexible budget amount
+- Divides by 4 weeks and multiplies by current week number
+- Subtracts actual spending from flexible budgets
+- Returns remaining allowance for the week
+
 **Database Tables Accessed:**
 - `onboarding_profiles` - Reads profile data
+- `budgets` - Reads flexible budgets for current month
+- `budget_transactions` - Reads spending transactions
+- `transactions` - Reads transaction amounts
+
+**External Services:** None
 
 ---
 
@@ -213,6 +236,7 @@ This document describes the Onboarding API endpoints for managing user onboardin
 - `income` - Monthly income amount
 - `expense` - Monthly expense amount
 - `pyf_amount` - Pay Yourself First amount
+- `budgeting_style` - User's preferred budgeting approach (enum: "detail_tracker" or "goal_focused")
 - `metadata` - JSON for additional data
 - `completed_at` - Onboarding completion timestamp
 - `created_at` - Creation timestamp
