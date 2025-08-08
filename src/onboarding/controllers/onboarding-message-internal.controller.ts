@@ -8,10 +8,8 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { OnboardingAiAdvisorService } from '../domain';
-import {
-  CreateOnboardingMessageDto,
-  OnboardingMessageResponseDto,
-} from './dto';
+import { OnboardingMessageResponseDto } from './dto';
+import { StreamOnboardingMessageDto } from './dto/stream-onboarding-message.dto';
 
 @ApiTags('Onboarding Messages')
 @ApiBearerAuth('x-api-key')
@@ -34,8 +32,8 @@ export class OnboardingMessageInternalController {
     description: 'Bad request - Invalid message content or sender',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async createMessage(
-    @Body() createMessageDto: CreateOnboardingMessageDto,
+  async stream(
+    @Body() createMessageDto: StreamOnboardingMessageDto,
     @Param('userId') userId: string,
     @Res() res: Response,
   ): Promise<void> {
@@ -49,7 +47,6 @@ export class OnboardingMessageInternalController {
       {
         onData: (chunk) => {
           res.write(chunk);
-          this.onboardingAiAdvisorService.handleStreamChunk(userId, chunk);
         },
         onEnd: () => {
           res.end();

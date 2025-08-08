@@ -10,7 +10,7 @@ import {
 export type CreateOnboardingMessageUseCaseInput = {
   userId: string;
   sender: OnboardingMessageSender;
-  content: string;
+  content?: string;
   componentId?: string;
   metadata?: Record<string, any>;
 };
@@ -29,11 +29,6 @@ export class CreateOnboardingMessageUseCase extends BaseUseCase<
   async execute(
     input: CreateOnboardingMessageUseCaseInput,
   ): Promise<OnboardingMessageEntity> {
-    // Validate content
-    if (!input.content || input.content.trim().length === 0) {
-      throw OnboardingErrorFactory.messageInvalidContent();
-    }
-
     // Validate sender
     if (!Object.values(OnboardingMessageSender).includes(input.sender)) {
       throw OnboardingErrorFactory.messageInvalidSender();
@@ -42,7 +37,7 @@ export class CreateOnboardingMessageUseCase extends BaseUseCase<
     const message = OnboardingMessageEntity.create({
       userId: input.userId,
       sender: input.sender,
-      content: input.content.trim(),
+      content: input.content?.trim() || '',
       componentId: input.componentId || null,
       metadata: input.metadata || null,
     });

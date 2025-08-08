@@ -23,8 +23,13 @@ export class GetOnboardingMessagesUseCase extends BaseUseCase<
   async execute(
     input: GetOnboardingMessagesUseCaseInput,
   ): Promise<OnboardingMessageEntity[]> {
-    return await this.onboardingMessageRepository.findMany({
-      userId: input.userId,
-    });
+    return await this.onboardingMessageRepository.findMany(
+      {
+        userId: input.userId,
+      },
+      {
+        sort: [{ field: 'created_at', direction: 'asc' }],
+      },
+    );
   }
 }

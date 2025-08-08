@@ -8,6 +8,4 @@ export abstract class OnboardingAiAdvisorService {
       onError?: (error: Error) => void;
     },
   ): Promise<void>;
-
-  abstract handleStreamChunk(userId: string, chunk: Buffer): void;
 }

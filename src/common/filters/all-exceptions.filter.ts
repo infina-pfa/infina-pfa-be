@@ -65,10 +65,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     if (exception instanceof BadRequestException) {
-      const response = exception.getResponse() as { message: string[] };
+      const response = exception.getResponse() as { message?: string[] };
       errorResponse = {
         statusCode: HttpStatus.BAD_REQUEST,
-        message: response.message.join(', '),
+        message: Array.isArray(response.message)
+          ? response.message.join(', ')
+          : response.message || 'Bad Request',
         code: 'bad_request',
         error: exception.name,
         timestamp: new Date().toISOString(),

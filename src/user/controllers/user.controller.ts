@@ -1,19 +1,19 @@
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { SupabaseAuthGuard } from '@/common/guards';
 import { AuthUser } from '@/common/types/auth-user';
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserProfileResponseDto } from './dto/user-profile.dto';
+import { CreateUserProfileUseCase } from '../use-cases/create-user-profile.use-case';
 import { GetUserProfileUseCase } from '../use-cases/get-user-profile.use-case';
 import { UpdateUserProfileUseCase } from '../use-cases/update-user-profile.use-case';
-import { CreateUserProfileUseCase } from '../use-cases/create-user-profile.use-case';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
-import { SupabaseAuthGuard } from '@/common/guards';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UserProfileResponseDto } from './dto/user-profile.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -84,7 +84,7 @@ export class UserController {
     return UserProfileResponseDto.fromEntity(createdUser);
   }
 
-  @Put('profile')
+  @Patch('profile')
   @ApiOperation({
     summary: 'Update user profile',
     description:

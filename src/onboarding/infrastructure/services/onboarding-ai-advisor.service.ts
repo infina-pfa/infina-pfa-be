@@ -2,7 +2,6 @@ import {
   AiInternalService,
   AiStreamConversationMessageRole,
   AiStreamFlowType,
-  parseStreamEvent,
 } from '@/common/internal-services';
 import {
   OnboardingAiAdvisorService,
@@ -30,9 +29,14 @@ export class OnboardingAiAdvisorServiceImpl
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
-    const messages = await this.onboardingMessageRepository.findMany({
-      userId,
-    });
+    const messages = await this.onboardingMessageRepository.findMany(
+      {
+        userId,
+      },
+      {
+        sort: [{ field: 'created_at', direction: 'asc' }],
+      },
+    );
 
     const userMessage = OnboardingMessageEntity.create({
       userId,
@@ -45,45 +49,19 @@ export class OnboardingAiAdvisorServiceImpl
     const stream = await this.aiInternalService.stream(
       userId,
       message,
-      messages.map((message) => ({
-        role:
-          message.sender === OnboardingMessageSender.AI
-            ? AiStreamConversationMessageRole.ASSISTANT
-            : AiStreamConversationMessageRole.USER,
-        content: message.content,
-      })),
+      messages
+        .filter((message) => !message.componentId)
+        .map((message) => ({
+          role:
+            message.sender === OnboardingMessageSender.AI
+              ? AiStreamConversationMessageRole.ASSISTANT
+              : AiStreamConversationMessageRole.USER,
+          content: message.content,
+        })),
       AiStreamFlowType.ONBOARDING,
       callbacks,
     );
 
     return stream;
-  }
-
-  handleStreamChunk(userId: string, chunk: Buffer): void {
-    const events = parseStreamEvent(chunk.toString('utf-8'));
-    for (const event of events) {
-      if (event.type === 'status') {
-        const { status_type, message } = event.data;
-        if (status_type === 'text_completed') {
-          const aiMessage = OnboardingMessageEntity.create({
-            userId,
-            sender: OnboardingMessageSender.AI,
-            content: message,
-          });
-          this.onboardingMessageRepository.create(aiMessage);
-        }
-      }
-      if (event.type === 'function_call' && event.data.handle_by_client) {
-        const { function_name, function_args } = event.data;
-        const aiMessage = OnboardingMessageEntity.create({
-          userId,
-          sender: OnboardingMessageSender.AI,
-          content: '',
-          componentId: function_name,
-          metadata: function_args,
-        });
-        this.onboardingMessageRepository.create(aiMessage);
-      }
-    }
   }
 }

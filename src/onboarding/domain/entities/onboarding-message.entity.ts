@@ -39,9 +39,6 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
   }
 
   public validate(): void {
-    if (!this.props.content || this.props.content.trim().length === 0) {
-      throw OnboardingErrorFactory.messageInvalidContent();
-    }
     if (!Object.values(OnboardingMessageSender).includes(this.props.sender)) {
       throw OnboardingErrorFactory.messageInvalidSender();
     }
@@ -72,9 +69,6 @@ export class OnboardingMessageEntity extends BaseEntity<OnboardingMessageEntityP
   }
 
   public updateContent(content: string): void {
-    if (!content || content.trim().length === 0) {
-      throw OnboardingErrorFactory.messageInvalidContent();
-    }
     this._props.content = content.trim();
     this.updated();
   }
