@@ -1,6 +1,5 @@
+import { MessageEntity, MessageSender, MessageType } from '@/ai-advisor/domain';
 import { ApiProperty } from '@nestjs/swagger';
-import { MessageSender, MessageType } from './create-message.dto';
-import { MessageEntity } from '@/ai-advisor/domain/entities/message.entity';
 
 export class MessageDto {
   @ApiProperty({
@@ -33,7 +32,7 @@ export class MessageDto {
     description: 'Content of the message',
     example: 'How can I create a budget for this month?',
   })
-  content: string;
+  content: string | null;
 
   @ApiProperty({
     description: 'Optional metadata for the message',

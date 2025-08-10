@@ -6,7 +6,7 @@ import { MessageRepository } from '../domain/repositories/message.repository';
 export interface CreateMessageUseCaseInput {
   userId: string;
   conversationId: string;
-  content: string;
+  content: string | null;
   metadata?: Record<string, any>;
 }
 
@@ -23,7 +23,7 @@ export class CreateMessageUseCase extends BaseUseCase<
     const message = MessageEntity.createUserMessage({
       userId: input.userId,
       conversationId: input.conversationId,
-      content: input.content,
+      content: input.content || null,
     });
 
     return this.messageRepository.create(message);

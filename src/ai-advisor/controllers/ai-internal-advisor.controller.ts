@@ -27,8 +27,8 @@ import {
 } from '../use-cases';
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageDto } from './dto/message.dto';
+import { StreamMessageDto } from './dto/stream-message.dto';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth()
@@ -99,7 +99,7 @@ export class AiInternalAdvisorController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   async streamMessage(
-    @Body() createMessageDto: CreateMessageDto,
+    @Body() createMessageDto: StreamMessageDto,
     @Param('id') conversationId: string,
     @Param('user_id') userId: string,
     @Res() res: Response,

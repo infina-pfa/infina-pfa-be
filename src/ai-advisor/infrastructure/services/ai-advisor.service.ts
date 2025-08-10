@@ -52,7 +52,7 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
           message.sender === MessageSender.AI
             ? AiStreamConversationMessageRole.ASSISTANT
             : AiStreamConversationMessageRole.USER,
-        content: message.content,
+        content: message.content || '',
       })),
       AiStreamFlowType.CHAT,
       callbacks,

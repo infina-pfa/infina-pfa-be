@@ -22,7 +22,7 @@ export class MessagePrismaRepository
       conversation_id: props.conversationId,
       sender: props.sender,
       type: props.type,
-      content: props.content,
+      content: props.content || null,
       metadata: props.metadata || null,
       user_id: props.userId,
       created_at: props.createdAt,

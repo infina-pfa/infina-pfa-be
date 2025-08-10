@@ -29,6 +29,7 @@ import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageDto } from './dto/message.dto';
+import { StreamMessageDto } from './dto/stream-message.dto';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth()
@@ -99,7 +100,7 @@ export class AiAdvisorController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Conversation not found' })
   async streamMessage(
-    @Body() createMessageDto: CreateMessageDto,
+    @Body() createMessageDto: StreamMessageDto,
     @Param('id') conversationId: string,
     @CurrentUser() user: AuthUser,
     @Res() res: Response,
@@ -170,7 +171,7 @@ export class AiAdvisorController {
     const message = await this.createMessageUseCase.execute({
       conversationId,
       userId: user.id,
-      content: createMessageDto.content,
+      content: createMessageDto.content || null,
     });
 
     return MessageDto.fromEntity(message);

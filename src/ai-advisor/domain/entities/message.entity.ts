@@ -20,7 +20,7 @@ export interface MessageEntityProps extends BaseProps {
   conversationId: string;
   sender: MessageSender;
   type: MessageType;
-  content: string;
+  content: string | null;
   metadata?: Record<string, any>;
   deletedAt: Date | null;
 }
@@ -109,7 +109,7 @@ export class MessageEntity extends BaseEntity<MessageEntityProps> {
     return this.props.type;
   }
 
-  public get content(): string {
+  public get content(): string | null {
     return this.props.content;
   }
 

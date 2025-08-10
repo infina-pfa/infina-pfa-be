@@ -1,25 +1,6 @@
+import { MessageSender, MessageType } from '@/ai-advisor/domain';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsObject,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-
-export enum MessageSender {
-  AI = 'ai',
-  USER = 'user',
-  SYSTEM = 'system',
-}
-
-export enum MessageType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  PHOTO = 'photo',
-  COMPONENT = 'component',
-  TOOL = 'tool',
-}
+import { IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateMessageDto {
   @ApiProperty({
@@ -27,24 +8,22 @@ export class CreateMessageDto {
     example: 'How can I create a budget for this month?',
   })
   @IsString()
-  @IsNotEmpty()
-  content: string;
+  @IsOptional()
+  content?: string | null;
 
   @ApiProperty({
     description: 'Type of the message',
     example: MessageType.TEXT,
   })
-  @IsOptional()
   @IsEnum(MessageType)
-  type?: MessageType;
+  type: MessageType;
 
   @ApiProperty({
     description: 'Sender of the message',
     example: MessageSender.USER,
   })
-  @IsOptional()
   @IsEnum(MessageSender)
-  sender?: MessageSender;
+  sender: MessageSender;
 
   @ApiProperty({
     description: 'Optional metadata for the message',
