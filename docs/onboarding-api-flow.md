@@ -3,6 +3,12 @@
 ## Overview
 This document describes the Onboarding API endpoints for managing user onboarding profiles and messages (chat with AI advisor).
 
+**Recent Updates:**
+- Message content is now nullable/optional in message creation
+- Introduced dedicated `StreamOnboardingMessageDto` for streaming endpoints
+- Added new AI Advisor controller with conversation management
+- Enhanced message handling for both streaming and regular message creation
+
 ## API Endpoints
 
 ### Onboarding Profile Endpoints
@@ -93,10 +99,10 @@ This document describes the Onboarding API endpoints for managing user onboardin
 
 **Purpose:** Sends a message to the AI advisor and receives a streaming response
 
-**Request Body:**
+**Request Body (StreamOnboardingMessageDto):**
 ```json
 {
-  "content": "string"    // User's message content (required)
+  "content": "string"    // User's message content (required, non-empty)
 }
 ```
 
@@ -146,9 +152,36 @@ This document describes the Onboarding API endpoints for managing user onboardin
 
 ---
 
+### 6. Create Onboarding Message (Non-Streaming)
+**Endpoint:** `POST /onboarding/messages`
+
+**Purpose:** Creates a non-streaming message in the onboarding conversation
+
+**Request Body (CreateOnboardingMessageDto):**
+```json
+{
+  "content": "string",           // Message content (optional, nullable)
+  "sender": "string",            // Sender type: "user" or "ai" (required)
+  "component_id": "string",      // UI component identifier (optional)
+  "metadata": {}                 // Additional message metadata (optional)
+}
+```
+
+**Database Tables Affected:**
+- `onboarding_messages` - Creates message record
+
+**External Services:** None
+
+**Notes:**
+- Content field is now optional/nullable to support component-only messages
+- Used for saving messages that don't require AI streaming response
+- Supports both user and AI message types
+
+---
+
 ## Internal API Endpoints
 
-### 6. Get Onboarding Profile (Internal)
+### 7. Get Onboarding Profile (Internal)
 **Endpoint:** `GET /internal/onboarding/profile`
 
 **Purpose:** Retrieves any user's onboarding profile with additional financial calculations (for internal services)
@@ -179,7 +212,7 @@ This document describes the Onboarding API endpoints for managing user onboardin
 
 ---
 
-### 7. Update Onboarding Profile (Internal)
+### 8. Update Onboarding Profile (Internal)
 **Endpoint:** `PATCH /internal/onboarding/profile`
 
 **Purpose:** Updates any user's onboarding profile (for internal services)
@@ -196,7 +229,7 @@ This document describes the Onboarding API endpoints for managing user onboardin
 
 ---
 
-### 8. Create Onboarding Message Stream (Internal)
+### 9. Create Onboarding Message Stream (Internal)
 **Endpoint:** `POST /internal/onboarding/messages/stream/:userId`
 
 **Purpose:** Creates AI chat message for a specific user (for internal services)
@@ -204,10 +237,10 @@ This document describes the Onboarding API endpoints for managing user onboardin
 **URL Parameters:**
 - `userId` (UUID) - Target user's ID
 
-**Request Body:**
+**Request Body (StreamOnboardingMessageDto):**
 ```json
 {
-  "content": "string"    // Message content
+  "content": "string"    // Message content (required, non-empty)
 }
 ```
 
@@ -254,6 +287,65 @@ This document describes the Onboarding API endpoints for managing user onboardin
 - `updated_at` - Last update timestamp
 - `deleted_at` - Soft delete timestamp
 
+## AI Advisor API Endpoints
+
+The new AI Advisor controller provides conversation-based chat functionality:
+
+### 1. Create Conversation
+**Endpoint:** `POST /ai-advisor/conversations`
+
+**Purpose:** Creates a new AI advisor conversation thread
+
+**Request Body:**
+```json
+{
+  "name": "string"    // Conversation name/title
+}
+```
+
+### 2. Get Conversation
+**Endpoint:** `GET /ai-advisor/conversations/:id`
+
+**Purpose:** Retrieves a specific conversation by ID
+
+### 3. Stream Message in Conversation
+**Endpoint:** `POST /ai-advisor/conversations/:id/stream`
+
+**Purpose:** Sends a message and receives streaming AI response
+
+**Request Body (StreamMessageDto):**
+```json
+{
+  "content": "string"    // Message content (required)
+}
+```
+
+**Response Type:** Server-Sent Events (SSE) stream
+
+### 4. Get Conversation Messages
+**Endpoint:** `GET /ai-advisor/conversations/:id/messages`
+
+**Purpose:** Retrieves all messages in a conversation
+
+### 5. Create Message (Non-Streaming)
+**Endpoint:** `POST /ai-advisor/conversations/:id/messages`
+
+**Purpose:** Creates a non-streaming message in conversation
+
+**Request Body (CreateMessageDto):**
+```json
+{
+  "content": "string"    // Message content (optional, nullable)
+}
+```
+
+**Notes:**
+- All AI Advisor endpoints require JWT authentication
+- Conversations provide persistent chat threads
+- Support for both streaming and non-streaming messages
+
+---
+
 ## Notes
 - Onboarding profile tracks user's financial baseline
 - PYF (Pay Yourself First) is a savings strategy amount
@@ -261,3 +353,5 @@ This document describes the Onboarding API endpoints for managing user onboardin
 - Messages are streamed for real-time interaction
 - All financial amounts stored as Decimal type
 - Metadata field allows flexible data storage
+- AI Advisor controller supports multi-conversation management
+- Message content is now nullable to support component-only messages
