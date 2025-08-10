@@ -9,6 +9,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
+  CompleteOnboardingUseCase,
   CreateOnboardingProfileUseCase,
   GetOnboardingProfileUseCase,
   UpdateOnboardingProfileUseCase,
@@ -28,6 +29,7 @@ export class OnboardingProfileController {
     private readonly createOnboardingProfileUseCase: CreateOnboardingProfileUseCase,
     private readonly updateOnboardingProfileUseCase: UpdateOnboardingProfileUseCase,
     private readonly getOnboardingProfileUseCase: GetOnboardingProfileUseCase,
+    private readonly completeOnboardingUseCase: CompleteOnboardingUseCase,
   ) {}
 
   @Post()
@@ -102,5 +104,18 @@ export class OnboardingProfileController {
     });
 
     return OnboardingProfileResponseDto.fromEntity(profile);
+  }
+
+  @Post('complete')
+  @ApiOperation({ summary: 'Complete onboarding profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'Onboarding profile completed successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Onboarding profile not found' })
+  async completeProfile(@CurrentUser() user: AuthUser): Promise<void> {
+    await this.completeOnboardingUseCase.execute({ userId: user.id });
   }
 }

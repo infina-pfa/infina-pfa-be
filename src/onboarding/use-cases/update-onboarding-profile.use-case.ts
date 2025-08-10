@@ -6,6 +6,7 @@ import {
   OnboardingProfileRepository,
   OnboardingErrorFactory,
   BudgetingStyle,
+  Metadata,
 } from '@/onboarding/domain';
 
 export type UpdateOnboardingProfileUseCaseInput = {
@@ -13,7 +14,7 @@ export type UpdateOnboardingProfileUseCaseInput = {
   expense?: number;
   income?: number;
   pyfAmount?: number;
-  metadata?: Record<string, any>;
+  metadata?: Metadata;
   budgetingStyle?: BudgetingStyle;
 };
 

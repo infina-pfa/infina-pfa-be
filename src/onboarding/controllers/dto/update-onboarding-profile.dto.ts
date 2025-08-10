@@ -1,4 +1,4 @@
-import { BudgetingStyle } from '@/onboarding/domain';
+import { BudgetingStyle, Metadata } from '@/onboarding/domain';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
@@ -53,7 +53,7 @@ export class UpdateOnboardingProfileDto {
   })
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>;
+  metadata?: Metadata;
 
   @ApiProperty({
     description: 'Mark the onboarding as completed',

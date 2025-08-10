@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsNumber, IsObject, Min } from 'class-validator';
+import { Metadata } from '../../domain';
 
 export class CreateOnboardingProfileDto {
   @ApiProperty({
@@ -45,5 +46,5 @@ export class CreateOnboardingProfileDto {
   })
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>;
+  metadata?: Metadata;
 }

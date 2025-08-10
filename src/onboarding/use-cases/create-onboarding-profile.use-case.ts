@@ -5,6 +5,7 @@ import {
   OnboardingProfileEntity,
   OnboardingProfileRepository,
   OnboardingErrorFactory,
+  Metadata,
 } from '@/onboarding/domain';
 
 export type CreateOnboardingProfileUseCaseInput = {
@@ -12,7 +13,7 @@ export type CreateOnboardingProfileUseCaseInput = {
   expense?: number;
   income?: number;
   pyfAmount?: number;
-  metadata?: Record<string, any>;
+  metadata?: Metadata;
 };
 
 @Injectable()

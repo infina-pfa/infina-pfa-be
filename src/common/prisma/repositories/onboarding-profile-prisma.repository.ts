@@ -1,6 +1,10 @@
 import { OnboardingProfileORM } from '@/common/types/orms';
 import { Decimal, PrismaDelegate } from '@/common/types/prisma';
-import { BudgetingStyle, OnboardingProfileEntity } from '@/onboarding/domain';
+import {
+  BudgetingStyle,
+  Metadata,
+  OnboardingProfileEntity,
+} from '@/onboarding/domain';
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from '../../base/repositories/base.repository';
 import { CurrencyVO } from '../../base/value-objects';
@@ -39,7 +43,7 @@ export class OnboardingProfilePrismaRepository
     return OnboardingProfileEntity.create(
       {
         userId: data.user_id,
-        metadata: data.metadata as Record<string, any> | null,
+        metadata: data.metadata as Metadata | null,
         completedAt: data.completed_at ? new Date(data.completed_at) : null,
         expense: data.expense ? new CurrencyVO(data.expense.toNumber()) : null,
         income: data.income ? new CurrencyVO(data.income.toNumber()) : null,

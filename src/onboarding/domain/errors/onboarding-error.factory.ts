@@ -62,4 +62,11 @@ export class OnboardingErrorFactory {
       message: message || 'Invalid onboarding data',
     });
   }
+
+  static notFoundInformation(name: string): NotFoundException {
+    return new NotFoundException({
+      code: OnboardingErrorCode.PROFILE_NOT_FOUND_INFORMATION,
+      message: `${name} not found`,
+    });
+  }
 }

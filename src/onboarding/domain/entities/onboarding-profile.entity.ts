@@ -7,9 +7,17 @@ export enum BudgetingStyle {
   GOAL_FOCUSED = 'goal_focused',
 }
 
+export type Metadata = {
+  goalDetails: {
+    amount: number;
+    monthlyTarget: number;
+  };
+  expenseBreakdown: Record<string, number>;
+};
+
 export interface OnboardingProfileEntityProps extends BaseProps {
   userId: string;
-  metadata: Record<string, any> | null;
+  metadata: Metadata | null;
   completedAt: Date | null;
   expense: CurrencyVO | null;
   income: CurrencyVO | null;
@@ -69,7 +77,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
     return this.props.userId;
   }
 
-  public get metadata(): Record<string, any> | null {
+  public get metadata(): Metadata | null {
     return this.props.metadata;
   }
 
@@ -124,7 +132,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
     this.updated();
   }
 
-  public updateMetadata(metadata: Record<string, any>): void {
+  public updateMetadata(metadata: Metadata): void {
     this._props.metadata = metadata;
     this.updated();
   }

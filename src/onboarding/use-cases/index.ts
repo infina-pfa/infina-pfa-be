@@ -1,9 +1,10 @@
 import { Provider } from '@nestjs/common';
-import { CreateOnboardingProfileUseCase } from './create-onboarding-profile.use-case';
-import { UpdateOnboardingProfileUseCase } from './update-onboarding-profile.use-case';
-import { GetOnboardingProfileUseCase } from './get-onboarding-profile.use-case';
+import { CompleteOnboardingUseCase } from './complete-onboarding.use-case';
 import { CreateOnboardingMessageUseCase } from './create-onboarding-message.use-case';
+import { CreateOnboardingProfileUseCase } from './create-onboarding-profile.use-case';
 import { GetOnboardingMessagesUseCase } from './get-onboarding-messages.use-case';
+import { GetOnboardingProfileUseCase } from './get-onboarding-profile.use-case';
+import { UpdateOnboardingProfileUseCase } from './update-onboarding-profile.use-case';
 
 export const onboardingUseCases: Provider[] = [
   CreateOnboardingProfileUseCase,
@@ -11,12 +12,14 @@ export const onboardingUseCases: Provider[] = [
   GetOnboardingProfileUseCase,
   CreateOnboardingMessageUseCase,
   GetOnboardingMessagesUseCase,
+  CompleteOnboardingUseCase,
 ];
 
 export {
-  CreateOnboardingProfileUseCase,
-  UpdateOnboardingProfileUseCase,
-  GetOnboardingProfileUseCase,
+  CompleteOnboardingUseCase,
   CreateOnboardingMessageUseCase,
+  CreateOnboardingProfileUseCase,
   GetOnboardingMessagesUseCase,
+  GetOnboardingProfileUseCase,
+  UpdateOnboardingProfileUseCase,
 };
