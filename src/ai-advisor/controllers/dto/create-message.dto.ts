@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export enum MessageSender {
   AI = 'ai',
@@ -23,6 +29,22 @@ export class CreateMessageDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  @ApiProperty({
+    description: 'Type of the message',
+    example: MessageType.TEXT,
+  })
+  @IsOptional()
+  @IsEnum(MessageType)
+  type?: MessageType;
+
+  @ApiProperty({
+    description: 'Sender of the message',
+    example: MessageSender.USER,
+  })
+  @IsOptional()
+  @IsEnum(MessageSender)
+  sender?: MessageSender;
 
   @ApiProperty({
     description: 'Optional metadata for the message',

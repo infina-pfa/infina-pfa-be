@@ -21,6 +21,7 @@ import { Response } from 'express';
 import { AiAdvisorService } from '../domain';
 import {
   CreateConversationUseCase,
+  CreateMessageUseCase,
   GetConversationUseCase,
   GetMessagesUseCase,
 } from '../use-cases';
@@ -39,6 +40,7 @@ export class AiAdvisorController {
     private readonly getConversationUseCase: GetConversationUseCase,
     private readonly aiAdvisorService: AiAdvisorService,
     private readonly getMessagesUseCase: GetMessagesUseCase,
+    private readonly createMessageUseCase: CreateMessageUseCase,
   ) {}
 
   @Post('conversations')
@@ -151,5 +153,26 @@ export class AiAdvisorController {
     });
 
     return messages.map((message) => MessageDto.fromEntity(message));
+  }
+
+  @Post('conversations/:id/messages')
+  @ApiOperation({ summary: 'Create a new message in a conversation' })
+  @ApiResponse({
+    status: 201,
+    description: 'Message created successfully',
+    type: MessageDto,
+  })
+  async createMessage(
+    @Body() createMessageDto: CreateMessageDto,
+    @Param('id') conversationId: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<MessageDto> {
+    const message = await this.createMessageUseCase.execute({
+      conversationId,
+      userId: user.id,
+      content: createMessageDto.content,
+    });
+
+    return MessageDto.fromEntity(message);
   }
 }
