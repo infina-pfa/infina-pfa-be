@@ -116,11 +116,6 @@ export class AiAdvisorController {
       {
         onData: (chunk) => {
           res.write(chunk);
-          this.aiAdvisorService.handleStreamChunk(
-            user.id,
-            conversationId,
-            chunk,
-          );
         },
         onEnd: () => {
           res.end();
