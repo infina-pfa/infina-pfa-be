@@ -8,4 +8,7 @@ export enum BudgetErrorCode {
 
   // Income errors
   INCOME_NOT_FOUND = 'INCOME_NOT_FOUND',
+
+  // Budget already exists
+  BUDGET_ALREADY_EXISTS = 'BUDGET_ALREADY_EXISTS',
 }

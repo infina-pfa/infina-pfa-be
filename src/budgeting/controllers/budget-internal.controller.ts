@@ -32,7 +32,7 @@ import { GetMonthlySpendingUseCase } from '../use-cases/get-monthly-spending.use
 import { SpendUseCase } from '../use-cases/spend.use-case';
 import { UpdateBudgetUseCase } from '../use-cases/update-budget.use-case';
 import { BudgetResponseDto } from './dto/budget.dto';
-import { CreateBudgetDto } from './dto/create-budget.dto';
+import { CreateBudgetInternalDto } from './dto/create-budget.dto';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { MonthlyIncomeQueryDto } from './dto/monthly-income-query.dto';
 import { MonthlySpendingQueryInternalDto } from './dto/monthly-spending-query.dto';
@@ -76,7 +76,7 @@ export class BudgetInternalController {
     description: 'Budget with same name already exists for this month',
   })
   async createBudget(
-    @Body() createBudgetDto: CreateBudgetDto,
+    @Body() createBudgetDto: CreateBudgetInternalDto,
   ): Promise<BudgetResponseDto> {
     const budget = await this.createBudgetUseCase.execute({
       ...createBudgetDto,

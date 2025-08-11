@@ -1,3 +1,4 @@
+import { BudgetCategory } from '@/budgeting/domain';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
@@ -8,7 +9,6 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { BudgetCategory } from '@/budgeting/domain';
 
 export class CreateBudgetDto {
   @ApiProperty({
@@ -28,13 +28,6 @@ export class CreateBudgetDto {
   @IsNotEmpty()
   @Min(0.01, { message: 'Budget amount must be greater than 0' })
   amount: number;
-
-  @ApiProperty({
-    description: 'User ID who owns this budget',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @IsUUID()
-  userId: string;
 
   @ApiProperty({
     description: 'Budget category',
@@ -76,4 +69,13 @@ export class CreateBudgetDto {
   @IsNumber()
   @Min(2025)
   year: number;
+}
+
+export class CreateBudgetInternalDto extends CreateBudgetDto {
+  @ApiProperty({
+    description: 'User ID who owns this budget',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @IsUUID()
+  userId: string;
 }

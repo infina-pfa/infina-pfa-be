@@ -9,6 +9,7 @@ import {
   CreateBudgetUseCase,
   CreateBudgetUseCaseInput,
 } from '../create-budget.use-case';
+import { BudgetErrorFactory } from '@/budgeting/domain/errors/budget-error.factory';
 
 describe('CreateBudgetUseCase', () => {
   let useCase: CreateBudgetUseCase;
@@ -295,7 +296,7 @@ describe('CreateBudgetUseCase', () => {
 
         await expect(useCase.execute(input)).rejects.toThrow(ConflictException);
         await expect(useCase.execute(input)).rejects.toThrow(
-          "Budget with name 'Existing Budget' already exists for this month",
+          BudgetErrorFactory.budgetAlreadyExists(),
         );
 
         expect(budgetAggregateRepository.findOne).toHaveBeenCalledWith({
