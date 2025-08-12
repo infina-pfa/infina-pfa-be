@@ -78,7 +78,7 @@ export class AiInternalService {
     const response = await this.client.get<{
       success: boolean;
       data: { startMessage: string };
-    }>(`/v1/chat/start-message/${userId}`);
+    }>(`/v1/start-message/${userId}`);
 
     if (!response.data.success) {
       throw new Error('Failed to get start message');
