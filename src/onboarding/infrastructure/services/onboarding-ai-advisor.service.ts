@@ -1,6 +1,5 @@
 import {
   AiInternalService,
-  AiStreamConversationMessageRole,
   AiStreamFlowType,
 } from '@/common/internal-services';
 import {
@@ -29,15 +28,6 @@ export class OnboardingAiAdvisorServiceImpl
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
-    const messages = await this.onboardingMessageRepository.findMany(
-      {
-        userId,
-      },
-      {
-        sort: [{ field: 'created_at', direction: 'asc' }],
-      },
-    );
-
     const userMessage = OnboardingMessageEntity.create({
       userId,
       sender: OnboardingMessageSender.USER,
@@ -49,15 +39,7 @@ export class OnboardingAiAdvisorServiceImpl
     const stream = await this.aiInternalService.stream(
       userId,
       message,
-      messages
-        .filter((message) => !message.componentId)
-        .map((message) => ({
-          role:
-            message.sender === OnboardingMessageSender.AI
-              ? AiStreamConversationMessageRole.ASSISTANT
-              : AiStreamConversationMessageRole.USER,
-          content: message.content,
-        })),
+      `onboarding-${userId}`,
       AiStreamFlowType.ONBOARDING,
       callbacks,
     );

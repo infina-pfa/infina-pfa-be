@@ -1,28 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { Readable } from 'stream';
-import { AiStreamConversationMessage, AiStreamFlowType } from './request.type';
+import { AiStreamFlowType } from './request.type';
 
 @Injectable()
 export class AiInternalService {
   private static readonly BASE_URL = process.env.AI_SERVICE_URL;
   private static readonly API_KEY = process.env.AI_SERVICE_API_KEY;
   private readonly client: AxiosInstance;
+  private readonly logger: Logger;
 
   constructor() {
     this.client = axios.create({
-      baseURL: `${AiInternalService.BASE_URL}/api/v1`,
+      baseURL: `${AiInternalService.BASE_URL}/api/v2`,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${AiInternalService.API_KEY}`,
       },
     });
+
+    this.logger = new Logger(AiInternalService.name);
   }
 
   async stream(
     userId: string,
     message: string,
-    history: AiStreamConversationMessage[],
+    conversationId: string,
     flowType: AiStreamFlowType,
     callbacks?: {
       onData?: (chunk: Buffer) => void;
@@ -30,12 +33,20 @@ export class AiInternalService {
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
+    this.logger.log(
+      `Streaming message to AI service: ${JSON.stringify({
+        userId,
+        conversationId,
+        flowType,
+      })}`,
+    );
+
     const response = await this.client.post(
       '/chat/stream',
       {
         user_id: userId,
         user_message: message,
-        conversation_history: history,
+        conversation_id: conversationId,
         flow_type: flowType,
       },
       {

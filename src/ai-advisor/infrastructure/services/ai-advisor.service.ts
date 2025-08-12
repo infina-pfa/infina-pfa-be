@@ -2,11 +2,9 @@ import {
   AiAdvisorService,
   MessageEntity,
   MessageRepository,
-  MessageSender,
 } from '@/ai-advisor/domain';
 import {
   AiInternalService,
-  AiStreamConversationMessageRole,
   AiStreamFlowType,
   parseStreamEvent,
 } from '@/common/internal-services';
@@ -31,11 +29,6 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
-    const messages = await this.messageRepository.findMany({
-      conversationId,
-      userId,
-    });
-
     const userMessage = MessageEntity.createUserMessage({
       userId,
       conversationId,
@@ -47,13 +40,7 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
     const stream = await this.aiInternalService.stream(
       userId,
       message,
-      messages.map((message) => ({
-        role:
-          message.sender === MessageSender.AI
-            ? AiStreamConversationMessageRole.ASSISTANT
-            : AiStreamConversationMessageRole.USER,
-        content: message.content || '',
-      })),
+      conversationId,
       AiStreamFlowType.CHAT,
       callbacks,
     );
