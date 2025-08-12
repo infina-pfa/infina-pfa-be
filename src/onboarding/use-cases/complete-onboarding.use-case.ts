@@ -80,7 +80,7 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
       category: 'flexible',
       icon: 'wallet',
       color: '#FF33A1',
-      month: new Date().getMonth(),
+      month: new Date().getMonth() + 1,
       year: new Date().getFullYear(),
     });
 

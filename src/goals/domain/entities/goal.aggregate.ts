@@ -158,7 +158,6 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     dueDate?: Date;
   }): void {
     this.props.goal.update(props);
-    this.updated();
     this.validate();
   }
 }
