@@ -24,6 +24,7 @@ import {
   CreateMessageUseCase,
   GetConversationUseCase,
   GetMessagesUseCase,
+  GetStartMessageUseCase,
 } from '../use-cases';
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
@@ -42,6 +43,7 @@ export class AiAdvisorController {
     private readonly aiAdvisorService: AiAdvisorService,
     private readonly getMessagesUseCase: GetMessagesUseCase,
     private readonly createMessageUseCase: CreateMessageUseCase,
+    private readonly getStartMessageUseCase: GetStartMessageUseCase,
   ) {}
 
   @Post('conversations')
@@ -170,5 +172,16 @@ export class AiAdvisorController {
     });
 
     return MessageDto.fromEntity(message);
+  }
+
+  @Get('start-message')
+  @ApiOperation({ summary: 'Get the start message for the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Start message retrieved successfully',
+    type: String,
+  })
+  async getStartMessage(@CurrentUser() user: AuthUser): Promise<string> {
+    return this.getStartMessageUseCase.execute({ userId: user.id });
   }
 }

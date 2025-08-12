@@ -12,7 +12,7 @@ export class AiInternalService {
 
   constructor() {
     this.client = axios.create({
-      baseURL: `${AiInternalService.BASE_URL}/api/v2`,
+      baseURL: `${AiInternalService.BASE_URL}/api`,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${AiInternalService.API_KEY}`,
@@ -42,7 +42,7 @@ export class AiInternalService {
     );
 
     const response = await this.client.post(
-      '/chat/stream',
+      '/v2/chat/stream',
       {
         user_id: userId,
         user_message: message,
@@ -71,5 +71,19 @@ export class AiInternalService {
     nodeStream.on('error', (error: Error) => {
       callbacks?.onError?.(error);
     });
+  }
+
+  async getStartMessage(userId: string): Promise<string> {
+    this.logger.log(`Getting start message for user: ${userId}`);
+    const response = await this.client.get<{
+      success: boolean;
+      data: { startMessage: string };
+    }>(`/v1/chat/start-message/${userId}`);
+
+    if (!response.data.success) {
+      throw new Error('Failed to get start message');
+    }
+
+    return response.data.data.startMessage;
   }
 }

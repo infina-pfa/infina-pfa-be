@@ -80,4 +80,8 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
       }
     }
   }
+
+  async getStartMessage(userId: string): Promise<string> {
+    return this.aiInternalService.getStartMessage(userId);
+  }
 }

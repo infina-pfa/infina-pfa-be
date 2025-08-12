@@ -23,6 +23,12 @@ headers: {
 }
 ```
 
+### Controller Information
+
+- **Controller Path**: `/incomes`
+- **API Tags**: `Incomes`
+- **Authentication**: Required for all endpoints (SupabaseAuthGuard)
+
 ## Income-Specific Error Codes
 
 ```typescript
@@ -54,7 +60,7 @@ interface TransactionResponseDto {
 
 Retrieves all income transactions for a specific month and year.
 
-**Endpoint:** `GET /budgets/income?month={month}&year={year}`
+**Endpoint:** `GET /incomes?month={month}&year={year}`
 
 **Query Parameters:**
 
@@ -86,7 +92,7 @@ export async function getMonthlyIncome(month: number, year: number) {
     year: year.toString(),
   });
 
-  const response = await fetch(`${API_URL}/budgets/income?${params}`, {
+  const response = await fetch(`${API_URL}/incomes?${params}`, {
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },
@@ -100,7 +106,7 @@ export async function getMonthlyIncome(month: number, year: number) {
 
 Creates a new income transaction.
 
-**Endpoint:** `POST /budgets/income`
+**Endpoint:** `POST /incomes`
 
 **Request Body:**
 
@@ -128,7 +134,7 @@ Returns a `TransactionResponseDto` object.
 export async function addIncome(data: CreateIncomeRequest) {
   const session = await getSession();
 
-  const response = await fetch(`${API_URL}/budgets/income`, {
+  const response = await fetch(`${API_URL}/incomes`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${session.access_token}`,
@@ -145,7 +151,7 @@ export async function addIncome(data: CreateIncomeRequest) {
 
 Updates an existing income transaction.
 
-**Endpoint:** `PATCH /budgets/income/{id}`
+**Endpoint:** `PATCH /incomes/{id}`
 
 **Path Parameters:**
 
@@ -181,7 +187,7 @@ export async function updateIncome(
 ) {
   const session = await getSession();
 
-  const response = await fetch(`${API_URL}/budgets/income/${incomeId}`, {
+  const response = await fetch(`${API_URL}/incomes/${incomeId}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${session.access_token}`,
@@ -198,7 +204,7 @@ export async function updateIncome(
 
 Deletes an income transaction.
 
-**Endpoint:** `DELETE /budgets/income/{id}`
+**Endpoint:** `DELETE /incomes/{id}`
 
 **Path Parameters:**
 
@@ -221,7 +227,7 @@ No response body.
 export async function deleteIncome(incomeId: string) {
   const session = await getSession();
 
-  const response = await fetch(`${API_URL}/budgets/income/${incomeId}`, {
+  const response = await fetch(`${API_URL}/incomes/${incomeId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${session.access_token}`,

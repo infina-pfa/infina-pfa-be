@@ -15,4 +15,6 @@ export abstract class AiAdvisorService {
     conversationId: string,
     chunk: Buffer,
   ): void;
+
+  abstract getStartMessage(userId: string): Promise<string>;
 }
