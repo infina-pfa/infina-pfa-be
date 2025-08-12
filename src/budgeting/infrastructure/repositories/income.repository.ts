@@ -42,6 +42,9 @@ export class IncomeRepositoryImpl
     month: number,
     year: number,
   ): Promise<IncomeAggregate | null> {
+    console.log('🚀 ~ IncomeRepositoryImpl ~ findByMonth ~ userId:', userId);
+    console.log('🚀 ~ IncomeRepositoryImpl ~ findByMonth ~ month:', month);
+    console.log('🚀 ~ IncomeRepositoryImpl ~ findByMonth ~ year:', year);
     if (month < 1 || month > 12 || year <= 0) {
       return null;
     }

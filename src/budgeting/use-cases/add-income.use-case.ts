@@ -20,6 +20,7 @@ export class AddIncomeUseCase extends BaseUseCase<
   }
 
   async execute(input: AddIncomeUseCaseInput): Promise<IncomeAggregate> {
+    console.log('🚀 ~ AddIncomeUseCase ~ execute ~ input:', input);
     const income = IncomeAggregate.create({
       userId: input.userId,
       transactions: new TransactionsWatchList([]),

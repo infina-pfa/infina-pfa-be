@@ -1,10 +1,11 @@
 import { BudgetInternalController } from '@/budgeting/controllers/budget-internal.controller';
+import { IncomeInternalController } from '@/budgeting/controllers/income-internal.controller';
 import { repositories } from '@/budgeting/infrastructure/repositories';
 import { budgetingUseCases } from '@/budgeting/use-cases';
 import { Module } from '@nestjs/common';
 
 @Module({
-  controllers: [BudgetInternalController],
+  controllers: [BudgetInternalController, IncomeInternalController],
   providers: [...repositories, ...budgetingUseCases],
   exports: [...repositories, ...budgetingUseCases],
 })

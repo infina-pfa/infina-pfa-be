@@ -31,7 +31,9 @@ export class UpdateIncomeDto {
   @IsNotEmpty()
   @Min(0, { message: 'Recurring frequency must be greater than 0' })
   recurring: number;
+}
 
+export class UpdateIncomeInternalDto extends UpdateIncomeDto {
   @ApiProperty({
     description: 'User ID who owns this income',
     example: '123e4567-e89b-12d3-a456-426614174000',
