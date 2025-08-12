@@ -1,6 +1,9 @@
+import { MessageSender } from '../entities/message.entity';
+
 export abstract class AiAdvisorService {
   abstract stream(
     userId: string,
+    sender: MessageSender,
     conversationId: string,
     message: string,
     callbacks?: {

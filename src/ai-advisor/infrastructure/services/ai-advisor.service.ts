@@ -2,6 +2,8 @@ import {
   AiAdvisorService,
   MessageEntity,
   MessageRepository,
+  MessageSender,
+  MessageType,
 } from '@/ai-advisor/domain';
 import {
   AiInternalService,
@@ -21,6 +23,7 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
 
   async stream(
     userId: string,
+    sender: MessageSender,
     conversationId: string,
     message: string,
     callbacks?: {
@@ -29,10 +32,12 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
-    const userMessage = MessageEntity.createUserMessage({
+    const userMessage = MessageEntity.create({
       userId,
       conversationId,
       content: message,
+      sender,
+      type: MessageType.TEXT,
     });
 
     await this.messageRepository.create(userMessage);

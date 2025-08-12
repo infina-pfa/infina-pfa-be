@@ -1,5 +1,6 @@
+import { MessageSender } from '@/ai-advisor/domain';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class StreamMessageDto {
   @ApiProperty({
@@ -9,4 +10,12 @@ export class StreamMessageDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  @ApiProperty({
+    description: 'Sender of the message',
+    example: MessageSender.USER,
+  })
+  @IsEnum(MessageSender)
+  @IsNotEmpty()
+  sender: MessageSender;
 }

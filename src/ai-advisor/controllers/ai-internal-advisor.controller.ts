@@ -110,6 +110,7 @@ export class AiInternalAdvisorController {
 
     await this.aiAdvisorService.stream(
       userId,
+      createMessageDto.sender,
       conversationId,
       createMessageDto.content,
       {

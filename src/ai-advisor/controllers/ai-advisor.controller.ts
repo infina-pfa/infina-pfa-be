@@ -113,6 +113,7 @@ export class AiAdvisorController {
 
     await this.aiAdvisorService.stream(
       user.id,
+      createMessageDto.sender,
       conversationId,
       createMessageDto.content,
       {
@@ -168,7 +169,10 @@ export class AiAdvisorController {
     const message = await this.createMessageUseCase.execute({
       conversationId,
       userId: user.id,
+      sender: createMessageDto.sender,
       content: createMessageDto.content || null,
+      type: createMessageDto.type,
+      metadata: createMessageDto.metadata,
     });
 
     return MessageDto.fromEntity(message);
