@@ -64,18 +64,21 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
         name,
         amount: new CurrencyVO(amount),
         category: 'fixed',
-        icon: iconMaps[name as keyof typeof iconMaps],
-        color: colorMaps[name as keyof typeof colorMaps],
-        month: new Date().getMonth(),
+        icon: iconMaps[name as keyof typeof iconMaps] || 'wallet',
+        color: colorMaps[name as keyof typeof colorMaps] || '#FF33A1',
+        month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
       }),
     );
     budgetProps.push({
       name: 'Thoải mái chi tiêu',
       amount: new CurrencyVO(
-        income -
-          pyfAmount -
-          Object.values(budgets).reduce((acc, curr) => acc + curr, 0),
+        Math.max(
+          income -
+            pyfAmount -
+            Object.values(budgets).reduce((acc, curr) => acc + curr, 0),
+          0,
+        ),
       ),
       category: 'flexible',
       icon: 'wallet',
