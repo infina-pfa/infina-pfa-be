@@ -81,9 +81,9 @@ export class BudgetInternalController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getBudgets(
-    @Param('userId') userId: string,
-    @Param('month') month: number,
-    @Param('year') year: number,
+    @Query('userId') userId: string,
+    @Query('month') month: number,
+    @Query('year') year: number,
   ): Promise<BudgetResponseDto[]> {
     return (await this.getBudgetsUseCase.execute({ userId, month, year })).map(
       (budget) => BudgetResponseDto.fromAggregate(budget),
