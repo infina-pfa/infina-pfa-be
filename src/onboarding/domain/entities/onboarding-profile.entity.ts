@@ -15,6 +15,11 @@ export type Metadata = {
   expenseBreakdown: Record<string, number>;
 };
 
+export type PyfMetadata = {
+  reasonNotPyf: string;
+  reminderDate: string;
+};
+
 export interface OnboardingProfileEntityProps extends BaseProps {
   userId: string;
   metadata: Metadata | null;
@@ -24,6 +29,7 @@ export interface OnboardingProfileEntityProps extends BaseProps {
   deletedAt: Date | null;
   pyfAmount: CurrencyVO | null;
   budgetingStyle: BudgetingStyle | null;
+  pyfMetadata: PyfMetadata | null;
 }
 
 export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityProps> {
@@ -95,6 +101,10 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
 
   public get pyfAmount(): CurrencyVO | null {
     return this.props.pyfAmount;
+  }
+
+  public get pyfMetadata(): PyfMetadata | null {
+    return this.props.pyfMetadata;
   }
 
   public get deletedAt(): Date | null {
