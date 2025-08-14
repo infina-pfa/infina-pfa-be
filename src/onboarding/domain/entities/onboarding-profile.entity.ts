@@ -45,6 +45,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
       | 'income'
       | 'pyfAmount'
       | 'budgetingStyle'
+      | 'pyfMetadata'
     >,
     id?: string,
   ): OnboardingProfileEntity {
@@ -58,6 +59,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
         deletedAt: props.deletedAt ?? null,
         pyfAmount: props.pyfAmount ?? null,
         budgetingStyle: props.budgetingStyle ?? null,
+        pyfMetadata: props.pyfMetadata ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
@@ -143,7 +145,18 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
   }
 
   public updateMetadata(metadata: Metadata): void {
-    this._props.metadata = metadata;
+    this._props.metadata = {
+      ...this.props.metadata,
+      ...metadata,
+    };
+    this.updated();
+  }
+
+  public updatePyfMetadata(pyfMetadata: PyfMetadata): void {
+    this._props.pyfMetadata = {
+      ...this._props.pyfMetadata,
+      ...pyfMetadata,
+    };
     this.updated();
   }
 

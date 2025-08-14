@@ -4,6 +4,7 @@ import {
   BudgetingStyle,
   Metadata,
   OnboardingProfileEntity,
+  PyfMetadata,
 } from '@/onboarding/domain';
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from '../../base/repositories/base.repository';
@@ -36,6 +37,7 @@ export class OnboardingProfilePrismaRepository
       created_at: props.createdAt,
       updated_at: props.updatedAt,
       deleted_at: props.deletedAt,
+      pyf_metadata: props.pyfMetadata,
     };
   }
 
@@ -50,6 +52,7 @@ export class OnboardingProfilePrismaRepository
         pyfAmount: data.pyf_amount
           ? new CurrencyVO(data.pyf_amount.toNumber())
           : null,
+        pyfMetadata: data.pyf_metadata as PyfMetadata | null,
         budgetingStyle: data.budgeting_style as BudgetingStyle | null,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
