@@ -4,6 +4,7 @@ import { CreateMessageUseCase } from './create-message.use-case';
 import { GetConversationUseCase } from './get-conversation.use-case';
 import { GetMessagesUseCase } from './get-messages.use-case';
 import { GetStartMessageUseCase } from './get-start-message.use-case';
+import { GetUserFinancialActionUseCase } from './get-user-financial-action.use-case';
 
 export const aiAdvisorUseCases: Provider[] = [
   CreateConversationUseCase,
@@ -11,6 +12,7 @@ export const aiAdvisorUseCases: Provider[] = [
   CreateMessageUseCase,
   GetMessagesUseCase,
   GetStartMessageUseCase,
+  GetUserFinancialActionUseCase,
 ];
 
 export {
@@ -19,4 +21,5 @@ export {
   GetConversationUseCase,
   GetMessagesUseCase,
   GetStartMessageUseCase,
+  GetUserFinancialActionUseCase,
 };

@@ -15,6 +15,11 @@ export type Metadata = {
   expenseBreakdown: Record<string, number>;
 };
 
+export type PyfMetadata = {
+  reasonNotPyf: string;
+  reminderDate: string;
+};
+
 export interface OnboardingProfileEntityProps extends BaseProps {
   userId: string;
   metadata: Metadata | null;
@@ -24,6 +29,7 @@ export interface OnboardingProfileEntityProps extends BaseProps {
   deletedAt: Date | null;
   pyfAmount: CurrencyVO | null;
   budgetingStyle: BudgetingStyle | null;
+  pyfMetadata: PyfMetadata | null;
 }
 
 export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityProps> {
@@ -39,6 +45,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
       | 'income'
       | 'pyfAmount'
       | 'budgetingStyle'
+      | 'pyfMetadata'
     >,
     id?: string,
   ): OnboardingProfileEntity {
@@ -52,6 +59,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
         deletedAt: props.deletedAt ?? null,
         pyfAmount: props.pyfAmount ?? null,
         budgetingStyle: props.budgetingStyle ?? null,
+        pyfMetadata: props.pyfMetadata ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
       },
@@ -97,6 +105,10 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
     return this.props.pyfAmount;
   }
 
+  public get pyfMetadata(): PyfMetadata | null {
+    return this.props.pyfMetadata;
+  }
+
   public get deletedAt(): Date | null {
     return this.props.deletedAt;
   }
@@ -133,7 +145,18 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
   }
 
   public updateMetadata(metadata: Metadata): void {
-    this._props.metadata = metadata;
+    this._props.metadata = {
+      ...this.props.metadata,
+      ...metadata,
+    };
+    this.updated();
+  }
+
+  public updatePyfMetadata(pyfMetadata: PyfMetadata): void {
+    this._props.pyfMetadata = {
+      ...this._props.pyfMetadata,
+      ...pyfMetadata,
+    };
     this.updated();
   }
 

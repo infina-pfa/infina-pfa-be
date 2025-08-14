@@ -7,6 +7,7 @@ import {
   OnboardingErrorFactory,
   BudgetingStyle,
   Metadata,
+  PyfMetadata,
 } from '@/onboarding/domain';
 
 export type UpdateOnboardingProfileUseCaseInput = {
@@ -16,6 +17,7 @@ export type UpdateOnboardingProfileUseCaseInput = {
   pyfAmount?: number;
   metadata?: Metadata;
   budgetingStyle?: BudgetingStyle;
+  pyfMetadata?: PyfMetadata;
 };
 
 @Injectable()
@@ -32,6 +34,10 @@ export class UpdateOnboardingProfileUseCase extends BaseUseCase<
   async execute(
     input: UpdateOnboardingProfileUseCaseInput,
   ): Promise<OnboardingProfileEntity> {
+    console.log(
+      '🚀 ~ UpdateOnboardingProfileUseCase ~ execute ~ input:',
+      input,
+    );
     // Validate input amounts
     if (input.expense !== undefined && input.expense < 0) {
       throw OnboardingErrorFactory.profileInvalidAmount();
@@ -73,6 +79,10 @@ export class UpdateOnboardingProfileUseCase extends BaseUseCase<
     // Update metadata
     if (input.metadata !== undefined) {
       profile.updateMetadata(input.metadata);
+    }
+
+    if (input.pyfMetadata !== undefined) {
+      profile.updatePyfMetadata(input.pyfMetadata);
     }
 
     return await this.onboardingProfileRepository.update(profile);

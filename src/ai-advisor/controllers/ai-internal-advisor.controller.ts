@@ -7,6 +7,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -21,26 +22,27 @@ import { Response } from 'express';
 import { AiAdvisorService } from '../domain';
 import {
   CreateConversationUseCase,
-  CreateMessageUseCase,
   GetConversationUseCase,
   GetMessagesUseCase,
+  GetUserFinancialActionUseCase,
 } from '../use-cases';
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { MessageDto } from './dto/message.dto';
 import { StreamMessageDto } from './dto/stream-message.dto';
+import { UserFinancialActionDto } from './dto/user-financial-action.dto';
 
 @ApiTags('AI Advisor')
-@ApiBearerAuth()
+@ApiBearerAuth('x-api-key')
 @Controller('internal/ai-advisor')
 @UseGuards(InternalServiceAuthGuard)
 export class AiInternalAdvisorController {
   constructor(
     private readonly createConversationUseCase: CreateConversationUseCase,
     private readonly getConversationUseCase: GetConversationUseCase,
-    private readonly createMessageUseCase: CreateMessageUseCase,
     private readonly aiAdvisorService: AiAdvisorService,
     private readonly getMessagesUseCase: GetMessagesUseCase,
+    private readonly getUserFinancialActionUseCase: GetUserFinancialActionUseCase,
   ) {}
 
   @Post('conversations')
@@ -149,5 +151,25 @@ export class AiInternalAdvisorController {
     });
 
     return messages.map((message) => MessageDto.fromEntity(message));
+  }
+
+  @Get('user-financial-action')
+  @ApiOperation({ summary: 'Get user financial action' })
+  @ApiResponse({
+    status: 200,
+    description: 'User financial action retrieved successfully',
+    type: UserFinancialActionDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found or onboarding profile not found',
+  })
+  async getUserFinancialAction(
+    @Query('user_id') userId: string,
+  ): Promise<UserFinancialActionDto> {
+    return await this.getUserFinancialActionUseCase.execute({
+      userId,
+    });
   }
 }

@@ -56,6 +56,7 @@ export class CreateOnboardingProfileUseCase extends BaseUseCase<
       income: input.income ? new CurrencyVO(input.income) : null,
       pyfAmount: input.pyfAmount ? new CurrencyVO(input.pyfAmount) : null,
       metadata: input.metadata || null,
+      pyfMetadata: null,
     });
 
     return await this.onboardingProfileRepository.create(profile);

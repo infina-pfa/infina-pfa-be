@@ -13,7 +13,7 @@ import {
 import {
   OnboardingInternalProfileResponseDto,
   OnboardingProfileResponseDto,
-  UpdateOnboardingProfileDto,
+  UpdateOnboardingProfileInternalDto,
 } from './dto';
 import { UserFinancialInfoService } from '../domain';
 
@@ -63,7 +63,7 @@ export class OnboardingProfileInternalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Onboarding profile not found' })
   async updateProfile(
-    @Body() updateProfileDto: UpdateOnboardingProfileDto,
+    @Body() updateProfileDto: UpdateOnboardingProfileInternalDto,
     @Query('userId') userId: string,
   ): Promise<OnboardingProfileResponseDto> {
     const profile = await this.updateOnboardingProfileUseCase.execute({

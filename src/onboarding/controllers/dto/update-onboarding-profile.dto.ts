@@ -1,4 +1,4 @@
-import { BudgetingStyle, Metadata } from '@/onboarding/domain';
+import { BudgetingStyle, Metadata, PyfMetadata } from '@/onboarding/domain';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
@@ -72,4 +72,18 @@ export class UpdateOnboardingProfileDto {
   @IsOptional()
   @IsEnum(BudgetingStyle)
   budgetingStyle?: BudgetingStyle;
+}
+
+export class UpdateOnboardingProfileInternalDto {
+  @ApiProperty({
+    description: 'Object with the PYF metadata',
+    example: {
+      reasonNotPyf: 'I forgot',
+      reminderDate: '2025-08-15T00:00:00.000Z',
+    },
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  pyfMetadata?: PyfMetadata;
 }

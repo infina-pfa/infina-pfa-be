@@ -1,4 +1,8 @@
-import { BudgetingStyle, OnboardingProfileEntity } from '@/onboarding/domain';
+import {
+  BudgetingStyle,
+  OnboardingProfileEntity,
+  PyfMetadata,
+} from '@/onboarding/domain';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class OnboardingProfileResponseDto {
@@ -103,6 +107,16 @@ export class OnboardingInternalProfileResponseDto extends OnboardingProfileRespo
     return {
       ...OnboardingProfileResponseDto.fromEntity(entity),
       remainingFreeToSpendThisWeek: extraData.remainingFreeToSpendThisWeek,
+      pyfMetadata: entity.pyfMetadata,
     };
   }
+
+  @ApiProperty({
+    description: 'Object with the PYF metadata',
+    example: {
+      reasonNotPyf: 'I forgot',
+      reminderDate: '2025-08-15T00:00:00.000Z',
+    },
+  })
+  pyfMetadata: PyfMetadata | null;
 }
