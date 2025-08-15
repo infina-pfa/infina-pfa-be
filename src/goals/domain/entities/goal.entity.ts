@@ -7,7 +7,6 @@ export interface GoalEntityProps extends BaseProps {
   title: string;
   description?: string;
   targetAmount?: CurrencyVO;
-  currentAmount: CurrencyVO;
   dueDate?: Date;
   deletedAt?: Date | null;
 }
@@ -16,14 +15,13 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
   public static create(
     props: OptionalProps<
       Omit<GoalEntityProps, 'id'>,
-      'createdAt' | 'updatedAt' | 'currentAmount' | 'deletedAt'
+      'createdAt' | 'updatedAt' | 'deletedAt'
     >,
     id?: string,
   ): GoalEntity {
     return new GoalEntity(
       {
         ...props,
-        currentAmount: props.currentAmount ?? new CurrencyVO(0),
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
         deletedAt: props.deletedAt ?? null,
@@ -41,9 +39,6 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
     }
     if (this.props.targetAmount.value <= 0) {
       throw GoalErrorFactory.invalidGoal('Target amount must be positive');
-    }
-    if (this.props.currentAmount.value < 0) {
-      throw GoalErrorFactory.invalidGoal('Current amount must be positive');
     }
     if (this.props.dueDate && this.props.dueDate < new Date()) {
       throw GoalErrorFactory.invalidGoal('Due date must be in the future');
@@ -66,19 +61,12 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
     return this.props.targetAmount;
   }
 
-  public get currentAmount(): CurrencyVO {
-    return this.props.currentAmount;
-  }
-
   public get dueDate(): Date | undefined {
     return this.props.dueDate;
   }
 
   public update(
-    props: Omit<
-      Partial<GoalEntityProps>,
-      'createdAt' | 'updatedAt' | 'userId' | 'currentAmount'
-    >,
+    props: Omit<Partial<GoalEntityProps>, 'createdAt' | 'updatedAt' | 'userId'>,
   ): void {
     this._props = {
       ...this._props,
@@ -87,25 +75,10 @@ export class GoalEntity extends BaseEntity<GoalEntityProps> {
     this.updated();
   }
 
-  public updateProgress(amount: CurrencyVO): void {
-    this._props = {
-      ...this._props,
-      currentAmount: amount,
-    };
-    this.updated();
-  }
-
-  public isCompleted(): boolean {
-    if (!this.props.targetAmount) {
-      return false;
-    }
-    return this.props.currentAmount.value >= this.props.targetAmount.value;
-  }
-
   public isOverdue(): boolean {
     if (!this.props.dueDate) {
       return false;
     }
-    return new Date() > this.props.dueDate && !this.isCompleted();
+    return new Date() > this.props.dueDate;
   }
 }

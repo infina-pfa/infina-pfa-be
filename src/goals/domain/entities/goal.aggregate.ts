@@ -49,10 +49,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
     // If no transactions, return zero in the goal's currency (or VND if no target amount)
     if (transactions.length === 0) {
-      const currency =
-        this.props.goal.targetAmount?.currency ||
-        this.props.goal.currentAmount.currency;
-      return new CurrencyVO(0, currency);
+      return new CurrencyVO(0, this.props.goal.targetAmount?.currency);
     }
 
     return transactions.reduce(
@@ -74,8 +71,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
 
   public get remainingAmount(): CurrencyVO {
     if (!this.targetAmount) {
-      const currency = this.props.goal.currentAmount.currency;
-      return new CurrencyVO(0, currency);
+      return new CurrencyVO(0, this.props.goal.targetAmount?.currency);
     }
     const remaining = this.targetAmount.subtract(this.totalContributed);
     return remaining.value < 0
@@ -98,7 +94,7 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
     this.props.transactions.add(
       TransactionEntity.create({
         amount: props.amount,
-        type: TransactionType.INCOME,
+        type: TransactionType.GOAL_CONTRIBUTION,
         name: props.name || 'Goal Contribution',
         description:
           props.description || 'Contribution to ' + this.props.goal.title,
@@ -108,9 +104,6 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
         updatedAt: new Date(),
       }),
     );
-
-    // Update the goal's current amount
-    this.props.goal.updateProgress(this.totalContributed);
   }
 
   public withdraw(props: {
@@ -146,9 +139,6 @@ export class GoalAggregate extends BaseEntity<GoalAggregateProps & BaseProps> {
         updatedAt: new Date(),
       }),
     );
-
-    // Update the goal's current amount
-    this.props.goal.updateProgress(this.totalContributed);
   }
 
   public updateGoalDetails(props: {

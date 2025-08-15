@@ -434,7 +434,6 @@ model goals {
   title             String
   due_date          DateTime?           @db.Timestamptz(6)
   description       String?
-  current_amount    Decimal             @default(0) @db.Decimal
   target_amount     Decimal?            @db.Decimal
   user_id           String              @db.Uuid
   deleted_at        DateTime?           @db.Timestamptz(6)
@@ -444,7 +443,6 @@ model goals {
   @@index([due_date], map: "idx_goals_due_date")
   @@index([user_id], map: "idx_goals_user_id")
   @@index([title], map: "idx_goals_title")
-  @@index([user_id, current_amount, target_amount], map: "idx_goals_user_amount")
   @@schema("public")
 }
 

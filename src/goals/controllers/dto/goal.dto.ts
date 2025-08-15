@@ -73,7 +73,7 @@ export class GoalResponseDto extends BaseDto {
     dto.id = goal.id;
     dto.title = props.title;
     dto.description = props.description;
-    dto.currentAmount = props.currentAmount.value;
+    dto.currentAmount = goalAggregate.totalContributed.value;
     dto.targetAmount = props.targetAmount?.value;
     dto.dueDate = props.dueDate?.toISOString();
     dto.remainingAmount = goalAggregate.remainingAmount.value;

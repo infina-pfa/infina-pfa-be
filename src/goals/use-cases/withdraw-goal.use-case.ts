@@ -43,9 +43,7 @@ export class WithdrawGoalUseCase extends BaseUseCase<
     }
 
     // Get the goal's currency from targetAmount or currentAmount
-    const goalCurrency =
-      goalAggregate.goal.targetAmount?.currency ||
-      goalAggregate.goal.currentAmount.currency;
+    const goalCurrency = goalAggregate.goal.targetAmount?.currency;
 
     // Create CurrencyVO using goal's currency
     const withdrawalAmount = new CurrencyVO(input.amount, goalCurrency);

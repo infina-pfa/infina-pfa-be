@@ -23,7 +23,6 @@ export class GoalPrismaRepository
       title: props.title,
       description: props.description || null,
       user_id: props.userId,
-      current_amount: new Decimal(props.currentAmount.value),
       target_amount: props.targetAmount
         ? new Decimal(props.targetAmount.value)
         : null,
@@ -40,7 +39,6 @@ export class GoalPrismaRepository
         title: data.title,
         description: data.description || undefined,
         userId: data.user_id,
-        currentAmount: new CurrencyVO(data.current_amount.toNumber()),
         targetAmount: data.target_amount
           ? new CurrencyVO(data.target_amount.toNumber())
           : undefined,

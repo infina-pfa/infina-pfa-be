@@ -42,10 +42,8 @@ export class ContributeGoalUseCase extends BaseUseCase<
       throw GoalErrorFactory.goalNotFound(); // Don't reveal goal exists for security
     }
 
-    // Get the goal's currency from targetAmount or currentAmount
-    const goalCurrency =
-      goalAggregate.goal.targetAmount?.currency ||
-      goalAggregate.goal.currentAmount.currency;
+    // Get the goal's currency from targetAmount
+    const goalCurrency = goalAggregate.goal.targetAmount?.currency;
 
     // Create CurrencyVO using goal's currency
     const contributionAmount = new CurrencyVO(input.amount, goalCurrency);
