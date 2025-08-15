@@ -146,7 +146,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
 
   public updateMetadata(metadata: Metadata): void {
     this._props.metadata = {
-      ...this.props.metadata,
+      ...this._props.metadata,
       ...metadata,
     };
     this.updated();

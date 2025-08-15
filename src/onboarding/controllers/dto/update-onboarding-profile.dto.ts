@@ -74,7 +74,7 @@ export class UpdateOnboardingProfileDto {
   budgetingStyle?: BudgetingStyle;
 }
 
-export class UpdateOnboardingProfileInternalDto {
+export class UpdateOnboardingProfileInternalDto extends UpdateOnboardingProfileDto {
   @ApiProperty({
     description: 'Object with the PYF metadata',
     example: {

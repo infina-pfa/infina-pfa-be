@@ -34,10 +34,6 @@ export class UpdateOnboardingProfileUseCase extends BaseUseCase<
   async execute(
     input: UpdateOnboardingProfileUseCaseInput,
   ): Promise<OnboardingProfileEntity> {
-    console.log(
-      '🚀 ~ UpdateOnboardingProfileUseCase ~ execute ~ input:',
-      input,
-    );
     // Validate input amounts
     if (input.expense !== undefined && input.expense < 0) {
       throw OnboardingErrorFactory.profileInvalidAmount();
