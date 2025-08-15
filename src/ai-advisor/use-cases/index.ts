@@ -5,6 +5,7 @@ import { GetConversationUseCase } from './get-conversation.use-case';
 import { GetMessagesUseCase } from './get-messages.use-case';
 import { GetStartMessageUseCase } from './get-start-message.use-case';
 import { GetUserFinancialActionUseCase } from './get-user-financial-action.use-case';
+import { UploadImageUseCase } from './upload-image.use-case';
 
 export const aiAdvisorUseCases: Provider[] = [
   CreateConversationUseCase,
@@ -13,6 +14,7 @@ export const aiAdvisorUseCases: Provider[] = [
   GetMessagesUseCase,
   GetStartMessageUseCase,
   GetUserFinancialActionUseCase,
+  UploadImageUseCase,
 ];
 
 export {
@@ -22,4 +24,5 @@ export {
   GetMessagesUseCase,
   GetStartMessageUseCase,
   GetUserFinancialActionUseCase,
+  UploadImageUseCase,
 };

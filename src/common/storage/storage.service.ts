@@ -77,6 +77,7 @@ export class StorageService {
       ) {
         throw error;
       }
+
       throw StorageErrorFactory.fileUploadFailed();
     }
   }

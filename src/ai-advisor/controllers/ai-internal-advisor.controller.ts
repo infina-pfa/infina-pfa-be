@@ -9,10 +9,14 @@ import {
   Post,
   Query,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -25,12 +29,16 @@ import {
   GetConversationUseCase,
   GetMessagesUseCase,
   GetUserFinancialActionUseCase,
+  UploadImageUseCase,
 } from '../use-cases';
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { MessageDto } from './dto/message.dto';
 import { StreamMessageDto } from './dto/stream-message.dto';
 import { UserFinancialActionDto } from './dto/user-financial-action.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadImageDto, UploadImageResponseDto } from './dto/upload-image.dto';
+import { ImageValidationPipe } from '@/common/pipes';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth('x-api-key')
@@ -43,6 +51,7 @@ export class AiInternalAdvisorController {
     private readonly aiAdvisorService: AiAdvisorService,
     private readonly getMessagesUseCase: GetMessagesUseCase,
     private readonly getUserFinancialActionUseCase: GetUserFinancialActionUseCase,
+    private readonly uploadImageUseCase: UploadImageUseCase,
   ) {}
 
   @Post('conversations')
@@ -169,6 +178,32 @@ export class AiInternalAdvisorController {
     @Query('user_id') userId: string,
   ): Promise<UserFinancialActionDto> {
     return await this.getUserFinancialActionUseCase.execute({
+      userId,
+    });
+  }
+
+  @Post('conversations/:id/upload-image')
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Upload an image for a conversation' })
+  @ApiParam({ name: 'id', description: 'Conversation ID' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadImageDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Image uploaded successfully',
+    type: UploadImageResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid file type or size' })
+  @ApiResponse({ status: 401, description: 'User not authenticated' })
+  @ApiResponse({ status: 404, description: 'Conversation not found' })
+  async uploadImage(
+    @Param('id') conversationId: string,
+    @UploadedFile(new ImageValidationPipe()) file: Express.Multer.File,
+    @Query('user_id') userId: string,
+  ): Promise<UploadImageResponseDto> {
+    return await this.uploadImageUseCase.execute({
+      conversationId,
+      file,
       userId,
     });
   }
