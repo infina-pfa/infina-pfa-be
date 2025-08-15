@@ -15,4 +15,11 @@ export class AiAdvisorErrorFactory {
       message: 'User not found',
     });
   }
+
+  static conversationNotFound(): NotFoundException {
+    return new NotFoundException({
+      code: AiAdvisorErrorCode.CONVERSATION_NOT_FOUND,
+      message: 'Conversation not found',
+    });
+  }
 }

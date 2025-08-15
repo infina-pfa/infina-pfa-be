@@ -1,9 +1,11 @@
 import {
   AiAdvisorService,
+  ConversationManagerService,
   UserFinancialManagerService,
 } from '@/ai-advisor/domain';
 import { Provider } from '@nestjs/common';
 import { AiAdvisorServiceImpl } from './ai-advisor.service';
+import { ConversationManagerServiceImpl } from './conversation-manager.service';
 import { UserFinancialManagerServiceImpl } from './user-financial-manager.service';
 
 export const services: Provider[] = [
@@ -14,5 +16,9 @@ export const services: Provider[] = [
   {
     provide: UserFinancialManagerService,
     useClass: UserFinancialManagerServiceImpl,
+  },
+  {
+    provide: ConversationManagerService,
+    useClass: ConversationManagerServiceImpl,
   },
 ];

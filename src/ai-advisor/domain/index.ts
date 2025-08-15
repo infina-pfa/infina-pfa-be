@@ -5,6 +5,7 @@ export * from './repositories/conversation.repository';
 export * from './repositories/message.repository';
 
 export * from './services/ai-advisor.service';
+export * from './services/conversation-manager.service';
 export * from './services/user-financial-manager.service';
 
 export * from './types/user-financial-action';
