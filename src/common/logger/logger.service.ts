@@ -93,6 +93,7 @@ export class LoggerService implements NestLoggerService {
         level: this.config.logLevel,
         client: esClient,
         index: `${this.config.elasticsearchIndexPrefix}-${this.config.nodeEnv}`,
+        dataStream: false, // Force regular index instead of data stream
         transformer: (logData: Record<string, any>) => {
           const level = logData.level as string;
           const message = logData.message as string;
@@ -105,7 +106,7 @@ export class LoggerService implements NestLoggerService {
             context: metaContext || this.context,
             correlationId: this.correlationId,
             environment: this.config.nodeEnv,
-            application: 'infina-pfa-backend',
+            application: 'infina-pfa-be',
             ...(meta || {}),
           };
         },
