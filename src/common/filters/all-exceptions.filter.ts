@@ -117,7 +117,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       userAgent: request.headers['user-agent'],
       stack: exception.stack,
       metadata: {
-        body: this.sanitizeBody(request.body as Record<string, any>),
+        body: this.logger.sanitizeBody(request.body as Record<string, any>),
         query: request.query,
         params: request.params,
       },
@@ -184,41 +184,5 @@ export class AllExceptionsFilter implements ExceptionFilter {
       default:
         return error.message;
     }
-  }
-
-  private sanitizeBody(body: Record<string, any>): Record<string, unknown> {
-    if (!body) return {};
-
-    const sensitiveFields = [
-      'password',
-      'token',
-      'secret',
-      'authorization',
-      'api_key',
-      'apiKey',
-      'access_token',
-      'refresh_token',
-      'credit_card',
-      'card_number',
-      'cvv',
-      'ssn',
-    ];
-
-    const sanitized = { ...body };
-
-    Object.keys(sanitized).forEach((key) => {
-      if (sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
-        sanitized[key] = '[REDACTED]';
-      } else if (
-        typeof sanitized[key] === 'object' &&
-        sanitized[key] !== null
-      ) {
-        sanitized[key] = this.sanitizeBody(
-          sanitized[key] as Record<string, any>,
-        );
-      }
-    });
-
-    return sanitized;
   }
 }

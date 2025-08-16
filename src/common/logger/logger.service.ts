@@ -9,7 +9,6 @@ import { LoggerConfig } from './logger.config';
 export class LoggerService implements NestLoggerService {
   private readonly logger: winston.Logger;
   private readonly context: string = 'Application';
-  private correlationId: string | null = null;
 
   constructor(private readonly config: LoggerConfig) {
     this.logger = this.createLogger();
@@ -30,14 +29,11 @@ export class LoggerService implements NestLoggerService {
             winston.format.printf(
               ({ timestamp, level, message, context, ...meta }: any) => {
                 const contextStr = context ? `[${String(context)}]` : '';
-                const correlationStr = this.correlationId
-                  ? `[${this.correlationId}]`
-                  : '';
                 const metaStr = Object.keys(meta as Record<string, unknown>)
                   .length
                   ? JSON.stringify(meta)
                   : '';
-                return `${String(timestamp)} ${String(level)}: ${correlationStr} ${contextStr} ${String(message)} ${metaStr}`;
+                return `${String(timestamp)} ${String(level)}: ${contextStr} ${String(message)} ${metaStr}`;
               },
             ),
           ),
@@ -104,7 +100,6 @@ export class LoggerService implements NestLoggerService {
             severity: level,
             message: message,
             context: metaContext || this.context,
-            correlationId: this.correlationId,
             environment: this.config.nodeEnv,
             application: 'infina-pfa-be',
             ...(meta || {}),
@@ -127,14 +122,6 @@ export class LoggerService implements NestLoggerService {
       transports,
       exitOnError: false,
     });
-  }
-
-  setCorrelationId(correlationId: string): void {
-    this.correlationId = correlationId;
-  }
-
-  clearCorrelationId(): void {
-    this.correlationId = null;
   }
 
   log(message: string, context?: string): void {
@@ -193,7 +180,6 @@ export class LoggerService implements NestLoggerService {
       statusCode,
       responseTime,
       userId,
-      correlationId: this.correlationId,
       ...meta,
     });
   }
@@ -209,7 +195,6 @@ export class LoggerService implements NestLoggerService {
       eventName,
       userId,
       payload,
-      correlationId: this.correlationId,
     });
   }
 
@@ -224,7 +209,42 @@ export class LoggerService implements NestLoggerService {
       eventType,
       userId,
       details,
-      correlationId: this.correlationId,
     });
+  }
+
+  public sanitizeBody(body: Record<string, any>): Record<string, unknown> {
+    if (!body) return {};
+
+    const sensitiveFields = [
+      'password',
+      'token',
+      'secret',
+      'authorization',
+      'api_key',
+      'apiKey',
+      'access_token',
+      'refresh_token',
+      'credit_card',
+      'card_number',
+      'cvv',
+      'ssn',
+    ];
+
+    const sanitized = { ...body };
+
+    Object.keys(sanitized).forEach((key) => {
+      if (sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
+        sanitized[key] = '[REDACTED]';
+      } else if (
+        typeof sanitized[key] === 'object' &&
+        sanitized[key] !== null
+      ) {
+        sanitized[key] = this.sanitizeBody(
+          sanitized[key] as Record<string, any>,
+        );
+      }
+    });
+
+    return sanitized;
   }
 }
