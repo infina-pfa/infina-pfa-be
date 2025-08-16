@@ -14,6 +14,9 @@ import { OnboardingModule } from './onboarding/module/onboarding.module';
 import { UserInternalModule, UserModule } from './user';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AiAdvisorInternalModule } from './ai-advisor/module/ai-advisor-internal.module';
+import { LoggerModule } from './common/logger/logger.module';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -22,6 +25,7 @@ import { AiAdvisorInternalModule } from './ai-advisor/module/ai-advisor-internal
       envFilePath: '.env',
     }),
     EventEmitterModule.forRoot(),
+    LoggerModule,
     PrismaModule,
     BudgetingModule,
     UserModule,
@@ -40,6 +44,8 @@ import { AiAdvisorInternalModule } from './ai-advisor/module/ai-advisor-internal
     InternalServiceAuthGuard,
     WebhookAuthGuard,
     AppService,
+    LoggingInterceptor,
+    AllExceptionsFilter,
   ],
 })
 export class AppModule {}

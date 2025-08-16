@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'dotenv/config';
@@ -10,6 +10,7 @@ import { BudgetingModule } from './budgeting/module/budgeting.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { LoggerService } from './common/logger/logger.service';
 import { GoalInternalModule, GoalModule } from './goals/module';
 import {
   OnboardingInternalModule,
@@ -19,7 +20,13 @@ import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  // Get the logger service instance
+  const logger = app.get(LoggerService);
+  app.useLogger(logger);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -28,14 +35,13 @@ async function bootstrap() {
     }),
   );
 
-  // Apply global interceptors
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new ResponseInterceptor(),
-  );
+  // Apply global interceptors with dependency injection
+  const loggingInterceptor = app.get(LoggingInterceptor, { strict: false });
+  app.useGlobalInterceptors(loggingInterceptor, new ResponseInterceptor());
 
-  // Apply global filters - order matters, more specific (HttpExceptionFilter) first
-  app.useGlobalFilters(new AllExceptionsFilter());
+  // Apply global filters with dependency injection
+  const allExceptionsFilter = app.get(AllExceptionsFilter, { strict: false });
+  app.useGlobalFilters(allExceptionsFilter);
 
   const config = new DocumentBuilder()
     .setTitle('Infina Personal Finance Advisor APIs')
@@ -82,8 +88,8 @@ async function bootstrap() {
     });
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);
 
-  await app.listen(process.env.PORT ?? 3000, () => {
-    Logger.log(`Server is running on port ${process.env.PORT ?? 3000}`);
-  });
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  logger.log(`Server is running on port ${port}`, 'Bootstrap');
 }
-bootstrap();
+void bootstrap();
