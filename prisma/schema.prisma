@@ -464,7 +464,6 @@ model messages {
 
   @@index([conversation_id, created_at(sort: Desc)], map: "idx_messages_conversation_created")
   @@index([conversation_id], map: "idx_messages_conversation_id")
-  @@index([sender, type], map: "idx_messages_sender_type")
   @@index([user_id], map: "idx_messages_user_id")
   @@index([content], map: "idx_messages_content")
   @@index([user_id, conversation_id], map: "idx_messages_user_conversation")
@@ -614,8 +613,6 @@ enum message_sender {
 /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 enum message_type {
   text
-  image
-  photo
   component
   tool
 

@@ -9,8 +9,6 @@ export enum MessageSender {
 
 export enum MessageType {
   TEXT = 'text',
-  IMAGE = 'image',
-  PHOTO = 'photo',
   COMPONENT = 'component',
   TOOL = 'tool',
 }
