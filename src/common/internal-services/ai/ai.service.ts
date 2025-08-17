@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { Readable } from 'stream';
-import { AiStreamFlowType } from './request.type';
+import { AiStreamFlowType, AiStreamImage } from './request.type';
 
 @Injectable()
 export class AiInternalService {
@@ -22,24 +22,76 @@ export class AiInternalService {
     this.logger = new Logger(AiInternalService.name);
   }
 
+  async fetchImagesAsBase64(imageUrls: string[]): Promise<AiStreamImage[]> {
+    const images: AiStreamImage[] = [];
+
+    for (const url of imageUrls) {
+      try {
+        this.logger.log(`Fetching image from URL: ${url}`);
+
+        // Fetch the image
+        const response = await axios.get<Buffer>(url, {
+          responseType: 'arraybuffer',
+          timeout: 30000, // 30 second timeout
+        });
+
+        // Get the content type
+        const contentType =
+          (response.headers['content-type'] as string) || 'image/jpeg';
+
+        // Convert to base64
+        const base64Data = Buffer.from(response.data).toString('base64');
+
+        images.push({
+          type: 'base64',
+          data: base64Data,
+          detail: 'auto',
+          mime_type: contentType,
+        });
+
+        this.logger.log(`Successfully converted image to base64: ${url}`);
+      } catch (error) {
+        this.logger.error(
+          `Failed to fetch image from ${url}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+        // Continue with other images even if one fails
+      }
+    }
+
+    return images;
+  }
+
   async stream(
     userId: string,
-    message: string,
-    conversationId: string,
-    flowType: AiStreamFlowType,
+    data: {
+      message: string;
+      conversationId: string;
+      flowType: AiStreamFlowType;
+      images?: string[];
+    },
     callbacks?: {
       onData?: (chunk: Buffer) => void;
       onEnd?: () => void;
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
+    const { message, conversationId, flowType, images: imageUrls } = data;
     this.logger.log(
       `Streaming message to AI service: ${JSON.stringify({
         userId,
         conversationId,
         flowType,
+        imageUrls,
       })}`,
     );
+
+    // Convert image URLs to base64 if provided
+    let images: AiStreamImage[] = [];
+    if (imageUrls && imageUrls.length > 0) {
+      images = await this.fetchImagesAsBase64(imageUrls);
+    }
 
     const response = await this.client.post(
       '/v2/chat/stream',
@@ -48,6 +100,7 @@ export class AiInternalService {
         user_message: message,
         conversation_id: conversationId,
         flow_type: flowType,
+        images,
       },
       {
         headers: {

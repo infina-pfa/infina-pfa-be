@@ -65,10 +65,10 @@ export class AiInternalAdvisorController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createConversation(
     @Body() createConversationDto: CreateConversationDto,
-    @CurrentUser() user: AuthUser,
+    @Query('user_id') userId: string,
   ): Promise<ConversationDto> {
     const conversation = await this.createConversationUseCase.execute({
-      userId: user.id,
+      userId,
       name: createConversationDto.name,
     });
 
@@ -121,9 +121,12 @@ export class AiInternalAdvisorController {
 
     await this.aiAdvisorService.stream(
       userId,
-      createMessageDto.sender,
-      conversationId,
-      createMessageDto.content,
+      {
+        sender: createMessageDto.sender,
+        conversationId,
+        message: createMessageDto.content,
+        imageUrls: createMessageDto.imageUrls,
+      },
       {
         onData: (chunk) => {
           res.write(chunk);

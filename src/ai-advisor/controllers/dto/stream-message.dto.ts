@@ -1,6 +1,12 @@
 import { MessageSender } from '@/ai-advisor/domain';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class StreamMessageDto {
   @ApiProperty({
@@ -18,4 +24,12 @@ export class StreamMessageDto {
   @IsEnum(MessageSender)
   @IsNotEmpty()
   sender: MessageSender;
+
+  @ApiProperty({
+    description: 'Image URLs',
+    example: ['https://example.com/image.jpg'],
+  })
+  @IsArray()
+  @IsOptional()
+  imageUrls?: string[];
 }

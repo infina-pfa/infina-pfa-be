@@ -23,30 +23,40 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
 
   async stream(
     userId: string,
-    sender: MessageSender,
-    conversationId: string,
-    message: string,
+    data: {
+      sender: MessageSender;
+      conversationId: string;
+      message: string;
+      imageUrls?: string[];
+    },
     callbacks?: {
       onData?: (chunk: Buffer) => void;
       onEnd?: () => void;
       onError?: (error: Error) => void;
     },
   ): Promise<void> {
+    const { sender, conversationId, message, imageUrls } = data;
     const userMessage = MessageEntity.create({
       userId,
       conversationId,
       content: message,
       sender,
       type: MessageType.TEXT,
+      metadata: {
+        imageUrls,
+      },
     });
 
     await this.messageRepository.create(userMessage);
 
     const stream = await this.aiInternalService.stream(
       userId,
-      message,
-      conversationId,
-      AiStreamFlowType.CHAT,
+      {
+        message,
+        conversationId,
+        flowType: AiStreamFlowType.CHAT,
+        images: imageUrls,
+      },
       callbacks,
     );
 

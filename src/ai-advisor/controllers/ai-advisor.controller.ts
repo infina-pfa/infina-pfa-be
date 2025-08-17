@@ -122,9 +122,12 @@ export class AiAdvisorController {
 
     await this.aiAdvisorService.stream(
       user.id,
-      createMessageDto.sender,
-      conversationId,
-      createMessageDto.content,
+      {
+        sender: createMessageDto.sender,
+        conversationId,
+        message: createMessageDto.content,
+        imageUrls: createMessageDto.imageUrls,
+      },
       {
         onData: (chunk) => {
           res.write(chunk);

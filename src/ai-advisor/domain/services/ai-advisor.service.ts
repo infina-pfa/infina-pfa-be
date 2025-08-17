@@ -3,9 +3,12 @@ import { MessageSender } from '../entities/message.entity';
 export abstract class AiAdvisorService {
   abstract stream(
     userId: string,
-    sender: MessageSender,
-    conversationId: string,
-    message: string,
+    data: {
+      sender: MessageSender;
+      conversationId: string;
+      message: string;
+      imageUrls?: string[];
+    },
     callbacks?: {
       onData?: (chunk: Buffer) => void;
       onEnd?: () => void;

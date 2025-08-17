@@ -38,9 +38,11 @@ export class OnboardingAiAdvisorServiceImpl
 
     const stream = await this.aiInternalService.stream(
       userId,
-      message,
-      `onboarding-${userId}`,
-      AiStreamFlowType.ONBOARDING,
+      {
+        message,
+        conversationId: `onboarding-${userId}`,
+        flowType: AiStreamFlowType.ONBOARDING,
+      },
       callbacks,
     );
 
