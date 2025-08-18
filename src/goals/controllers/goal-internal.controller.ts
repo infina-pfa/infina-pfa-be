@@ -32,6 +32,7 @@ import {
   UpdateGoalInternalDto,
   WithdrawGoalDto,
 } from './dto';
+import { GoalType } from '../domain';
 
 @ApiTags('Goals')
 @ApiBearerAuth('x-api-key')
@@ -68,6 +69,7 @@ export class GoalInternalController {
       dueDate: createGoalDto.dueDate
         ? new Date(createGoalDto.dueDate)
         : undefined,
+      type: createGoalDto.type || GoalType.EMERGENCY,
     });
 
     return GoalResponseDto.fromEntity(goalAggregate);

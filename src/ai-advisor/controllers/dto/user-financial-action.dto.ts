@@ -6,7 +6,9 @@ export class UserFinancialActionDto {
     type: Object,
   })
   pyf: {
-    doneAt: Date | null;
+    pyfAmount: number;
+    currentPyf: number;
+    pyfAt: Date | null;
     reasonNotPyf: string | null;
     reminderDate: Date | null;
   };

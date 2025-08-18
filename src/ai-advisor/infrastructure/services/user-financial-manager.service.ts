@@ -92,7 +92,11 @@ export class UserFinancialManagerServiceImpl extends UserFinancialManagerService
     };
   }
 
-  private async getPyfDoneAt(userId: string): Promise<Date | null> {
+  private async getPyfDoneAt(userId: string): Promise<{
+    pyfAmount: number;
+    currentPyf: number;
+    pyfAt: Date | null;
+  }> {
     const user = await this.prismaClient.public_users.findFirst({
       where: {
         user_id: userId,
@@ -103,23 +107,32 @@ export class UserFinancialManagerServiceImpl extends UserFinancialManagerService
       throw AiAdvisorErrorFactory.userNotFound();
     }
 
-    let lastPyf: Date | null = null;
-
-    if (user.financial_stage === 'start_saving') {
-      const pyfTransaction = await this.prismaClient.transactions.findFirst({
+    const onboardingProfile =
+      await this.prismaClient.onboarding_profiles.findFirst({
         where: {
           user_id: userId,
-          type: 'goal_contribution',
-          created_at: {
-            gte: startOfMonth(new Date()),
-            lte: new Date(),
-          },
         },
       });
-      lastPyf = pyfTransaction?.created_at ?? null;
-    }
 
-    return lastPyf;
+    const pyfTransactions = await this.prismaClient.transactions.findMany({
+      where: {
+        user_id: userId,
+        type: 'goal_contribution',
+        created_at: {
+          gte: startOfMonth(new Date()),
+          lte: new Date(),
+        },
+      },
+    });
+
+    return {
+      pyfAmount: onboardingProfile?.pyf_amount?.toNumber() || 0,
+      currentPyf: pyfTransactions.reduce(
+        (acc, transaction) => acc + transaction.amount.toNumber(),
+        0,
+      ),
+      pyfAt: pyfTransactions[pyfTransactions.length - 1]?.created_at ?? null,
+    };
   }
 
   private async getSetupNextBudget(userId: string): Promise<boolean> {
@@ -149,7 +162,7 @@ export class UserFinancialManagerServiceImpl extends UserFinancialManagerService
 
     return {
       pyf: {
-        doneAt: await this.getPyfDoneAt(userId),
+        ...(await this.getPyfDoneAt(userId)),
         reasonNotPyf,
         reminderDate,
       },
