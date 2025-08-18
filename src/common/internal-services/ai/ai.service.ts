@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { Readable } from 'stream';
-import { AiStreamFlowType, AiStreamImage } from './request.type';
+import {
+  AiStreamFlowType,
+  AiStreamImage,
+  AiStreamSTTResponse,
+} from './request.type';
 
 @Injectable()
 export class AiInternalService {
@@ -124,6 +128,24 @@ export class AiInternalService {
     nodeStream.on('error', (error: Error) => {
       callbacks?.onError?.(error);
     });
+  }
+
+  async speechToText(file: Express.Multer.File): Promise<AiStreamSTTResponse> {
+    const formData = new FormData();
+    const blob = new Blob([file.buffer], { type: file.mimetype });
+    formData.append('file', blob, file.originalname);
+
+    const response = await this.client.post(
+      '/v2/speech-to-text/transcribe',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+
+    return response.data;
   }
 
   async getStartMessage(userId: string): Promise<string> {

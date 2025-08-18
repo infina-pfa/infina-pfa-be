@@ -96,6 +96,10 @@ export class AiAdvisorServiceImpl extends AiAdvisorService {
     }
   }
 
+  async speechToText(file: Express.Multer.File): Promise<string> {
+    return (await this.aiInternalService.speechToText(file)).text;
+  }
+
   async getStartMessage(userId: string): Promise<string> {
     return this.aiInternalService.getStartMessage(userId);
   }

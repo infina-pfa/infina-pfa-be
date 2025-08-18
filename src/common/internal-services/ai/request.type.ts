@@ -20,6 +20,18 @@ export type AiStreamImage = {
   mime_type: string;
 };
 
+export type AiStreamSTTResponse = {
+  text: string;
+  provider: string;
+  language: string;
+  metadata: {
+    model: string;
+    processing_time: number;
+    fallback_used: boolean;
+    failed_providers?: string[];
+  };
+};
+
 export type AiStreamBody = {
   user_id: string;
   user_message: string;

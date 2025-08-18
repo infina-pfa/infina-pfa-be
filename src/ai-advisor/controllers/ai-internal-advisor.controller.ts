@@ -1,5 +1,6 @@
 import { CurrentUser } from '@/common/decorators';
 import { InternalServiceAuthGuard } from '@/common/guards';
+import { ImageValidationPipe } from '@/common/pipes';
 import { AuthUser } from '@/common/types';
 import {
   Body,
@@ -13,6 +14,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -34,11 +36,10 @@ import {
 import { ConversationDto } from './dto/conversation.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { MessageDto } from './dto/message.dto';
+import { SpeechToTextResponseDto } from './dto/speech-to-text.dto';
 import { StreamMessageDto } from './dto/stream-message.dto';
-import { UserFinancialActionDto } from './dto/user-financial-action.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadImageDto, UploadImageResponseDto } from './dto/upload-image.dto';
-import { ImageValidationPipe } from '@/common/pipes';
+import { UserFinancialActionDto } from './dto/user-financial-action.dto';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth('x-api-key')
@@ -209,5 +210,36 @@ export class AiInternalAdvisorController {
       file,
       userId,
     });
+  }
+
+  @Post('speech-to-text')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Convert speech to text' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Audio file to transcribe',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Audio successfully transcribed',
+    type: SpeechToTextResponseDto,
+  })
+  async speechToText(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<SpeechToTextResponseDto> {
+    const result = await this.aiAdvisorService.speechToText(file);
+    return {
+      text: result,
+    };
   }
 }

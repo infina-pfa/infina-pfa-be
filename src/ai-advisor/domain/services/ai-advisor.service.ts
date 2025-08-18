@@ -22,5 +22,12 @@ export abstract class AiAdvisorService {
     chunk: Buffer,
   ): void;
 
+  abstract speechToText(
+    file: Express.Multer.File,
+    provider?: string,
+    language?: string,
+    enableFallback?: boolean,
+  ): Promise<string>;
+
   abstract getStartMessage(userId: string): Promise<string>;
 }

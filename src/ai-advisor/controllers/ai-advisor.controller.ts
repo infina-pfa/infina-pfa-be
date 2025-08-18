@@ -39,6 +39,7 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { MessageDto } from './dto/message.dto';
 import { StreamMessageDto } from './dto/stream-message.dto';
 import { UploadImageDto, UploadImageResponseDto } from './dto/upload-image.dto';
+import { SpeechToTextResponseDto } from './dto/speech-to-text.dto';
 
 @ApiTags('AI Advisor')
 @ApiBearerAuth()
@@ -225,5 +226,36 @@ export class AiAdvisorController {
       file,
       userId: user.id,
     });
+  }
+
+  @Post('speech-to-text')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Convert speech to text' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Audio file to transcribe',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Audio successfully transcribed',
+    type: SpeechToTextResponseDto,
+  })
+  async speechToText(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<SpeechToTextResponseDto> {
+    const result = await this.aiAdvisorService.speechToText(file);
+    return {
+      text: result,
+    };
   }
 }
