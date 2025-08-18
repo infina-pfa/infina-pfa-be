@@ -16,7 +16,7 @@ export class CommonErrorFactory {
   static unauthorizedNoToken(): UnauthorizedException {
     return new UnauthorizedException({
       code: CommonErrorCode.UNAUTHORIZED_NO_TOKEN,
-      message: 'No token provided',
+      message: 'Unauthorized',
     });
   }
 
