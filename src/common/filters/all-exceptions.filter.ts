@@ -115,12 +115,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       userId,
       ip: request.ip,
       userAgent: request.headers['user-agent'],
-      stack: exception.stack,
-      metadata: {
-        body: this.logger.sanitizeBody(request.body as Record<string, any>),
-        query: request.query,
-        params: request.params,
-      },
+      stack: `[STACK] ${JSON.stringify(exception.stack)}`,
     });
 
     // Send error response
