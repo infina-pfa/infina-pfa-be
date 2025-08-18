@@ -1,6 +1,8 @@
+import { GoalType } from '@/goals/domain';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -45,6 +47,15 @@ export class CreateGoalDto {
   @IsDateString()
   @IsOptional()
   dueDate?: string;
+
+  @ApiProperty({
+    description: 'Type of the goal',
+    example: 'emergency',
+    required: false,
+  })
+  @IsEnum(GoalType)
+  @IsOptional()
+  type?: GoalType;
 }
 
 export class CreateGoalInternalDto extends CreateGoalDto {

@@ -1,4 +1,7 @@
-import { GoalEntity } from '../../../goals/domain/entities/goal.entity';
+import {
+  GoalEntity,
+  GoalType,
+} from '../../../goals/domain/entities/goal.entity';
 import { PrismaRepository } from './prisma.repository';
 import { PrismaClient } from '../prisma-client';
 import { GoalORM } from '@/common/types/orms';
@@ -27,6 +30,7 @@ export class GoalPrismaRepository
         ? new Decimal(props.targetAmount.value)
         : null,
       due_date: props.dueDate || null,
+      type: props.type,
       created_at: props.createdAt,
       updated_at: props.updatedAt,
       deleted_at: props.deletedAt || null,
@@ -43,6 +47,7 @@ export class GoalPrismaRepository
           ? new CurrencyVO(data.target_amount.toNumber())
           : undefined,
         dueDate: data.due_date || undefined,
+        type: data.type as GoalType,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
         deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,

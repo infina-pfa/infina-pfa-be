@@ -3,6 +3,7 @@ import {
   GoalEntity,
   GoalAggregateRepository,
   GoalErrorFactory,
+  GoalType,
 } from '@/goals/domain';
 import { GoalTransactionsWatchList } from '@/goals/domain/watch-list/goal-transactions.watch-list';
 import { CurrencyVO } from '@/common/base';
@@ -15,6 +16,7 @@ export interface CreateGoalUseCaseInput {
   description?: string;
   targetAmount?: number;
   dueDate?: Date;
+  type: GoalType;
 }
 
 @Injectable()
@@ -58,6 +60,7 @@ export class CreateGoalUseCase extends BaseUseCase<
         ? new CurrencyVO(input.targetAmount)
         : undefined,
       dueDate: input.dueDate,
+      type: input.type,
       deletedAt: null,
     });
 

@@ -2,6 +2,11 @@ import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
 import { GoalErrorFactory } from '../errors/goal-error.factory';
 
+export enum GoalType {
+  EMERGENCY = 'emergency',
+  GROWTH = 'growth',
+}
+
 export interface GoalEntityProps extends BaseProps {
   userId: string;
   title: string;
@@ -9,6 +14,7 @@ export interface GoalEntityProps extends BaseProps {
   targetAmount?: CurrencyVO;
   dueDate?: Date;
   deletedAt?: Date | null;
+  type: GoalType;
 }
 
 export class GoalEntity extends BaseEntity<GoalEntityProps> {

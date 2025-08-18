@@ -437,6 +437,7 @@ model goals {
   target_amount     Decimal?            @db.Decimal
   user_id           String              @db.Uuid
   deleted_at        DateTime?           @db.Timestamptz(6)
+  type              goal_type           @default(emergency)
   goal_transactions goal_transactions[]
   users             auth_users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -651,6 +652,14 @@ enum financial_stage {
 enum language {
   vi
   en
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum goal_type {
+  emergency
+  growth
 
   @@schema("public")
 }
