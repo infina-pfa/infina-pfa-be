@@ -348,6 +348,46 @@ interface UploadImageResponseDto {
 - `401 Unauthorized` - User not authenticated
 - `404 Not Found` - Conversation not found
 
+### 8. Speech to Text
+
+Converts audio speech to text for use in conversations.
+
+**Endpoint:** `POST /ai-advisor/speech-to-text`
+
+**Request:**
+- **Content-Type:** `multipart/form-data`
+- **Form Field:** `file` - Binary audio file
+
+**File Requirements:**
+- **Formats:** Common audio formats (MP3, WAV, M4A, etc.)
+- **Field Name:** `file`
+
+**Example cURL Request:**
+```bash
+curl -X POST \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "file=@/path/to/audio.mp3" \
+  http://localhost:3000/api/v1/ai-advisor/speech-to-text
+```
+
+**Response:** `200 OK`
+```typescript
+interface SpeechToTextResponseDto {
+  text: string;  // Transcribed text from audio
+}
+```
+
+**Example Response:**
+```json
+{
+  "text": "How can I create a budget for this month?"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid file type or processing error
+- `401 Unauthorized` - User not authenticated
+
 ## Usage Examples
 
 ### Example 1: Complete Conversation Flow
@@ -468,6 +508,37 @@ function streamAIResponse(conversationId, message, token) {
       sender: 'user'
     })
   });
+}
+```
+
+### Example 3: Speech to Text Integration
+
+```javascript
+async function transcribeAudio(audioFile, token) {
+  const formData = new FormData();
+  formData.append('file', audioFile);
+  
+  const response = await fetch('/api/v1/ai-advisor/speech-to-text', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  });
+  
+  const { text } = await response.json();
+  
+  // Use the transcribed text to send a message
+  return text;
+}
+
+// Complete flow with speech input
+async function handleVoiceMessage(audioBlob, conversationId, token) {
+  // 1. Convert speech to text
+  const transcribedText = await transcribeAudio(audioBlob, token);
+  
+  // 2. Send the transcribed text as a message
+  await streamAIResponse(conversationId, transcribedText, token);
 }
 ```
 
