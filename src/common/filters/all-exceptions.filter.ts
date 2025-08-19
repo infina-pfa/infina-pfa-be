@@ -59,14 +59,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof PrismaClientKnownRequestError) {
       errorResponse = {
         statusCode: HttpStatus.BAD_REQUEST,
-        message: this.getPrismaErrorMessage(exception),
-        code: exception.code,
-        error: exception.name,
+        message: 'Bad Request',
+        code: 'bad_request',
+        error: 'Bad Request',
         timestamp: new Date().toISOString(),
         path: request.url,
         correlationId,
       };
       status = HttpStatus.BAD_REQUEST;
+      this.logger.logStructured('error', 'Prisma Error', {
+        type: 'exception',
+        message: this.getPrismaErrorMessage(exception),
+        error: exception.name,
+        correlationId,
+      });
     }
 
     // Handle HTTP exceptions

@@ -36,6 +36,10 @@ export class SpendUseCase extends BaseUseCase<
       throw BudgetErrorFactory.budgetNotFound();
     }
 
+    if (budgetAggregate.userId !== input.userId) {
+      throw BudgetErrorFactory.budgetNotBelongToUser();
+    }
+
     budgetAggregate.spend({
       amount: new CurrencyVO(input.amount),
       name: input.name,

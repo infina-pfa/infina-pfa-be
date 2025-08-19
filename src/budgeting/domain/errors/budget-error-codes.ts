@@ -11,4 +11,7 @@ export enum BudgetErrorCode {
 
   // Budget already exists
   BUDGET_ALREADY_EXISTS = 'BUDGET_ALREADY_EXISTS',
+
+  // Budget not belong to user
+  BUDGET_NOT_BELONG_TO_USER = 'BUDGET_NOT_BELONG_TO_USER',
 }

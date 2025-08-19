@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { AppError } from '@/common/errors/base';
 import { BudgetErrorCode } from './budget-error-codes';
 
@@ -35,6 +39,13 @@ export class BudgetErrorFactory {
     return new ConflictException({
       code: BudgetErrorCode.BUDGET_ALREADY_EXISTS,
       message: 'Budget already exists',
+    });
+  }
+
+  static budgetNotBelongToUser(): ForbiddenException {
+    return new ForbiddenException({
+      code: BudgetErrorCode.BUDGET_NOT_BELONG_TO_USER,
+      message: 'Budget not belong to user',
     });
   }
 }
