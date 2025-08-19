@@ -130,10 +130,27 @@ export class AiInternalService {
     });
   }
 
-  async speechToText(file: Express.Multer.File): Promise<AiStreamSTTResponse> {
+  async speechToText(
+    file: Express.Multer.File,
+    options?: {
+      provider?: string;
+      language?: string;
+      enableFallback?: boolean;
+    },
+  ): Promise<AiStreamSTTResponse> {
     const formData = new FormData();
     const blob = new Blob([file.buffer], { type: file.mimetype });
     formData.append('file', blob, file.originalname);
+    formData.append('language', options?.language || 'vie');
+
+    // Add optional parameters
+    if (options?.provider !== undefined) {
+      formData.append('provider', options.provider);
+    }
+
+    if (options?.enableFallback !== undefined) {
+      formData.append('enable_fallback', options.enableFallback.toString());
+    }
 
     const response = await this.client.post(
       '/v2/speech-to-text/transcribe',
