@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   CreateBudgetProps,
+  GoalManagerService,
   OnboardingErrorFactory,
   OnboardingProfileRepository,
 } from '../domain';
@@ -25,6 +26,13 @@ const colorMaps = {
   utilities: '#FF33A1',
 };
 
+const nameMaps = {
+  food: 'Ăn uống',
+  rent: 'Nhà ở',
+  transport: 'Di chuyển',
+  utilities: 'Tiện ích',
+};
+
 @Injectable()
 export class CompleteOnboardingUseCase extends BaseUseCase<
   CompleteOnboardingUseCaseInput,
@@ -33,6 +41,7 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
   constructor(
     private readonly onboardingProfileRepository: OnboardingProfileRepository,
     private readonly budgetManagerService: BudgetManagerService,
+    private readonly goalManagerService: GoalManagerService,
   ) {
     super();
   }
@@ -41,6 +50,7 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
     const profile = await this.onboardingProfileRepository.findOne({
       userId: input.userId,
     });
+
     if (!profile) {
       throw OnboardingErrorFactory.profileNotFound();
     }
@@ -51,6 +61,7 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
 
     const emergencyFundGoal = profile.metadata.goalDetails?.amount;
     const pyfAmount = profile.metadata.goalDetails?.monthlyTarget;
+    const timeFrame = profile.metadata.goalDetails?.timeframe;
 
     if (!emergencyFundGoal) {
       throw OnboardingErrorFactory.notFoundInformation('Emergency fund goal');
@@ -59,17 +70,17 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
     const income = emergencyFundGoal / 3;
     const budgets = profile.metadata.expenseBreakdown;
 
-    const budgetProps: CreateBudgetProps[] = Object.entries(budgets).map(
-      ([name, amount]) => ({
-        name,
+    const budgetProps: CreateBudgetProps[] = Object.entries(budgets)
+      .filter(([, amount]) => amount > 0)
+      .map(([name, amount]) => ({
+        name: nameMaps[name as keyof typeof nameMaps] || name,
         amount: new CurrencyVO(amount),
         category: 'fixed',
         icon: iconMaps[name as keyof typeof iconMaps] || 'wallet',
         color: colorMaps[name as keyof typeof colorMaps] || '#FF33A1',
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
-      }),
-    );
+      }));
     budgetProps.push({
       name: 'Thoải mái chi tiêu',
       amount: new CurrencyVO(
@@ -94,7 +105,12 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
       pyfAmount: new CurrencyVO(pyfAmount),
     });
 
-    await this.onboardingProfileRepository.update(profile);
     await this.budgetManagerService.createBudgets(input.userId, budgetProps);
+    await this.goalManagerService.createEmergencyFundGoal(
+      input.userId,
+      new Date(Date.now() + timeFrame * 30 * 24 * 60 * 60 * 1000),
+      new CurrencyVO(emergencyFundGoal),
+    );
+    await this.onboardingProfileRepository.update(profile);
   }
 }

@@ -11,6 +11,7 @@ export type Metadata = {
   goalDetails: {
     amount: number;
     monthlyTarget: number;
+    timeframe: number;
   };
   expenseBreakdown: Record<string, number>;
 };

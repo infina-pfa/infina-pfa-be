@@ -3,10 +3,12 @@ import {
   OnboardingAiAdvisorService,
   UserFinancialInfoService,
 } from '@/onboarding/domain';
+import { GoalManagerService } from '@/onboarding/domain/services';
 import { Provider } from '@nestjs/common';
+import { BudgetManagerServiceImpl } from './budget-manager.service';
+import { GoalManagerServiceImpl } from './goal-manager.service';
 import { OnboardingAiAdvisorServiceImpl } from './onboarding-ai-advisor.service';
 import { UserFinancialInfoServiceImpl } from './user-financial-info.service';
-import { BudgetManagerServiceImpl } from './budget-manager.service';
 
 export const services: Provider[] = [
   {
@@ -20,5 +22,9 @@ export const services: Provider[] = [
   {
     provide: BudgetManagerService,
     useClass: BudgetManagerServiceImpl,
+  },
+  {
+    provide: GoalManagerService,
+    useClass: GoalManagerServiceImpl,
   },
 ];
