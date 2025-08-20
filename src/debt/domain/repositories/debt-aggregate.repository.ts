@@ -12,4 +12,5 @@ export abstract class DebtAggregateRepository {
     props: Partial<Readonly<DebtEntityProps>>,
     options?: FindManyOptions,
   ): Promise<DebtAggregate[]>;
+  abstract delete(debtAggregate: DebtAggregate): Promise<void>;
 }

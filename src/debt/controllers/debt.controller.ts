@@ -24,6 +24,7 @@ import {
   GetDebtsUseCase,
   PayDebtUseCase,
   RemoveDebtPaymentUseCase,
+  RemoveDebtUseCase,
   UpdateDebtUseCase,
 } from '../use-cases';
 import {
@@ -46,6 +47,7 @@ export class DebtController {
     private readonly updateDebtUseCase: UpdateDebtUseCase,
     private readonly payDebtUseCase: PayDebtUseCase,
     private readonly removeDebtPaymentUseCase: RemoveDebtPaymentUseCase,
+    private readonly removeDebtUseCase: RemoveDebtUseCase,
   ) {}
 
   @Post()
@@ -182,6 +184,23 @@ export class DebtController {
       userId: user.id,
       debtId: id,
       debtPaymentId: paymentId,
+    });
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remove a debt' })
+  @ApiParam({ name: 'id', description: 'Debt ID' })
+  @ApiResponse({ status: 200, description: 'Debt removed successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Access denied to debt' })
+  @ApiResponse({ status: 404, description: 'Debt not found' })
+  async removeDebt(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.removeDebtUseCase.execute({
+      userId: user.id,
+      debtId: id,
     });
   }
 }

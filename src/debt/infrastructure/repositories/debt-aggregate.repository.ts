@@ -167,4 +167,30 @@ export class DebtAggregateRepositoryImpl implements DebtAggregateRepository {
       }),
     );
   }
+
+  async delete(debtAggregate: DebtAggregate): Promise<void> {
+    const debtORM = this.debtRepository.toORM(
+      debtAggregate.props.debt,
+    ) as DebtORM;
+    const payments = debtAggregate.props.payments.items;
+
+    await this.prismaClient.$transaction(async (tx) => {
+      await tx.debts.delete({
+        where: { id: debtORM.id },
+      });
+
+      await tx.debt_transactions.deleteMany({
+        where: {
+          debt_id: debtORM.id,
+          transaction_id: {
+            in: payments.map((p) => p.id),
+          },
+        },
+      });
+
+      await tx.transactions.deleteMany({
+        where: { id: { in: payments.map((p) => p.id) } },
+      });
+    });
+  }
 }
