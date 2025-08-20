@@ -23,7 +23,8 @@
       "@/user/*": ["src/user/*"],
       "@/goals/*": ["src/goals/*"],
       "@/onboarding/*": ["src/onboarding/*"],
-      "@/ai-advisor/*": ["src/ai-advisor/*"]
+      "@/ai-advisor/*": ["src/ai-advisor/*"],
+      "@/debt/*": ["src/debt/*"]
     }
   }
 }
