@@ -1,9 +1,7 @@
 import { BudgetCategory, BudgetEntity } from '@/budgeting/domain';
-import {
-  TransactionEntity,
-  TransactionType,
-} from '@/budgeting/domain/entities/transactions.entity';
+import { TransactionEntity } from '@/budgeting/domain/entities/transactions.entity';
 import { BaseDto } from '@/common/base';
+import { TransactionType } from '@/common/types/transaction';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BudgetDto extends BaseDto {

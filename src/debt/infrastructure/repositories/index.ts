@@ -1,7 +1,12 @@
+import {
+  DebtAggregateRepository,
+  DebtPaymentRepository,
+  DebtRepository,
+} from '@/debt/domain';
 import { Provider } from '@nestjs/common';
-import { DebtRepositoryImpl } from './debt.repository';
+import { DebtAggregateRepositoryImpl } from './debt-aggregate.repository';
 import { DebtPaymentRepositoryImpl } from './debt-payment.repository';
-import { DebtPaymentRepository, DebtRepository } from '@/debt/domain';
+import { DebtRepositoryImpl } from './debt.repository';
 
 export const repositories: Provider[] = [
   {
@@ -11,5 +16,9 @@ export const repositories: Provider[] = [
   {
     provide: DebtPaymentRepository,
     useClass: DebtPaymentRepositoryImpl,
+  },
+  {
+    provide: DebtAggregateRepository,
+    useClass: DebtAggregateRepositoryImpl,
   },
 ];
