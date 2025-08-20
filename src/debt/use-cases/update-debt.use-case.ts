@@ -6,10 +6,10 @@ import { DebtErrorFactory } from '../domain/errors/error.factory';
 export interface UpdateDebtUseCaseInput {
   userId: string;
   debtId: string;
-  lender: string;
-  purpose: string;
-  rate: number;
-  dueDate: Date;
+  lender?: string;
+  purpose?: string;
+  rate?: number;
+  dueDate?: Date;
 }
 
 @Injectable()

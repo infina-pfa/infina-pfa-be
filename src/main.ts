@@ -18,6 +18,7 @@ import {
 } from './onboarding/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
+import { DebtModule } from './debt/modules/debt.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -57,6 +58,7 @@ async function bootstrap() {
         GoalModule,
         OnboardingModule,
         AiAdvisorModule,
+        DebtModule,
       ],
     });
   SwaggerModule.setup('api', app, documentFactory);

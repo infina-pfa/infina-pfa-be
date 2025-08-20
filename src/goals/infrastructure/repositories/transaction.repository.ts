@@ -8,7 +8,7 @@ export class TransactionRepositoryImpl
   extends TransactionPrismaRepository
   implements TransactionRepository
 {
-  constructor(private readonly prismaClient: PrismaClient) {
-    super(prismaClient.transactions);
+  constructor(prismaClient: PrismaClient) {
+    super(prismaClient);
   }
 }
