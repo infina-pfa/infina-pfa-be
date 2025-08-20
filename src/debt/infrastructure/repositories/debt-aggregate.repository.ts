@@ -1,4 +1,5 @@
 import { PrismaClient } from '@/common/prisma';
+import { FindManyOptions } from '@/common/types';
 import { DebtORM, TransactionORM } from '@/common/types/orms';
 import {
   DebtAggregate,
@@ -56,11 +57,22 @@ export class DebtAggregateRepositoryImpl implements DebtAggregateRepository {
         ),
       });
 
-      await tx.transactions.deleteMany({
-        where: {
-          id: { in: entity.props.payments.removedItems.map((p) => p.id) },
-        },
-      });
+      if (entity.props.payments.removedItems.length > 0) {
+        await tx.debt_transactions.deleteMany({
+          where: {
+            debt_id: entity.id,
+            transaction_id: {
+              in: entity.props.payments.removedItems.map((p) => p.id),
+            },
+          },
+        });
+
+        await tx.transactions.deleteMany({
+          where: {
+            id: { in: entity.props.payments.removedItems.map((p) => p.id) },
+          },
+        });
+      }
 
       await tx.transactions.updateMany({
         where: {
@@ -120,5 +132,39 @@ export class DebtAggregateRepositoryImpl implements DebtAggregateRepository {
         (transaction) => transaction.transactions,
       ),
     });
+  }
+
+  async findMany(
+    props: Partial<Readonly<DebtEntityProps>>,
+    options?: FindManyOptions,
+  ): Promise<DebtAggregate[]> {
+    const debtORMs = await this.prismaClient.debts.findMany({
+      where: {
+        user_id: props.userId,
+        lender: props.lender,
+        purpose: props.purpose,
+        rate: props.rate,
+        due_date: props.dueDate,
+        deleted_at: null,
+      },
+      include: {
+        debt_transactions: { include: { transactions: true } },
+      },
+      take: options?.pagination?.limit,
+      skip: options?.pagination?.page,
+      orderBy: options?.sort?.map((sort) => ({
+        [sort.field]: sort.direction,
+      })),
+    });
+
+    return debtORMs.map((debtORM) =>
+      this.toEntity({
+        id: debtORM.id,
+        debt: debtORM,
+        payments: debtORM.debt_transactions.map(
+          (transaction) => transaction.transactions,
+        ),
+      }),
+    );
   }
 }

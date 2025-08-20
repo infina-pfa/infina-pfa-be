@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { repositories } from '../infrastructure/repositories';
-
+import { useCases } from '../use-cases';
 @Module({
-  imports: [],
-  providers: [...repositories],
-  exports: [...repositories],
+  providers: [...repositories, ...useCases],
 })
 export class DebtModule {}

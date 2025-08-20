@@ -1,0 +1,4 @@
+export enum DebtErrorCodes {
+  DEBT_NOT_FOUND = 'DEBT_NOT_FOUND',
+  FORBIDDEN_DEBT = 'FORBIDDEN_DEBT',
+}

@@ -52,7 +52,7 @@ export class DebtAggregate extends BaseEntity<DebtAggregateProps & BaseProps> {
     return this.props.debt.rate;
   }
 
-  public create(
+  public static newDebt(
     userId: string,
     props: {
       amount: CurrencyVO;
@@ -62,10 +62,15 @@ export class DebtAggregate extends BaseEntity<DebtAggregateProps & BaseProps> {
       dueDate: Date;
       currentPaidAmount: CurrencyVO;
     },
-  ): void {
+  ): DebtAggregate {
     const debt = DebtEntity.create({
       userId,
       ...props,
+    });
+
+    const debtAggregate = DebtAggregate.create({
+      debt,
+      payments: new DebtPaymentWatchList([]),
     });
 
     if (props.currentPaidAmount.value > 0) {
@@ -73,16 +78,36 @@ export class DebtAggregate extends BaseEntity<DebtAggregateProps & BaseProps> {
         userId,
         amount: props.currentPaidAmount,
         recurring: 0,
-        name: 'Đã trả',
+        name: 'Nợ đã trả',
         description: 'Đã trả số tiền nợ',
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-
-      this.props.payments.add(payment);
+      debtAggregate.payments.add(payment);
     }
 
-    this._props.debt = debt;
-    this.updated();
+    return debtAggregate;
+  }
+
+  public pay(amount: CurrencyVO, name?: string, description?: string): void {
+    this._props.payments.add(
+      DebtPaymentEntity.create({
+        userId: this.userId,
+        amount,
+        name: `Trả nợ cho ${this._props.debt.lender}`,
+        description,
+        recurring: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    );
+  }
+
+  public removePayment(debtPaymentId: string): void {
+    this._props.payments.remove(
+      this._props.payments.items.find(
+        (payment) => payment.id === debtPaymentId,
+      )!,
+    );
   }
 }

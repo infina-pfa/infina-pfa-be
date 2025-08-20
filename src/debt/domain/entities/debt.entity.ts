@@ -79,4 +79,8 @@ export class DebtEntity extends BaseEntity<DebtEntityProps> {
   public get dueDate(): Date {
     return this.props.dueDate;
   }
+
+  public get lender(): string {
+    return this.props.lender;
+  }
 }

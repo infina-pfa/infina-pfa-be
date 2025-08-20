@@ -7,7 +7,7 @@ export interface DebtPaymentEntityProps extends BaseProps {
   amount: CurrencyVO;
   recurring: number;
   name: string;
-  description: string;
+  description?: string;
   type: TransactionType;
   deletedAt?: Date | null;
 }

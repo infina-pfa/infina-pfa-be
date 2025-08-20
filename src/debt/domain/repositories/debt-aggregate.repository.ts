@@ -1,3 +1,4 @@
+import { FindManyOptions } from '@/common/types';
 import { DebtAggregate } from '../aggregates/debt.aggregate';
 import { DebtEntityProps } from '../entities';
 
@@ -7,4 +8,8 @@ export abstract class DebtAggregateRepository {
   abstract findOne(
     props: Partial<Readonly<DebtEntityProps>>,
   ): Promise<DebtAggregate | null>;
+  abstract findMany(
+    props: Partial<Readonly<DebtEntityProps>>,
+    options?: FindManyOptions,
+  ): Promise<DebtAggregate[]>;
 }
