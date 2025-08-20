@@ -68,7 +68,7 @@ export class DebtInternalController {
       currentPaidAmount: createDebtDto.currentPaidAmount ?? 0,
     });
 
-    return DebtResponseDto.fromAggregate(debt);
+    return DebtResponseDto.fromAggregate(debt, true);
   }
 
   @Get()
@@ -82,7 +82,7 @@ export class DebtInternalController {
   async getDebts(@Query('userId') userId: string): Promise<DebtResponseDto[]> {
     const debts = await this.getDebtsUseCase.execute({ userId });
 
-    return debts.map((debt) => DebtResponseDto.fromAggregate(debt));
+    return debts.map((debt) => DebtResponseDto.fromAggregate(debt, true));
   }
 
   @Get(':id')

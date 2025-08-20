@@ -24,12 +24,12 @@ export class GetDebtUseCase extends BaseUseCase<
       input.debtId,
     );
 
-    if (debtAggregate?.userId !== input.userId) {
-      throw DebtErrorFactory.forbiddenDebt();
-    }
-
     if (!debtAggregate) {
       throw DebtErrorFactory.debtNotFound();
+    }
+
+    if (debtAggregate?.userId !== input.userId) {
+      throw DebtErrorFactory.forbiddenDebt();
     }
 
     return debtAggregate;

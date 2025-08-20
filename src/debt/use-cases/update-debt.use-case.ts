@@ -24,6 +24,10 @@ export class UpdateDebtUseCase extends BaseUseCase<
   async execute(input: UpdateDebtUseCaseInput): Promise<DebtEntity> {
     const debt = await this.debtRepository.findById(input.debtId);
 
+    if (!debt) {
+      throw DebtErrorFactory.debtNotFound();
+    }
+
     if (debt?.userId !== input.userId) {
       throw DebtErrorFactory.forbiddenDebt();
     }

@@ -125,7 +125,7 @@ export class PaymentResponseDto {
 
   static fromEntity(
     payment: DebtPaymentEntity,
-    debt: DebtEntity,
+    debt?: DebtEntity,
   ): PaymentResponseDto {
     const dto = new PaymentResponseDto();
     dto.id = payment.id;
@@ -136,7 +136,9 @@ export class PaymentResponseDto {
     dto.recurring = payment.props.recurring;
     dto.createdAt = payment.props.createdAt;
     dto.updatedAt = payment.props.updatedAt;
-    dto.debt = debt ? DebtDto.fromEntity(debt) : new DebtDto();
+    if (debt) {
+      dto.debt = DebtDto.fromEntity(debt);
+    }
     return dto;
   }
 }
@@ -222,7 +224,7 @@ export class DebtResponseDto extends BaseDto {
 
     if (includePayments) {
       dto.payments = aggregate.payments.items.map((payment) =>
-        PaymentResponseDto.fromEntity(payment, debt),
+        PaymentResponseDto.fromEntity(payment),
       );
     }
 

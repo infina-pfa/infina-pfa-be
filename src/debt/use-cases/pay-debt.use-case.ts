@@ -27,12 +27,12 @@ export class PayDebtUseCase extends BaseUseCase<
       input.debtId,
     );
 
-    if (debtAggregate?.userId !== input.userId) {
-      throw DebtErrorFactory.forbiddenDebt();
-    }
-
     if (!debtAggregate) {
       throw DebtErrorFactory.debtNotFound();
+    }
+
+    if (debtAggregate?.userId !== input.userId) {
+      throw DebtErrorFactory.forbiddenDebt();
     }
 
     debtAggregate.pay(

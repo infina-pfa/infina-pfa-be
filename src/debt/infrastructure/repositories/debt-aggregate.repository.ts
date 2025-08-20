@@ -51,11 +51,21 @@ export class DebtAggregateRepositoryImpl implements DebtAggregateRepository {
         },
       });
 
-      await tx.transactions.createMany({
-        data: entity.props.payments.addedItems.map(
-          (p) => this.debtPaymentRepository.toORM(p) as TransactionORM,
-        ),
-      });
+      if (entity.props.payments.addedItems.length > 0) {
+        await tx.transactions.createMany({
+          data: entity.props.payments.addedItems.map(
+            (p) => this.debtPaymentRepository.toORM(p) as TransactionORM,
+          ),
+        });
+
+        await tx.debt_transactions.createMany({
+          data: entity.props.payments.addedItems.map((p) => ({
+            debt_id: entity.props.debt.id,
+            transaction_id: p.id,
+            user_id: entity.props.debt.userId,
+          })),
+        });
+      }
 
       if (entity.props.payments.removedItems.length > 0) {
         await tx.debt_transactions.deleteMany({
@@ -145,10 +155,12 @@ export class DebtAggregateRepositoryImpl implements DebtAggregateRepository {
         purpose: props.purpose,
         rate: props.rate,
         due_date: props.dueDate,
-        deleted_at: null,
       },
       include: {
-        debt_transactions: { include: { transactions: true } },
+        debt_transactions: {
+          include: { transactions: true },
+          where: { transactions: { deleted_at: null } },
+        },
       },
       take: options?.pagination?.limit,
       skip: options?.pagination?.page,

@@ -41,25 +41,10 @@ export class DebtEntity extends BaseEntity<DebtEntityProps> {
       Omit<DebtEntityProps, 'createdAt' | 'updatedAt' | 'userId' | 'deletedAt'>
     >,
   ): void {
-    if (props.amount) {
-      this._props.amount = new CurrencyVO(props.amount.value);
-    }
-
-    if (props.lender) {
-      this._props.lender = props.lender;
-    }
-
-    if (props.purpose) {
-      this._props.purpose = props.purpose;
-    }
-
-    if (props.rate) {
-      this._props.rate = props.rate;
-    }
-
-    if (props.dueDate) {
-      this._props.dueDate = props.dueDate;
-    }
+    this._props = {
+      ...this._props,
+      ...props,
+    };
 
     this.updated();
   }

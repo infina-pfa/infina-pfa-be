@@ -83,7 +83,7 @@ export class DebtController {
   async getDebts(@CurrentUser() user: AuthUser): Promise<DebtResponseDto[]> {
     const debts = await this.getDebtsUseCase.execute({ userId: user.id });
 
-    return debts.map((debt) => DebtResponseDto.fromAggregate(debt));
+    return debts.map((debt) => DebtResponseDto.fromAggregate(debt, true));
   }
 
   @Get(':id')

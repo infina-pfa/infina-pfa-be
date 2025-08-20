@@ -22,15 +22,15 @@ export class RemoveDebtPaymentUseCase extends BaseUseCase<
 
   async execute(input: RemoveDebtPaymentUseCaseInput): Promise<void> {
     const debtAggregate = await this.debtAggregateRepository.findById(
-      input.debtPaymentId,
+      input.debtId,
     );
-
-    if (debtAggregate?.userId !== input.userId) {
-      throw DebtErrorFactory.forbiddenDebt();
-    }
 
     if (!debtAggregate) {
       throw DebtErrorFactory.debtNotFound();
+    }
+
+    if (debtAggregate?.userId !== input.userId) {
+      throw DebtErrorFactory.forbiddenDebt();
     }
 
     debtAggregate.removePayment(input.debtPaymentId);
