@@ -1,6 +1,4 @@
-import { CurrentUser } from '@/common/decorators';
-import { SupabaseAuthGuard } from '@/common/guards';
-import { AuthUser } from '@/common/types';
+import { InternalServiceAuthGuard } from '@/common/guards';
 import {
   Body,
   Controller,
@@ -9,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -35,10 +34,10 @@ import {
 } from './dto';
 
 @ApiTags('Debts')
-@ApiBearerAuth()
-@Controller('debts')
-@UseGuards(SupabaseAuthGuard)
-export class DebtController {
+@ApiBearerAuth('x-api-key')
+@Controller('/internal/debts')
+@UseGuards(InternalServiceAuthGuard)
+export class DebtInternalController {
   constructor(
     private readonly createDebtUseCase: CreateDebtUseCase,
     private readonly getDebtsUseCase: GetDebtsUseCase,
@@ -59,11 +58,11 @@ export class DebtController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createDebt(
     @Body() createDebtDto: CreateDebtDto,
-    @CurrentUser() user: AuthUser,
+    @Query('userId') userId: string,
   ): Promise<DebtResponseDto> {
     const debt = await this.createDebtUseCase.execute({
       ...createDebtDto,
-      userId: user.id,
+      userId,
       currentPaidAmount: createDebtDto.currentPaidAmount ?? 0,
     });
 
@@ -78,8 +77,8 @@ export class DebtController {
     type: [DebtResponseDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getDebts(@CurrentUser() user: AuthUser): Promise<DebtResponseDto[]> {
-    const debts = await this.getDebtsUseCase.execute({ userId: user.id });
+  async getDebts(@Query('userId') userId: string): Promise<DebtResponseDto[]> {
+    const debts = await this.getDebtsUseCase.execute({ userId });
 
     return debts.map((debt) => DebtResponseDto.fromAggregate(debt));
   }
@@ -98,11 +97,11 @@ export class DebtController {
   @ApiResponse({ status: 404, description: 'Debt not found' })
   async getDebtDetail(
     @Param('id') id: string,
-    @CurrentUser() user: AuthUser,
+    @Query('userId') userId: string,
   ): Promise<DebtResponseDto> {
     const debt = await this.getDebtUseCase.execute({
       debtId: id,
-      userId: user.id,
+      userId,
     });
 
     return DebtResponseDto.fromAggregate(debt, true);
@@ -123,11 +122,11 @@ export class DebtController {
   async updateDebt(
     @Param('id') id: string,
     @Body() updateDebtDto: UpdateDebtDto,
-    @CurrentUser() user: AuthUser,
+    @Query('userId') userId: string,
   ): Promise<DebtDto> {
     const debt = await this.updateDebtUseCase.execute({
       debtId: id,
-      userId: user.id,
+      userId,
       lender: updateDebtDto.lender,
       purpose: updateDebtDto.purpose,
       rate: updateDebtDto.rate,
@@ -152,11 +151,11 @@ export class DebtController {
   async payDebt(
     @Param('id') id: string,
     @Body() payDebtDto: PayDebtDto,
-    @CurrentUser() user: AuthUser,
+    @Query('userId') userId: string,
   ): Promise<DebtResponseDto> {
     const debt = await this.payDebtUseCase.execute({
       debtId: id,
-      userId: user.id,
+      userId,
       amount: payDebtDto.amount,
       name: payDebtDto.name,
       description: payDebtDto.description,
@@ -176,10 +175,10 @@ export class DebtController {
   async removeDebtPayment(
     @Param('id') id: string,
     @Param('paymentId') paymentId: string,
-    @CurrentUser() user: AuthUser,
+    @Query('userId') userId: string,
   ): Promise<void> {
     await this.removeDebtPaymentUseCase.execute({
-      userId: user.id,
+      userId,
       debtId: id,
       debtPaymentId: paymentId,
     });

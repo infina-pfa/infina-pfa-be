@@ -11,6 +11,8 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggerService } from './common/logger/logger.service';
+import { DebtInternalModule } from './debt/modules/debt-internal.module';
+import { DebtModule } from './debt/modules/debt.module';
 import { GoalInternalModule, GoalModule } from './goals/module';
 import {
   OnboardingInternalModule,
@@ -18,7 +20,6 @@ import {
 } from './onboarding/module';
 import { UserInternalModule } from './user';
 import { UserModule } from './user/module/user.module';
-import { DebtModule } from './debt/modules/debt.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -86,6 +87,7 @@ async function bootstrap() {
         GoalInternalModule,
         OnboardingInternalModule,
         AiAdvisorInternalModule,
+        DebtInternalModule,
       ],
     });
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);
