@@ -1,11 +1,8 @@
-import {
-  IncomeAggregate,
-  IncomeRepository,
-  TransactionType,
-} from '@/budgeting/domain';
+import { IncomeAggregate, IncomeRepository } from '@/budgeting/domain';
 import { TransactionsWatchList } from '@/budgeting/domain/watch-list/transactions.watch-list';
 import { TransactionPrismaRepository } from '@/common/prisma';
 import { PrismaClient } from '@/common/prisma/prisma-client';
+import { TransactionType } from '@/common/types/transaction';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -13,8 +10,8 @@ export class IncomeRepositoryImpl
   extends TransactionPrismaRepository
   implements IncomeRepository
 {
-  constructor(private readonly prismaClient: PrismaClient) {
-    super(prismaClient.transactions);
+  constructor(protected readonly prismaClient: PrismaClient) {
+    super(prismaClient);
   }
 
   async add(income: IncomeAggregate): Promise<void> {

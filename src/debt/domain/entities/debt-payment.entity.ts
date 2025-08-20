@@ -1,9 +1,8 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProp } from '@/common/utils/type';
-import { BudgetErrorFactory } from '../errors/budget-error.factory';
 import { TransactionType } from '@/common/types/transaction';
 
-export interface TransactionEntityProps extends BaseProps {
+export interface DebtPaymentEntityProps extends BaseProps {
   userId: string;
   amount: CurrencyVO;
   recurring: number;
@@ -13,18 +12,19 @@ export interface TransactionEntityProps extends BaseProps {
   deletedAt?: Date | null;
 }
 
-export class TransactionEntity extends BaseEntity<TransactionEntityProps> {
+export class DebtPaymentEntity extends BaseEntity<DebtPaymentEntityProps> {
   public static create(
     props: OptionalProp<
-      TransactionEntityProps,
+      Omit<DebtPaymentEntityProps, 'type'>,
       'createdAt' | 'updatedAt' | 'deletedAt'
     >,
     id?: string,
-  ): TransactionEntity {
-    return new TransactionEntity(
+  ): DebtPaymentEntity {
+    return new DebtPaymentEntity(
       {
         ...props,
         deletedAt: props.deletedAt ?? null,
+        type: TransactionType.DEBT_PAYMENT,
       },
       id,
     );
@@ -32,7 +32,7 @@ export class TransactionEntity extends BaseEntity<TransactionEntityProps> {
 
   public validate(): void {
     if (this.props.amount.value <= 0) {
-      throw BudgetErrorFactory.budgetInvalidAmount();
+      throw new Error('Invalid amount');
     }
   }
 
