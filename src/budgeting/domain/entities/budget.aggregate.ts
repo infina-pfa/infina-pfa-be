@@ -1,7 +1,8 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { TransactionsWatchList } from '../watch-list/transactions.watch-list';
 import { BudgetEntity } from './budget.entity';
-import { TransactionEntity, TransactionType } from './transactions.entity';
+import { TransactionEntity } from './transactions.entity';
+import { TransactionType } from '@/common/types/transaction';
 
 export interface BudgetAggregateProps {
   budget: BudgetEntity;

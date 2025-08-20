@@ -11,6 +11,8 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { LoggerService } from './common/logger/logger.service';
+import { DebtInternalModule } from './debt/modules/debt-internal.module';
+import { DebtModule } from './debt/modules/debt.module';
 import { GoalInternalModule, GoalModule } from './goals/module';
 import {
   OnboardingInternalModule,
@@ -57,6 +59,7 @@ async function bootstrap() {
         GoalModule,
         OnboardingModule,
         AiAdvisorModule,
+        DebtModule,
       ],
     });
   SwaggerModule.setup('api', app, documentFactory);
@@ -84,6 +87,7 @@ async function bootstrap() {
         GoalInternalModule,
         OnboardingInternalModule,
         AiAdvisorInternalModule,
+        DebtInternalModule,
       ],
     });
   SwaggerModule.setup('api-internal', app, internalDocumentFactory);

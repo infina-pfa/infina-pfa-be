@@ -57,7 +57,6 @@ export class GoalAggregateRepositoryImpl implements GoalAggregateRepository {
         },
         update: {
           ...goalORM.goal,
-          updated_at: new Date(),
         },
       });
 

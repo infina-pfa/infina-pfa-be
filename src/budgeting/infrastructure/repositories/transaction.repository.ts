@@ -3,10 +3,10 @@ import {
   BudgetTransaction,
   TransactionEntity,
   TransactionRepository,
-  TransactionType,
 } from '@/budgeting/domain';
 import { TransactionPrismaRepository } from '@/common/prisma';
 import { PrismaClient } from '@/common/prisma/prisma-client';
+import { TransactionType } from '@/common/types/transaction';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -15,10 +15,10 @@ export class TransactionRepositoryImpl
   implements TransactionRepository
 {
   constructor(
-    private readonly prismaClient: PrismaClient,
+    protected readonly prismaClient: PrismaClient,
     private readonly budgetRepository: BudgetRepository,
   ) {
-    super(prismaClient.transactions);
+    super(prismaClient);
   }
 
   override async delete(entity: TransactionEntity): Promise<void> {
@@ -49,7 +49,7 @@ export class TransactionRepositoryImpl
     const budgetTransactions = await this.prismaClient.transactions.findMany({
       where: {
         user_id: userId,
-        type: TransactionType.BUDGET_SPENDING, // Only spending transactions
+        type: TransactionType.BUDGET_SPENDING,
         created_at: {
           gte: new Date(year, month - 1, 1), // Start of the month
           lte: new Date(year, month, 0), // End of the month

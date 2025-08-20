@@ -323,6 +323,8 @@ model auth_users {
   budget_transactions         budget_transactions[]
   budgets                     budgets[]
   conversations               conversations[]
+  debt_transactions           debt_transactions[]
+  debts                       debts[]
   goal_transactions           goal_transactions[]
   goals                       goals[]
   messages                    messages[]
@@ -506,6 +508,7 @@ model transactions {
   user_id             String?               @db.Uuid
   deleted_at          DateTime?             @db.Timestamptz(6)
   budget_transactions budget_transactions[]
+  debt_transactions   debt_transactions[]
   goal_transactions   goal_transactions[]
   users               auth_users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -551,6 +554,42 @@ model onboarding_messages {
   @@index([created_at(sort: Desc)], map: "idx_onboarding_messages_created_at")
   @@index([user_id, created_at(sort: Desc)], map: "idx_onboarding_messages_user_created")
   @@index([user_id], map: "idx_onboarding_messages_user_id")
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model debt_transactions {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime     @default(now()) @db.Timestamptz(6)
+  user_id        String       @db.Uuid
+  debt_id        String       @db.Uuid
+  transaction_id String       @db.Uuid
+  deleted_at     DateTime?    @db.Timestamptz(6)
+  debts          debts        @relation(fields: [debt_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactions   transactions @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users          auth_users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model debts {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime            @default(now()) @db.Timestamptz(6)
+  user_id           String              @db.Uuid
+  lender            String
+  purpose           String
+  amount            Decimal             @db.Decimal
+  deleted_at        DateTime?           @db.Timestamptz(6)
+  rate              Decimal             @db.Decimal
+  due_date          DateTime            @db.Timestamptz(6)
+  debt_transactions debt_transactions[]
+  users             auth_users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@schema("public")
 }
 
@@ -626,6 +665,7 @@ enum transaction_type {
   budget_spending
   goal_contribution
   goal_withdrawal
+  debt_payment
 
   @@schema("public")
 }

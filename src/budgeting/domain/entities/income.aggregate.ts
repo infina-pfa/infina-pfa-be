@@ -1,6 +1,7 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
+import { TransactionType } from '@/common/types/transaction';
 import { TransactionsWatchList } from '../watch-list/transactions.watch-list';
-import { TransactionEntity, TransactionType } from '../..';
+import { TransactionEntity } from './transactions.entity';
 
 export interface IncomeProps extends BaseProps {
   userId: string;

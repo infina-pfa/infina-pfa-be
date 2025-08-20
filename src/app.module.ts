@@ -17,6 +17,8 @@ import { AiAdvisorInternalModule } from './ai-advisor/module/ai-advisor-internal
 import { LoggerModule } from './common/logger/logger.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { DebtModule } from './debt/modules/debt.module';
+import { DebtInternalModule } from './debt/modules/debt-internal.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     BudgetingInternalModule,
     GoalInternalModule,
     OnboardingInternalModule,
+    DebtModule,
+    DebtInternalModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,11 +1,9 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
-import {
-  TransactionEntity,
-  TransactionType,
-} from '@/budgeting/domain/entities/transactions.entity';
+import { TransactionEntity } from '@/budgeting/domain/entities/transactions.entity';
 import { GoalTransactionsWatchList } from '../watch-list/goal-transactions.watch-list';
 import { GoalEntity } from './goal.entity';
 import { GoalErrorFactory } from '../errors/goal-error.factory';
+import { TransactionType } from '@/common/types/transaction';
 
 export interface GoalAggregateProps {
   goal: GoalEntity;

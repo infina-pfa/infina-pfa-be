@@ -7,6 +7,8 @@ import {
   onboarding_messages,
   conversations,
   messages,
+  debts,
+  transaction_type,
 } from '../../../generated/prisma';
 
 export type BudgetORM = budgets;
@@ -17,3 +19,6 @@ export type OnboardingProfileORM = onboarding_profiles;
 export type OnboardingMessageORM = onboarding_messages;
 export type ConversationORM = conversations;
 export type MessageORM = messages;
+export type DebtORM = debts;
+
+export type TransactionTypeORM = transaction_type;
