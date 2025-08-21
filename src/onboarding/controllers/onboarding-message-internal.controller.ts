@@ -1,5 +1,5 @@
 import { InternalServiceAuthGuard } from '@/common/guards';
-import { Body, Controller, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Query, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -34,7 +34,7 @@ export class OnboardingMessageInternalController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async stream(
     @Body() createMessageDto: StreamOnboardingMessageDto,
-    @Param('userId') userId: string,
+    @Query('userId') userId: string,
     @Res() res: Response,
   ): Promise<void> {
     res.setHeader('Content-Type', 'text/event-stream');
