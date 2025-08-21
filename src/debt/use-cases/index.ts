@@ -3,6 +3,7 @@ import { Provider } from '@nestjs/common';
 import { CreateDebtUseCase } from './create-debt.use-case';
 import { GetDebtUseCase } from './get-debt.use-case';
 import { GetDebtsUseCase } from './get-debts.use-case';
+import { GetMonthlyPaymentUseCase } from './get-monthly-pay.use-case';
 import { PayDebtUseCase } from './pay-debt.use-case';
 import { RemoveDebtPaymentUseCase } from './remove-debt-payment.use-case';
 import { RemoveDebtUseCase } from './remove-debt.use-case';
@@ -12,6 +13,7 @@ export {
   CreateDebtUseCase,
   GetDebtsUseCase,
   GetDebtUseCase,
+  GetMonthlyPaymentUseCase,
   PayDebtUseCase,
   RemoveDebtPaymentUseCase,
   RemoveDebtUseCase,
@@ -26,4 +28,5 @@ export const useCases: Provider[] = [
   RemoveDebtPaymentUseCase,
   UpdateDebtUseCase,
   RemoveDebtUseCase,
+  GetMonthlyPaymentUseCase,
 ];

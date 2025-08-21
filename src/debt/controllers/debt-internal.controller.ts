@@ -21,6 +21,7 @@ import {
   CreateDebtUseCase,
   GetDebtUseCase,
   GetDebtsUseCase,
+  GetMonthlyPaymentUseCase,
   PayDebtUseCase,
   RemoveDebtPaymentUseCase,
   RemoveDebtUseCase,
@@ -47,6 +48,7 @@ export class DebtInternalController {
     private readonly payDebtUseCase: PayDebtUseCase,
     private readonly removeDebtPaymentUseCase: RemoveDebtPaymentUseCase,
     private readonly removeDebtUseCase: RemoveDebtUseCase,
+    private readonly getMonthlyPaymentUseCase: GetMonthlyPaymentUseCase,
   ) {}
 
   @Post()
@@ -201,5 +203,18 @@ export class DebtInternalController {
       userId,
       debtId: id,
     });
+  }
+
+  @Get('monthly-payment')
+  @ApiOperation({
+    summary: 'Get the debt monthly payment for the current user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Monthly payment retrieved successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getMonthlyPayment(@Query('userId') userId: string): Promise<number> {
+    return this.getMonthlyPaymentUseCase.execute({ userId });
   }
 }

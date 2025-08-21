@@ -8,3 +8,5 @@ export * from './repositories/debt-payment.repository';
 export * from './repositories/debt-aggregate.repository';
 
 export * from './watch-list/debt-payment.watch-list';
+
+export * from './services/debt-manager.service';
