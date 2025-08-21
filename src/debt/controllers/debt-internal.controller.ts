@@ -21,6 +21,7 @@ import {
   CreateDebtUseCase,
   GetDebtUseCase,
   GetDebtsUseCase,
+  GetMonthlyPaymentUseCase,
   PayDebtUseCase,
   RemoveDebtPaymentUseCase,
   RemoveDebtUseCase,
@@ -47,95 +48,22 @@ export class DebtInternalController {
     private readonly payDebtUseCase: PayDebtUseCase,
     private readonly removeDebtPaymentUseCase: RemoveDebtPaymentUseCase,
     private readonly removeDebtUseCase: RemoveDebtUseCase,
+    private readonly getMonthlyPaymentUseCase: GetMonthlyPaymentUseCase,
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new debt' })
-  @ApiResponse({
-    status: 201,
-    description: 'Debt created successfully',
-    type: DebtResponseDto,
+  @Get('monthly-payment')
+  @ApiOperation({
+    summary: 'Get the debt monthly payment for the current user',
   })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async createDebt(
-    @Body() createDebtDto: CreateDebtDto,
-    @Query('userId') userId: string,
-  ): Promise<DebtResponseDto> {
-    const debt = await this.createDebtUseCase.execute({
-      ...createDebtDto,
-      userId,
-      currentPaidAmount: createDebtDto.currentPaidAmount ?? 0,
-    });
-
-    return DebtResponseDto.fromAggregate(debt, true);
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Get all debts for the current user' })
   @ApiResponse({
     status: 200,
-    description: 'List of debts for the current user',
-    type: [DebtResponseDto],
+    description: 'Monthly payment retrieved successfully',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getDebts(@Query('userId') userId: string): Promise<DebtResponseDto[]> {
-    const debts = await this.getDebtsUseCase.execute({ userId });
-
-    return debts.map((debt) => DebtResponseDto.fromAggregate(debt, true));
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get debt detail by ID' })
-  @ApiParam({ name: 'id', description: 'Debt ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Debt detail retrieved successfully',
-    type: DebtResponseDto,
-  })
-  @ApiResponse({ status: 400, description: 'Invalid debt ID format' })
-  @ApiResponse({ status: 401, description: 'User not authenticated' })
-  @ApiResponse({ status: 403, description: 'Access denied to debt' })
-  @ApiResponse({ status: 404, description: 'Debt not found' })
-  async getDebtDetail(
-    @Param('id') id: string,
+  async getMonthlyPayment(
     @Query('userId') userId: string,
-  ): Promise<DebtResponseDto> {
-    const debt = await this.getDebtUseCase.execute({
-      debtId: id,
-      userId,
-    });
-
-    return DebtResponseDto.fromAggregate(debt, true);
-  }
-
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update a debt' })
-  @ApiParam({ name: 'id', description: 'Debt ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Debt updated successfully',
-    type: DebtResponseDto,
-  })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Access denied to debt' })
-  @ApiResponse({ status: 404, description: 'Debt not found' })
-  async updateDebt(
-    @Param('id') id: string,
-    @Body() updateDebtDto: UpdateDebtDto,
-    @Query('userId') userId: string,
-  ): Promise<DebtDto> {
-    const debt = await this.updateDebtUseCase.execute({
-      debtId: id,
-      userId,
-      lender: updateDebtDto.lender,
-      purpose: updateDebtDto.purpose,
-      rate: updateDebtDto.rate,
-      dueDate: updateDebtDto.dueDate,
-    });
-
-    return DebtDto.fromEntity(debt);
+  ): Promise<{ monthlyPayment: number }> {
+    return this.getMonthlyPaymentUseCase.execute({ userId });
   }
 
   @Post(':id/payments')
@@ -201,5 +129,94 @@ export class DebtInternalController {
       userId,
       debtId: id,
     });
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new debt' })
+  @ApiResponse({
+    status: 201,
+    description: 'Debt created successfully',
+    type: DebtResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async createDebt(
+    @Body() createDebtDto: CreateDebtDto,
+    @Query('userId') userId: string,
+  ): Promise<DebtResponseDto> {
+    const debt = await this.createDebtUseCase.execute({
+      ...createDebtDto,
+      userId,
+      currentPaidAmount: createDebtDto.currentPaidAmount ?? 0,
+    });
+
+    return DebtResponseDto.fromAggregate(debt, true);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get debt detail by ID' })
+  @ApiParam({ name: 'id', description: 'Debt ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Debt detail retrieved successfully',
+    type: DebtResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid debt ID format' })
+  @ApiResponse({ status: 401, description: 'User not authenticated' })
+  @ApiResponse({ status: 403, description: 'Access denied to debt' })
+  @ApiResponse({ status: 404, description: 'Debt not found' })
+  async getDebtDetail(
+    @Param('id') id: string,
+    @Query('userId') userId: string,
+  ): Promise<DebtResponseDto> {
+    const debt = await this.getDebtUseCase.execute({
+      debtId: id,
+      userId,
+    });
+
+    return DebtResponseDto.fromAggregate(debt, true);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a debt' })
+  @ApiParam({ name: 'id', description: 'Debt ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Debt updated successfully',
+    type: DebtResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Access denied to debt' })
+  @ApiResponse({ status: 404, description: 'Debt not found' })
+  async updateDebt(
+    @Param('id') id: string,
+    @Body() updateDebtDto: UpdateDebtDto,
+    @Query('userId') userId: string,
+  ): Promise<DebtDto> {
+    const debt = await this.updateDebtUseCase.execute({
+      debtId: id,
+      userId,
+      lender: updateDebtDto.lender,
+      purpose: updateDebtDto.purpose,
+      rate: updateDebtDto.rate,
+      dueDate: updateDebtDto.dueDate,
+    });
+
+    return DebtDto.fromEntity(debt);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all debts for the current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of debts for the current user',
+    type: [DebtResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getDebts(@Query('userId') userId: string): Promise<DebtResponseDto[]> {
+    const debts = await this.getDebtsUseCase.execute({ userId });
+
+    return debts.map((debt) => DebtResponseDto.fromAggregate(debt, true));
   }
 }

@@ -11,6 +11,7 @@ import { BaseRepository } from '../../base/repositories/base.repository';
 import { CurrencyVO } from '../../base/value-objects';
 import { PrismaClient } from '../prisma-client';
 import { PrismaRepository } from './prisma.repository';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class OnboardingProfilePrismaRepository
@@ -28,7 +29,7 @@ export class OnboardingProfilePrismaRepository
     return {
       id: entity.id,
       user_id: props.userId,
-      metadata: props.metadata,
+      metadata: props.metadata as unknown as JsonValue,
       completed_at: props.completedAt,
       expense: props.expense ? new Decimal(props.expense.value) : null,
       income: props.income ? new Decimal(props.income.value) : null,
