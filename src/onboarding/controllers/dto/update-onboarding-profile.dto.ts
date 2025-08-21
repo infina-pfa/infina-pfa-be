@@ -46,8 +46,22 @@ export class UpdateOnboardingProfileDto {
   @ApiProperty({
     description: 'Additional metadata for the onboarding profile',
     example: {
-      financialGoals: ['retirement', 'emergency_fund'],
-      riskTolerance: 'moderate',
+      goalDetails: {
+        amount: 100000,
+        monthlyTarget: 1000,
+        timeframe: 10,
+      },
+      debts: [
+        {
+          lender: 'Bank of America',
+          purpose: 'Home mortgage',
+          rate: 5.5,
+          dueDate: '2025-12-31T00:00:00.000Z',
+          amount: 100000,
+          currentPaidAmount: 0,
+        },
+      ],
+      expenseBreakdown: {},
     },
     required: false,
   })
