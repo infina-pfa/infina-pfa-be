@@ -3,6 +3,7 @@ import { Body, Controller, Post, Query, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -20,7 +21,7 @@ export class OnboardingMessageInternalController {
     private readonly onboardingAiAdvisorService: OnboardingAiAdvisorService,
   ) {}
 
-  @Post('stream/:userId')
+  @Post('stream')
   @ApiOperation({ summary: 'Create a new onboarding message' })
   @ApiResponse({
     status: 201,
@@ -32,6 +33,7 @@ export class OnboardingMessageInternalController {
     description: 'Bad request - Invalid message content or sender',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiQuery({ name: 'userId', type: String, required: true })
   async stream(
     @Body() createMessageDto: StreamOnboardingMessageDto,
     @Query('userId') userId: string,
