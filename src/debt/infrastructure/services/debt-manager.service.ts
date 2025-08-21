@@ -6,7 +6,7 @@ export type DebtDetails = {
   lender: string;
   purpose: string;
   rate: number;
-  dueDate: Date;
+  dueDate: string;
   amount: number;
   currentPaidAmount: number;
 };
@@ -18,9 +18,11 @@ export class DebtManagerServiceImpl implements DebtManagerService {
   private calculateMonthlyPayment(debts: DebtDetails): number {
     const { amount, rate, dueDate } = debts;
     const today = new Date();
-    const timeDiff = dueDate.getTime() - today.getTime();
+    const timeDiff = new Date(dueDate).getTime() - today.getTime();
     const timeDiffInMonths = Math.ceil(timeDiff / (1000 * 60 * 60 * 24 * 30));
-    return (amount * rate) / (1 - Math.pow(1 + rate, -timeDiffInMonths));
+    return (
+      (amount * rate) / 100 / (1 - Math.pow(1 + rate / 100, -timeDiffInMonths))
+    );
   }
 
   async getMonthlyPayment(userId: string): Promise<number> {
@@ -35,18 +37,18 @@ export class DebtManagerServiceImpl implements DebtManagerService {
       throw new NotFoundException('Onboarding profile not found');
     }
 
-    const debts = onboardingProfile.metadata as unknown as {
+    const metadata = onboardingProfile.metadata as unknown as {
       debts: DebtDetails[];
     };
 
-    if (!debts) {
+    if (!metadata) {
       return 0;
     }
 
-    const monthlyPayment = debts.debts.reduce((acc, debt) => {
+    const monthlyPayment = metadata.debts?.reduce((acc, debt) => {
       return acc + this.calculateMonthlyPayment(debt);
     }, 0);
 
-    return monthlyPayment;
+    return monthlyPayment || 0;
   }
 }

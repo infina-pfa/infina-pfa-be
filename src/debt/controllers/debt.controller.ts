@@ -52,40 +52,19 @@ export class DebtController {
     private readonly getMonthlyPaymentUseCase: GetMonthlyPaymentUseCase,
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new debt' })
-  @ApiResponse({
-    status: 201,
-    description: 'Debt created successfully',
-    type: DebtResponseDto,
+  @Get('monthly-payment')
+  @ApiOperation({
+    summary: 'Get the debt monthly payment for the current user',
   })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async createDebt(
-    @Body() createDebtDto: CreateDebtDto,
-    @CurrentUser() user: AuthUser,
-  ): Promise<DebtResponseDto> {
-    const debt = await this.createDebtUseCase.execute({
-      ...createDebtDto,
-      userId: user.id,
-      currentPaidAmount: createDebtDto.currentPaidAmount ?? 0,
-    });
-
-    return DebtResponseDto.fromAggregate(debt);
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Get all debts for the current user' })
   @ApiResponse({
     status: 200,
-    description: 'List of debts for the current user',
-    type: [DebtResponseDto],
+    description: 'Monthly payment retrieved successfully',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getDebts(@CurrentUser() user: AuthUser): Promise<DebtResponseDto[]> {
-    const debts = await this.getDebtsUseCase.execute({ userId: user.id });
-
-    return debts.map((debt) => DebtResponseDto.fromAggregate(debt, true));
+  async getMonthlyPayment(
+    @CurrentUser() user: AuthUser,
+  ): Promise<{ monthlyPayment: number }> {
+    return this.getMonthlyPaymentUseCase.execute({ userId: user.id });
   }
 
   @Get(':id')
@@ -206,16 +185,39 @@ export class DebtController {
     });
   }
 
-  @Get('monthly-payment')
-  @ApiOperation({
-    summary: 'Get the debt monthly payment for the current user',
+  @Post()
+  @ApiOperation({ summary: 'Create a new debt' })
+  @ApiResponse({
+    status: 201,
+    description: 'Debt created successfully',
+    type: DebtResponseDto,
   })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async createDebt(
+    @Body() createDebtDto: CreateDebtDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<DebtResponseDto> {
+    const debt = await this.createDebtUseCase.execute({
+      ...createDebtDto,
+      userId: user.id,
+      currentPaidAmount: createDebtDto.currentPaidAmount ?? 0,
+    });
+
+    return DebtResponseDto.fromAggregate(debt);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all debts for the current user' })
   @ApiResponse({
     status: 200,
-    description: 'Monthly payment retrieved successfully',
+    description: 'List of debts for the current user',
+    type: [DebtResponseDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getMonthlyPayment(@CurrentUser() user: AuthUser): Promise<number> {
-    return this.getMonthlyPaymentUseCase.execute({ userId: user.id });
+  async getDebts(@CurrentUser() user: AuthUser): Promise<DebtResponseDto[]> {
+    const debts = await this.getDebtsUseCase.execute({ userId: user.id });
+
+    return debts.map((debt) => DebtResponseDto.fromAggregate(debt, true));
   }
 }

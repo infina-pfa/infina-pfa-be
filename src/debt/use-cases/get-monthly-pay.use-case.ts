@@ -9,13 +9,21 @@ export interface GetMonthlyPaymentUseCaseInput {
 @Injectable()
 export class GetMonthlyPaymentUseCase extends BaseUseCase<
   GetMonthlyPaymentUseCaseInput,
-  number
+  { monthlyPayment: number }
 > {
   constructor(private readonly debtManagerService: DebtManagerService) {
     super();
   }
 
-  async execute(input: GetMonthlyPaymentUseCaseInput): Promise<number> {
-    return this.debtManagerService.getMonthlyPayment(input.userId);
+  async execute(input: GetMonthlyPaymentUseCaseInput): Promise<{
+    monthlyPayment: number;
+  }> {
+    const monthlyPayment = await this.debtManagerService.getMonthlyPayment(
+      input.userId,
+    );
+
+    return {
+      monthlyPayment,
+    };
   }
 }
