@@ -54,3 +54,11 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:cov:core
+
+      - name: Dispatch to e2e repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.E2E_PAT }}
+          repository: infina-pfa/infina-pfa-e2e
+          event-type: backend_push
+          client-payload: '{"source":"be","branch":"staging"}'
