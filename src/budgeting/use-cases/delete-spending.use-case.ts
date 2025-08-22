@@ -21,8 +21,12 @@ export class DeleteSpendingUseCase extends BaseUseCase<
       input.spendingId,
     );
 
-    if (!spending || (input.userId && spending.props.userId !== input.userId)) {
+    if (!spending) {
       throw BudgetErrorFactory.spendingNotFound();
+    }
+
+    if (input.userId && spending.props.userId !== input.userId) {
+      throw BudgetErrorFactory.budgetNotBelongToUser();
     }
 
     await this.transactionRepository.delete(spending);

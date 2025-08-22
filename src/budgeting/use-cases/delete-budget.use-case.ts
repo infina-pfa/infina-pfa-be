@@ -23,11 +23,12 @@ export class DeleteBudgetUseCase extends BaseUseCase<
       input.budgetId,
     );
 
-    if (
-      !budgetAggregate ||
-      (input.userId && budgetAggregate.props.budget.userId !== input.userId)
-    ) {
+    if (!budgetAggregate) {
       throw BudgetErrorFactory.budgetNotFound();
+    }
+
+    if (input.userId && budgetAggregate.props.budget.userId !== input.userId) {
+      throw BudgetErrorFactory.budgetNotBelongToUser();
     }
 
     await this.budgetAggregateRepository.delete(budgetAggregate);
