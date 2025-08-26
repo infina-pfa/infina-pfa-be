@@ -4,7 +4,7 @@ import { UserErrorFactory } from '../errors/user-error.factory';
 import { OptionalProps } from '@/common/utils';
 
 export enum FinancialStage {
-  DEBT = 'debt',
+  DEBT = 'get_out_of_debt',
   START_SAVING = 'start_saving',
   START_INVESTING = 'start_investing',
 }
