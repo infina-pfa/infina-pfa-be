@@ -1,5 +1,5 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
-import { DebtEntity, DebtPaymentEntity } from '../entities';
+import { DebtEntity, DebtPaymentEntity, DebtType } from '../entities';
 import { DebtPaymentWatchList } from '../watch-list/debt-payment.watch-list';
 
 export interface DebtAggregateProps {
@@ -61,6 +61,7 @@ export class DebtAggregate extends BaseEntity<DebtAggregateProps & BaseProps> {
       rate: number;
       dueDate: Date;
       currentPaidAmount: CurrencyVO;
+      type: DebtType;
     },
   ): DebtAggregate {
     const debt = DebtEntity.create({

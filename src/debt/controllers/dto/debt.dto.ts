@@ -1,6 +1,11 @@
 import { BaseDto } from '@/common/base/dto/base.dto';
 import { TransactionType } from '@/common/types/transaction';
-import { DebtAggregate, DebtEntity, DebtPaymentEntity } from '@/debt/domain';
+import {
+  DebtAggregate,
+  DebtEntity,
+  DebtPaymentEntity,
+  DebtType,
+} from '@/debt/domain';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class DebtDto extends BaseDto {
@@ -41,6 +46,13 @@ export class DebtDto extends BaseDto {
   purpose: string;
 
   @ApiProperty({
+    description: 'Debt type',
+    enum: DebtType,
+    example: DebtType.BAD_DEBT,
+  })
+  type: DebtType;
+
+  @ApiProperty({
     description: 'Debt created at',
     example: '2023-01-01T00:00:00.000Z',
   })
@@ -63,6 +75,7 @@ export class DebtDto extends BaseDto {
     dto.purpose = debt.props.purpose;
     dto.createdAt = debt.props.createdAt;
     dto.updatedAt = debt.props.updatedAt;
+    dto.type = debt.props.type;
     return dto;
   }
 }

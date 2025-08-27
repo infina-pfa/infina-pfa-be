@@ -1,6 +1,6 @@
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { Injectable } from '@nestjs/common';
-import { DebtEntity, DebtRepository } from '../domain';
+import { DebtEntity, DebtRepository, DebtType } from '../domain';
 import { DebtErrorFactory } from '../domain/errors/error.factory';
 
 export interface UpdateDebtUseCaseInput {
@@ -10,6 +10,7 @@ export interface UpdateDebtUseCaseInput {
   purpose?: string;
   rate?: number;
   dueDate?: Date;
+  type?: DebtType;
 }
 
 @Injectable()
@@ -37,6 +38,7 @@ export class UpdateDebtUseCase extends BaseUseCase<
       purpose: input.purpose,
       rate: input.rate,
       dueDate: input.dueDate,
+      type: input.type,
     });
 
     await this.debtRepository.update(debt);

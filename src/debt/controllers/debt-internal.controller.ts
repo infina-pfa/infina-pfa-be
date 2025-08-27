@@ -201,6 +201,7 @@ export class DebtInternalController {
       purpose: updateDebtDto.purpose,
       rate: updateDebtDto.rate,
       dueDate: updateDebtDto.dueDate,
+      type: updateDebtDto.type,
     });
 
     return DebtDto.fromEntity(debt);

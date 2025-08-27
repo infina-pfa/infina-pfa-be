@@ -1,7 +1,7 @@
 import { CurrencyVO } from '@/common/base';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
 import { Injectable } from '@nestjs/common';
-import { DebtAggregate, DebtAggregateRepository } from '../domain';
+import { DebtAggregate, DebtAggregateRepository, DebtType } from '../domain';
 
 export interface CreateDebtUseCaseInput {
   userId: string;
@@ -11,6 +11,7 @@ export interface CreateDebtUseCaseInput {
   dueDate: Date;
   amount: number;
   currentPaidAmount: number;
+  type?: DebtType;
 }
 
 @Injectable()
@@ -32,6 +33,7 @@ export class CreateDebtUseCase extends BaseUseCase<
       dueDate: input.dueDate,
       amount: new CurrencyVO(input.amount),
       currentPaidAmount: new CurrencyVO(input.currentPaidAmount),
+      type: input.type ?? DebtType.BAD_DEBT,
     });
 
     await this.debtAggregateRepository.save(debtAggregate);

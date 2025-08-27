@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
+import { DebtType } from '@/debt/domain';
 
 export class UpdateDebtDto {
   @ApiProperty({
@@ -41,4 +49,13 @@ export class UpdateDebtDto {
   @IsOptional()
   @Type(() => Date)
   dueDate?: Date;
+
+  @ApiProperty({
+    description: 'Debt type',
+    enum: DebtType,
+    example: DebtType.BAD_DEBT,
+  })
+  @IsEnum(DebtType)
+  @IsOptional()
+  type?: DebtType;
 }

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDate,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -8,6 +9,7 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { DebtType } from '@/debt/domain';
 
 export class CreateDebtDto {
   @ApiProperty({
@@ -62,4 +64,13 @@ export class CreateDebtDto {
   @IsOptional()
   @Min(0, { message: 'Paid amount must be non-negative' })
   currentPaidAmount?: number;
+
+  @ApiProperty({
+    description: 'Debt type',
+    enum: DebtType,
+    example: DebtType.BAD_DEBT,
+  })
+  @IsEnum(DebtType)
+  @IsOptional()
+  type?: DebtType;
 }
