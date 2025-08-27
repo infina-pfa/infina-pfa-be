@@ -24,4 +24,9 @@ export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
     props: Partial<E['props']>,
     options?: FindManyOptions,
   ): Promise<E[]>;
+
+  abstract updateMany(
+    props: Partial<E['props']>,
+    entities: E[],
+  ): Promise<number>;
 }

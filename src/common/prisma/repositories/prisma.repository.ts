@@ -70,4 +70,15 @@ export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
     });
     return entities.length;
   }
+
+  public async updateMany(
+    props: Partial<E['props']>,
+    entities: E[],
+  ): Promise<number> {
+    await this.prisma.updateMany({
+      where: camelCaseToSnakeCase(props),
+      data: entities.map((entity) => this.toORM(entity)),
+    });
+    return entities.length;
+  }
 }

@@ -5,6 +5,7 @@ import { CreateOnboardingProfileUseCase } from './create-onboarding-profile.use-
 import { GetOnboardingMessagesUseCase } from './get-onboarding-messages.use-case';
 import { GetOnboardingProfileUseCase } from './get-onboarding-profile.use-case';
 import { UpdateOnboardingProfileUseCase } from './update-onboarding-profile.use-case';
+import { MonthlyResetPyfMetadataUseCase } from './monthly-reset-pyf-metadata.use-case';
 
 export const onboardingUseCases: Provider[] = [
   CreateOnboardingProfileUseCase,
@@ -13,6 +14,7 @@ export const onboardingUseCases: Provider[] = [
   CreateOnboardingMessageUseCase,
   GetOnboardingMessagesUseCase,
   CompleteOnboardingUseCase,
+  MonthlyResetPyfMetadataUseCase,
 ];
 
 export {
@@ -22,4 +24,5 @@ export {
   GetOnboardingMessagesUseCase,
   GetOnboardingProfileUseCase,
   UpdateOnboardingProfileUseCase,
+  MonthlyResetPyfMetadataUseCase,
 };

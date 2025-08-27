@@ -1,5 +1,13 @@
 import { InternalServiceAuthGuard } from '@/common/guards';
-import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -8,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import {
   GetOnboardingProfileUseCase,
+  MonthlyResetPyfMetadataUseCase,
   UpdateOnboardingProfileUseCase,
 } from '../use-cases';
 import {
@@ -26,6 +35,7 @@ export class OnboardingProfileInternalController {
     private readonly updateOnboardingProfileUseCase: UpdateOnboardingProfileUseCase,
     private readonly getOnboardingProfileUseCase: GetOnboardingProfileUseCase,
     private readonly userFinancialInfoService: UserFinancialInfoService,
+    private readonly monthlyResetPyfMetadataUseCase: MonthlyResetPyfMetadataUseCase,
   ) {}
 
   @Get()
@@ -72,5 +82,12 @@ export class OnboardingProfileInternalController {
     });
 
     return OnboardingProfileResponseDto.fromEntity(profile);
+  }
+
+  @Post('monthly-reset-pyf-metadata')
+  @ApiOperation({ summary: 'Reset Pyf metadata for all users' })
+  @ApiResponse({ status: 201, description: 'Pyf metadata reset successfully' })
+  async monthlyResetPyfMetadata(): Promise<void> {
+    await this.monthlyResetPyfMetadataUseCase.execute();
   }
 }

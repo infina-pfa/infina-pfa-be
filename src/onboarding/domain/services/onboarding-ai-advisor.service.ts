@@ -8,4 +8,6 @@ export abstract class OnboardingAiAdvisorService {
       onError?: (error: Error) => void;
     },
   ): Promise<void>;
+
+  abstract resetPfyMetadata(): Promise<void>;
 }

@@ -171,6 +171,11 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
     this.updated();
   }
 
+  public resetPyfMetadata(): void {
+    this._props.pyfMetadata = null;
+    this.updated();
+  }
+
   public delete(): void {
     this._props.deletedAt = new Date();
     this.updated();
