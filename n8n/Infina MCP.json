@@ -1,0 +1,1306 @@
+{
+  "name": "Infina MCP",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "50102df2-d211-44d8-8104-0dd22b11d63f"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [208, -176],
+      "id": "cb4dc97a-644d-414b-9a86-6c2ccfa4d6cc",
+      "name": "MCP Server Trigger",
+      "webhookId": "50102df2-d211-44d8-8104-0dd22b11d63f"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get user monthly spending transaction",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets/spending",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            },
+            {
+              "name": "month",
+              "value": "={{ $fromAI('month', ``, 'number') }}"
+            },
+            {
+              "name": "year",
+              "value": "={{ $fromAI('year', ``, 'number') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-144, 352],
+      "id": "37fa1554-0f48-4b38-95ce-156f34d56b27",
+      "name": "Get Monthly Spending "
+    },
+    {
+      "parameters": {
+        "toolDescription": "Create a new budget",
+        "method": "POST",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', `user id of user`, 'string') }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $fromAI('type', `have 2 type:\"fixed\" and \"flexible\" when user not clairify then it flexible`, 'string') }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "=month",
+              "value": "={{ $fromAI('month', ``, 'number') }}"
+            },
+            {
+              "name": "year",
+              "value": "={{ $fromAI('year', ``, 'number') }}"
+            },
+            {
+              "name": "color",
+              "value": "={{ $fromAI('color', `this is the list of available color:'#2ECC71','#FF9800','#FFC107','#0055FF','#F44336','#6B7280'`, 'string') }}"
+            },
+            {
+              "name": "icon",
+              "value": "={{ $fromAI('icon', `if user not specified choose the best one that fit the name from this list of icon:\"car\",\"shopping\",\"food\",\"electricity\",\"home\",\"entertainment\",\"health\",\"travel\",\"education\",\"other\"`, 'string') }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-480, 208],
+      "id": "9bead8ca-c87d-4a94-87b6-e42254dc4452",
+      "name": "Create Budget"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get user all budgets",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            },
+            {
+              "name": "month",
+              "value": "={{ $fromAI('month', ``, 'number') }}"
+            },
+            {
+              "name": "year",
+              "value": "={{ $fromAI('year', ``, 'number') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [160, 208],
+      "id": "5f322baf-125c-423b-9f3c-7f2f24cb2cad",
+      "name": "Get All Budgets"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get budget a by ID",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets/{{ $fromAI('id', `this is id of budget if missing then check all budget to matching`, 'string') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [0, 208],
+      "id": "297b7997-470a-4c94-ad5e-5bc88131b9dc",
+      "name": "Get Budget by ID"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Update a Budget. step1 find the budget user are referring too if still dont know ask for info, step 2 fill the budget id to the path",
+        "method": "PATCH",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets/{{ $fromAI('id', `budget id goes here`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "icon",
+              "value": "={{ $fromAI('icon', `if user not specified choose the best one that fit the name from this list of icon:\"car\",\"shopping\",\"food\",\"electricity\",\"home\",\"entertainment\",\"health\",\"travel\",\"education\",\"other\"`, 'string') }}"
+            },
+            {
+              "name": "color",
+              "value": "={{ $fromAI('color', `this is the list of available color:'#2ECC71','#FF9800','#FFC107','#0055FF','#F44336','#6B7280'`, 'string') }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $fromAI('type', `have 2 type:\"fixed\" and \"flexible\" when user not clairify then it flexible`, 'string') }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-144, 208],
+      "id": "fc812a90-4d7b-435f-ac5a-a54c6c0ec80a",
+      "name": "Update Budget"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Record a Spending to and existing budget,step1 find the budget user are referring too if still dont know ask for info, step 2 fill the budget id to the path",
+        "method": "POST",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets/{{ $fromAI('id', `budget id goes here,auto categorize the spending to the best fit existing budget `, 'string') }}/spend",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $fromAI('description', ``, 'string') }}"
+            },
+            {
+              "name": "recurring",
+              "value": "={{ $fromAI('recurring', `number of day to repeat the transaction,0 for not recurring `, 'number') }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-496, 368],
+      "id": "5238d88f-cd62-4b70-919e-e7882df735eb",
+      "name": "Record Spending"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Delete a Budget.step1 find the budget user are referring too if still dont know ask for info, step 2 fill the budget id to the path",
+        "method": "DELETE",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets/{{ $fromAI('id', `budget id `, 'string') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-304, 208],
+      "id": "ecae4347-1a68-4706-8a4f-b52cc4ff8526",
+      "name": "Delete Budget"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Delete a Spending",
+        "method": "DELETE",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/budgets/{{ $fromAI('id', `budget id goes here`, 'string') }}/spending/{{ $fromAI('spendingId', ``, 'string') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [-320, 368],
+      "id": "4ae7fb54-c70c-406f-8cd8-9d6139f6263a",
+      "name": "Delete Spending"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get user monthly income",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/incomes/{{ $fromAI('userId', ``, 'string') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "month",
+              "value": "={{ $fromAI('month', ``, 'number') }}"
+            },
+            {
+              "name": "year",
+              "value": "={{ $fromAI('year', ``, 'number') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [464, 208],
+      "id": "4f0a0db3-0d35-4d63-95e1-9c89353945a7",
+      "name": "Get user monthly income"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Add a new income transaction",
+        "method": "POST",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/incomes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "recurring",
+              "value": "={{ $fromAI('recurring', `number of day to repeat the transaction,0 for not recurring `, 'number') }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [656, 208],
+      "id": "328d9e20-93c9-40a5-80ff-21a7289098d1",
+      "name": "Add a new income transaction"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Update an income transaction ",
+        "method": "PATCH",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/incomes/{{ $fromAI('id', `income transaction id goes here`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "recurring",
+              "value": "={{ $fromAI('recurring', `number of day to repeat the transaction,0 for not recurring `, 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [832, 208],
+      "id": "f142fd1a-4e24-449c-8fe5-2b94617ef1ea",
+      "name": "Update an income transaction"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Delete an income transaction. step 1 find the transaction that user are referring too , step 2 fill to all the correct id",
+        "method": "DELETE",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/incomes/{{ $fromAI('id', `income transaction Id goes here`, 'string') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "*/*"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [976, 208],
+      "id": "f7692366-14eb-464c-b9e6-dec3d7a49210",
+      "name": "Delete an income transaction"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Create a new financial ",
+        "method": "POST",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/goals",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $fromAI('title', ``, 'string') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $fromAI('description', ``, 'string') }}"
+            },
+            {
+              "name": "targetAmount",
+              "value": "={{ $fromAI('targetAmount', ``, 'number') }}"
+            },
+            {
+              "name": "dueDate",
+              "value": "={{ $fromAI('dueDate', ``, 'string') }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [464, 352],
+      "id": "abc120c5-0df9-4bb0-8cea-947df8c6547f",
+      "name": "Create a new financial goal"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all user financial goals",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/goals",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [656, 352],
+      "id": "dd7298cb-a922-4ab3-8f06-661480372ac0",
+      "name": "Get all user financial goals"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Update a financial goal. step1 find the goal user are referring too if still dont know ask for info, step 2 fill the goal id to the path",
+        "method": "PATCH",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/goals/{{ $fromAI('id', `goal id goes here`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $fromAI('title', ``, 'string') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $fromAI('description', ``, 'string') }}"
+            },
+            {
+              "name": "targetAmount",
+              "value": "={{ $fromAI('targetAmount', ``, 'number') }}"
+            },
+            {
+              "name": "dueDate",
+              "value": "={{ $fromAI('dueDate', ``, 'string') }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $fromAI('userId', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [816, 368],
+      "id": "b9e6b455-bbc1-4347-98c1-7eb0b0f8da6a",
+      "name": "Update a financial goal"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Contribute to a financial goal. Use this when user add money to goal.step 1 find the goal that user are referring to , step 2 get that goal id and put it in the path",
+        "method": "POST",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/goals/{{ $fromAI('id', `goal id goes here`, 'string') }}/contribute",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $fromAI('description', ``, 'string') }}"
+            },
+            {
+              "name": "recurring",
+              "value": "={{ $fromAI('recurring', `number of day to repeat the transaction,0 for not recurring `, 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [976, 368],
+      "id": "c6dd63d2-9caf-4060-bc4a-471043ee4843",
+      "name": "Contribute to a financial goal"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Withdraw form a financial goal.Use this when user withdraw, deduct money from goal.step 1 find the goal that user are referring to , step 2 get that goal id and put it in the path",
+        "method": "POST",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/goals/{{ $fromAI('id', `goal id goes here`, 'string') }}/withdraw",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', ``, 'number') }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', ``, 'string') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $fromAI('description', ``, 'string') }}"
+            },
+            {
+              "name": "recurring",
+              "value": "={{ $fromAI('recurring', `number of day to repeat the transaction,0 for not recurring `, 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [1120, 352],
+      "id": "89e13d2a-c376-44dc-95e9-b3b87cd6d573",
+      "name": "Withdraw form a financial goal"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Create a new debt for the user",
+        "method": "POST",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "lender",
+              "value": "={{ $fromAI('lender', `name of the lender`, 'string') }}"
+            },
+            {
+              "name": "purpose",
+              "value": "={{ $fromAI('purpose', `purpose of the debt`, 'string') }}"
+            },
+            {
+              "name": "rate",
+              "value": "={{ $fromAI('rate', `interest rate as percentage`, 'number') }}"
+            },
+            {
+              "name": "dueDate",
+              "value": "={{ $fromAI('dueDate', `due date in ISO 8601 format`, 'string') }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', `total debt amount`, 'number') }}"
+            },
+            {
+              "name": "currentPaidAmount",
+              "value": "={{ $fromAI('currentPaidAmount', `initial paid amount, default 0`, 'number') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [464, 496],
+      "id": "debt-create-001",
+      "name": "Create Debt"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get all debts for the user",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [656, 496],
+      "id": "debt-get-all-002",
+      "name": "Get All Debts"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get detailed information about a specific debt including payments",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts/{{ $fromAI('id', `debt id`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [832, 496],
+      "id": "debt-get-detail-003",
+      "name": "Get Debt Details"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Update an existing debt. Step 1: find the debt user is referring to, Step 2: fill the debt id to the path",
+        "method": "PATCH",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts/{{ $fromAI('id', `debt id`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "lender",
+              "value": "={{ $fromAI('lender', `new lender name`, 'string') }}"
+            },
+            {
+              "name": "purpose",
+              "value": "={{ $fromAI('purpose', `new purpose`, 'string') }}"
+            },
+            {
+              "name": "rate",
+              "value": "={{ $fromAI('rate', `new interest rate`, 'number') }}"
+            },
+            {
+              "name": "dueDate",
+              "value": "={{ $fromAI('dueDate', `new due date in ISO 8601 format`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [976, 496],
+      "id": "debt-update-004",
+      "name": "Update Debt"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Record a payment transaction against a debt. Step 1: find the debt user is referring to, Step 2: fill the debt id to the path",
+        "method": "POST",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts/{{ $fromAI('id', `debt id`, 'string') }}/payments",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "={{ $fromAI('amount', `payment amount`, 'number') }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $fromAI('name', `payment name`, 'string') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $fromAI('description', `payment description`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [1120, 496],
+      "id": "debt-payment-005",
+      "name": "Record Debt Payment"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get the total monthly debt payment amount for the user",
+        "url": "https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts/monthly-payment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [1264, 496],
+      "id": "debt-monthly-006",
+      "name": "Get Monthly Debt Payment"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Delete a debt and all associated payment transactions. Step 1: find the debt user is referring to, Step 2: fill the debt id to the path",
+        "method": "DELETE",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts/{{ $fromAI('id', `debt id`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [1408, 496],
+      "id": "debt-delete-007",
+      "name": "Delete Debt"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Delete a specific payment transaction from a debt. Step 1: find the debt and payment, Step 2: fill both ids to the path",
+        "method": "DELETE",
+        "url": "=https://infina-pfa-be-kwway.ondigitalocean.app/internal/debts/{{ $fromAI('id', `debt id`, 'string') }}/payments/{{ $fromAI('paymentId', `payment transaction id`, 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "R40PoeMOrtK1pxhSf5Jqrv9Z4AJ7UvEl"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [1552, 496],
+      "id": "debt-delete-payment-008",
+      "name": "Delete Debt Payment"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Monthly Spending ": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Budget": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Budgets": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Budget by ID": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Budget": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Spending": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Budget": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Spending": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get user monthly income": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add a new income transaction": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an income transaction": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an income transaction": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a new financial goal": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all user financial goals": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a financial goal": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contribute to a financial goal": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Withdraw form a financial goal": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Debt": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Debts": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Debt Details": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Debt": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Debt Payment": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Monthly Debt Payment": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Debt": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Debt Payment": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "04b82480-f081-4d7d-8c51-5094632af0c1",
+  "meta": {
+    "instanceId": "c041c43995eb323e7bf06ecab6caa63ac40fd6ffd02ea45e82f728b7bfc4ab9a"
+  },
+  "id": "TSG8hawgBbpmCO2q",
+  "tags": []
+}

@@ -22,6 +22,7 @@ The debt management system uses the following PostgreSQL tables (managed by Pris
   - `amount` (Decimal): Total debt amount
   - `rate` (Decimal): Interest rate as percentage
   - `due_date` (DateTime): Debt due date
+  - `type` (Enum): Debt type ('bad_debt' or 'good_debt')
   - `created_at`, `updated_at`, `deleted_at` (Timestamps)
 - **Indexes**: Optimized for queries by user_id
 
@@ -96,7 +97,7 @@ The `currentPaidAmount` field in the API responses is **dynamically calculated**
 ### Base URL
 
 ```
-http://localhost:3000/api/v1
+http://localhost:3000/
 ```
 
 ### Authentication
@@ -105,6 +106,15 @@ http://localhost:3000/api/v1
 headers: {
   'Authorization': `Bearer ${accessToken}`,
   'Content-Type': 'application/json'
+}
+```
+
+## Debt Types
+
+```typescript
+enum DebtType {
+  BAD_DEBT = 'bad_debt', // Debt that doesn't generate income (e.g., credit cards, personal loans)
+  GOOD_DEBT = 'good_debt', // Debt that can generate income or appreciate in value (e.g., mortgages, student loans)
 }
 ```
 
@@ -118,6 +128,39 @@ enum DebtErrorCode {
   DEBT_ACCESS_DENIED = 'DEBT_ACCESS_DENIED', // User doesn't own the debt
 }
 ```
+
+## Internal API Endpoints
+
+The debt module also provides internal API endpoints for service-to-service communication. These endpoints use the same business logic but authenticate via API key instead of user JWT.
+
+### Base URL for Internal APIs
+
+```
+http://localhost:3000/api-internal
+```
+
+### Authentication
+
+```typescript
+headers: {
+  'x-api-key': `${internalApiKey}`,
+  'Content-Type': 'application/json'
+}
+```
+
+### Internal Endpoints
+
+All internal endpoints mirror the public endpoints but:
+
+- Use `/internal/debts` prefix instead of `/debts`
+- Authenticate via `x-api-key` header instead of Bearer token
+- Accept `userId` as a query parameter instead of extracting from JWT token
+- Same request/response bodies as public endpoints
+
+Example:
+
+- Public: `GET /debts/{id}` with Bearer token
+- Internal: `GET /internal/debts/{id}?userId={userId}` with x-api-key
 
 ## Endpoints
 
@@ -137,6 +180,7 @@ interface CreateDebtRequest {
   dueDate: Date; // Due date (required, ISO 8601 format)
   amount: number; // Total debt amount (required, min: 0.01)
   currentPaidAmount?: number; // Initial paid amount (optional, min: 0, default: 0)
+  type?: DebtType; // Debt type (optional, defaults to 'bad_debt')
 }
 ```
 
@@ -152,6 +196,7 @@ interface DebtResponse {
   purpose: string;
   rate: number; // Interest rate percentage
   dueDate: string; // ISO 8601 datetime
+  type: DebtType; // Debt type ('bad_debt' or 'good_debt')
   amount: number; // Total debt amount
   currentPaidAmount: number; // Amount already paid
   createdAt: string; // ISO 8601 datetime
@@ -216,6 +261,7 @@ interface DebtSimple {
   amount: number;
   rate: number;
   dueDate: string;
+  type: DebtType;
   lender: string;
   purpose: string;
   createdAt: string;
@@ -248,6 +294,7 @@ interface UpdateDebtRequest {
   purpose?: string; // New purpose (optional)
   rate?: number; // New interest rate (optional, min: 0)
   dueDate?: Date; // New due date (optional, ISO 8601 format)
+  type?: DebtType; // New debt type (optional)
 }
 ```
 
@@ -299,7 +346,7 @@ type PayDebtResponse = DebtDetailResponse; // Returns updated debt with all paym
 
 ### 6. Get Monthly Payment
 
-Retrieves the total monthly debt payment amount for the authenticated user.
+Calculates and retrieves the total monthly debt payment amount for the authenticated user.
 
 **Endpoint:** `GET /debts/monthly-payment`
 
@@ -311,9 +358,49 @@ interface MonthlyPaymentResponse {
 }
 ```
 
+**Calculation Logic:**
+
+The monthly payment is calculated differently based on the user's onboarding status:
+
+1. **For Onboarded Users** (completed onboarding):
+
+   - Retrieves all active debts from the database
+   - Calculates monthly payment for each debt
+   - Returns the sum of all monthly payments
+
+2. **For Non-Onboarded Users**:
+
+   - Retrieves debt information from onboarding profile metadata
+   - Calculates monthly payment based on metadata
+   - Returns the calculated amount
+
+3. **Monthly Payment Formula**:
+
+   For each debt, the monthly payment is calculated as:
+
+   - **If interest rate = 0** (no interest):
+     ```
+     Monthly Payment = (Amount - Current Paid Amount) / Months Until Due
+     ```
+     Special case: If due date has passed (0 months), returns full remaining amount
+   - **If interest rate > 0** (with interest):
+     ```
+     Monthly Payment = (Principal * (Rate/100)) / (1 - (1 + Rate/100)^(-Months))
+     ```
+     Where Principal = Amount - Current Paid Amount
+
+   Note: Months are calculated as: `ceil(Days Until Due Date / 30)`
+
 **Error Responses:**
 
 - `401 Unauthorized` - Missing or invalid token
+- `404 Not Found` - Onboarding profile not found (for non-onboarded users)
+
+**Internal API Variant:**
+
+- Endpoint: `GET /internal/debts/monthly-payment?userId={userId}`
+- Authentication: x-api-key header instead of Bearer token
+- Same response format and calculation logic
 
 ### 7. Delete Debt
 
@@ -372,3 +459,4 @@ Deletes a specific payment transaction from a debt.
 8. **Transaction Types**: Debt payments use `type = 'debt_payment'`
 9. **Soft Deletes**: Deleted records have `deleted_at` timestamp set
 10. **Current Paid Amount**: Dynamically calculated from payment transactions
+11. **Debt Type**: Categorizes debt as 'bad_debt' (consumer debt) or 'good_debt' (investment debt)
