@@ -111,6 +111,10 @@ export class CompleteOnboardingUseCase extends BaseUseCase<
       new Date(Date.now() + timeFrame * 30 * 24 * 60 * 60 * 1000),
       new CurrencyVO(emergencyFundGoal),
     );
+    await this.budgetManagerService.createIncome(
+      input.userId,
+      new CurrencyVO(income),
+    );
     await this.onboardingProfileRepository.update(profile);
   }
 }

@@ -17,4 +17,6 @@ export abstract class BudgetManagerService {
     userId: string,
     props: CreateBudgetProps[],
   ): Promise<void>;
+
+  abstract createIncome(userId: string, amount: CurrencyVO): Promise<void>;
 }

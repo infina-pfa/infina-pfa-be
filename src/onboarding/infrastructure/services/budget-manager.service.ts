@@ -1,4 +1,6 @@
+import { CurrencyVO } from '@/common/base';
 import { PrismaClient } from '@/common/prisma';
+import { TransactionType } from '@/common/types/transaction';
 import { BudgetManagerService, CreateBudgetProps } from '@/onboarding/domain';
 import { Injectable } from '@nestjs/common';
 
@@ -16,6 +18,19 @@ export class BudgetManagerServiceImpl implements BudgetManagerService {
         user_id: userId,
         amount: budget.amount.value,
       })),
+    });
+  }
+
+  async createIncome(userId: string, amount: CurrencyVO): Promise<void> {
+    await this.prisma.transactions.create({
+      data: {
+        user_id: userId,
+        amount: amount.value,
+        name: 'Thu nhập',
+        type: TransactionType.INCOME,
+        recurring: 0,
+        description: 'Thu nhập đầu tiên',
+      },
     });
   }
 }
