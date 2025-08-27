@@ -188,6 +188,13 @@ export class DebtResponseDto extends BaseDto {
   dueDate: Date;
 
   @ApiProperty({
+    description: 'Debt type',
+    enum: DebtType,
+    example: DebtType.BAD_DEBT,
+  })
+  type: DebtType;
+
+  @ApiProperty({
     description: 'Total debt amount',
     example: 10000,
   })
@@ -234,6 +241,7 @@ export class DebtResponseDto extends BaseDto {
     dto.currentPaidAmount = aggregate.currentPaidAmount.value;
     dto.createdAt = debt.props.createdAt;
     dto.updatedAt = debt.props.updatedAt;
+    dto.type = debt.props.type;
 
     if (includePayments) {
       dto.payments = aggregate.payments.items.map((payment) =>
