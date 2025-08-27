@@ -359,6 +359,7 @@ model budget_transactions {
   @@index([user_id], map: "idx_budget_transactions_user_id")
   @@index([created_at(sort: Desc)], map: "idx_budget_transactions_created_at")
   @@index([user_id, budget_id], map: "idx_budget_transactions_user_budget")
+  @@index([deleted_at], map: "idx_budget_transactions_deleted_at")
   @@schema("public")
 }
 
@@ -384,6 +385,7 @@ model budgets {
   @@index([user_id, year, month], map: "idx_budgets_user_month_year")
   @@index([category], map: "idx_budgets_category")
   @@index([user_id, name, year, month], map: "idx_budgets_user_name_year_month")
+  @@index([deleted_at], map: "idx_budgets_deleted_at")
   @@schema("public")
 }
 
@@ -402,6 +404,7 @@ model conversations {
   @@index([user_id], map: "idx_conversations_user_id")
   @@index([created_at(sort: Desc)], map: "idx_conversations_created_at")
   @@index([name], map: "idx_conversations_name")
+  @@index([deleted_at], map: "idx_conversations_deleted_at")
   @@schema("public")
 }
 
@@ -424,6 +427,7 @@ model goal_transactions {
   @@index([transaction_id], map: "idx_goal_transactions_transaction_id")
   @@index([user_id], map: "idx_goal_transactions_user_id")
   @@index([user_id, goal_id], map: "idx_goal_transactions_user_goal")
+  @@index([deleted_at], map: "idx_goal_transactions_deleted_at")
   @@schema("public")
 }
 
@@ -446,6 +450,8 @@ model goals {
   @@index([due_date], map: "idx_goals_due_date")
   @@index([user_id], map: "idx_goals_user_id")
   @@index([title], map: "idx_goals_title")
+  @@index([deleted_at], map: "idx_goals_deleted_at")
+  @@index([type], map: "idx_goals_type")
   @@schema("public")
 }
 
@@ -470,6 +476,9 @@ model messages {
   @@index([user_id], map: "idx_messages_user_id")
   @@index([content], map: "idx_messages_content")
   @@index([user_id, conversation_id], map: "idx_messages_user_conversation")
+  @@index([deleted_at], map: "idx_messages_deleted_at")
+  @@index([sender], map: "idx_messages_sender")
+  @@index([type], map: "idx_messages_type")
   @@schema("public")
 }
 
@@ -491,6 +500,8 @@ model onboarding_profiles {
 
   @@index([created_at], map: "idx_onboarding_profiles_created_at")
   @@index([user_id], map: "idx_onboarding_profiles_user_id")
+  @@index([completed_at], map: "idx_onboarding_profiles_completed_at")
+  @@index([deleted_at], map: "idx_onboarding_profiles_deleted_at")
   @@schema("public")
 }
 
@@ -516,6 +527,10 @@ model transactions {
   @@index([user_id], map: "idx_transactions_user_id")
   @@index([amount], map: "idx_transactions_amount")
   @@index([name], map: "idx_transactions_name")
+  @@index([deleted_at], map: "idx_transactions_deleted_at")
+  @@index([type], map: "idx_transactions_type")
+  @@index([user_id, deleted_at], map: "idx_transactions_user_deleted")
+  @@index([user_id, type, deleted_at], map: "idx_transactions_user_type_deleted")
   @@schema("public")
 }
 
@@ -534,6 +549,7 @@ model public_users {
 
   @@index([user_id], map: "idx_users_user_id")
   @@index([name], map: "idx_users_name")
+  @@index([deleted_at], map: "idx_public_users_deleted_at")
   @@map("users")
   @@schema("public")
 }
@@ -554,6 +570,8 @@ model onboarding_messages {
   @@index([created_at(sort: Desc)], map: "idx_onboarding_messages_created_at")
   @@index([user_id, created_at(sort: Desc)], map: "idx_onboarding_messages_user_created")
   @@index([user_id], map: "idx_onboarding_messages_user_id")
+  @@index([deleted_at], map: "idx_onboarding_messages_deleted_at")
+  @@index([sender], map: "idx_onboarding_messages_sender")
   @@schema("public")
 }
 
@@ -571,6 +589,13 @@ model debt_transactions {
   transactions   transactions @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users          auth_users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([created_at(sort: Desc)], map: "idx_debt_transactions_created_at")
+  @@index([debt_id, created_at(sort: Desc)], map: "idx_debt_transactions_debt_created")
+  @@index([debt_id], map: "idx_debt_transactions_debt_id")
+  @@index([deleted_at], map: "idx_debt_transactions_deleted_at")
+  @@index([transaction_id], map: "idx_debt_transactions_transaction_id")
+  @@index([user_id, debt_id], map: "idx_debt_transactions_user_debt")
+  @@index([user_id], map: "idx_debt_transactions_user_id")
   @@schema("public")
 }
 
@@ -587,9 +612,15 @@ model debts {
   deleted_at        DateTime?           @db.Timestamptz(6)
   rate              Decimal             @db.Decimal
   due_date          DateTime            @db.Timestamptz(6)
+  type              debt_type           @default(bad_debt)
   debt_transactions debt_transactions[]
   users             auth_users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([deleted_at], map: "idx_debts_deleted_at")
+  @@index([due_date], map: "idx_debts_due_date")
+  @@index([user_id, deleted_at], map: "idx_debts_user_deleted")
+  @@index([user_id, due_date], map: "idx_debts_user_due_date")
+  @@index([user_id], map: "idx_debts_user_id")
   @@schema("public")
 }
 
@@ -700,6 +731,14 @@ enum language {
 enum goal_type {
   emergency
   growth
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum debt_type {
+  bad_debt
+  good_debt
 
   @@schema("public")
 }

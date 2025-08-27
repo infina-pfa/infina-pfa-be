@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '../prisma-client';
 import { Decimal, PrismaDelegate } from '@/common/types/prisma';
 import { DebtORM } from '@/common/types/orms';
-import { DebtEntity } from '@/debt/domain';
+import { DebtEntity, DebtType } from '@/debt/domain';
 
 @Injectable()
 export class DebtPrismaRepository
@@ -28,6 +28,7 @@ export class DebtPrismaRepository
       rate: new Decimal(props.rate),
       due_date: props.dueDate,
       deleted_at: deletedAt ?? null,
+      type: props.type,
     };
   }
 
@@ -42,6 +43,7 @@ export class DebtPrismaRepository
         dueDate: data.due_date,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
+        type: data.type as DebtType,
       },
       data.id,
     );
