@@ -38,6 +38,13 @@ export class OnboardingProfileInternalController {
     private readonly monthlyResetPyfMetadataUseCase: MonthlyResetPyfMetadataUseCase,
   ) {}
 
+  @Post('monthly-reset-pyf-metadata')
+  @ApiOperation({ summary: 'Reset Pyf metadata for all users' })
+  @ApiResponse({ status: 201, description: 'Pyf metadata reset successfully' })
+  async monthlyResetPyfMetadata(): Promise<void> {
+    await this.monthlyResetPyfMetadataUseCase.execute();
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get onboarding profile for the current user' })
   @ApiResponse({
@@ -82,12 +89,5 @@ export class OnboardingProfileInternalController {
     });
 
     return OnboardingProfileResponseDto.fromEntity(profile);
-  }
-
-  @Post('monthly-reset-pyf-metadata')
-  @ApiOperation({ summary: 'Reset Pyf metadata for all users' })
-  @ApiResponse({ status: 201, description: 'Pyf metadata reset successfully' })
-  async monthlyResetPyfMetadata(): Promise<void> {
-    await this.monthlyResetPyfMetadataUseCase.execute();
   }
 }

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Currency, Language } from '@/common/types/user';
-import { UserEntity, FinancialStage } from '../../domain/entities/user.entity';
+import { Currency, FinancialStage, Language } from '@/common/types/user';
+import { UserEntity } from '../../domain/entities/user.entity';
 import { UserErrorFactory } from '../../domain/errors';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { GetUserProfileUseCase } from '../get-user-profile.use-case';

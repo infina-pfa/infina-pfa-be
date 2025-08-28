@@ -1,13 +1,7 @@
 import { BaseEntity, BaseProps } from '@/common/base';
-import { Currency, Language } from '@/common/types/user';
+import { Currency, FinancialStage, Language } from '@/common/types/user';
 import { UserErrorFactory } from '../errors/user-error.factory';
 import { OptionalProps } from '@/common/utils';
-
-export enum FinancialStage {
-  DEBT = 'get_out_of_debt',
-  START_SAVING = 'start_saving',
-  START_INVESTING = 'start_investing',
-}
 
 export interface UserEntityProps extends BaseProps {
   name: string;

@@ -27,7 +27,7 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
     >,
     id?: string,
   ): BudgetEntity {
-    if (props.amount.value <= 0) {
+    if (props.amount.value < 0) {
       throw BudgetErrorFactory.budgetInvalidAmount();
     }
 
@@ -43,7 +43,7 @@ export class BudgetEntity extends BaseEntity<BudgetEntityProps> {
   }
 
   public validate(): void {
-    if (this.props.amount.value <= 0) {
+    if (this.props.amount.value < 0) {
       throw BudgetErrorFactory.budgetInvalidAmount();
     }
   }

@@ -1,13 +1,7 @@
 import { PrismaClient } from '@/common/prisma';
+import { calculateMonthlyPayment, DebtDetails } from '@/common/utils';
 import { DebtAggregateRepository, DebtManagerService } from '@/debt/domain';
 import { Injectable, NotFoundException } from '@nestjs/common';
-
-export type DebtDetails = {
-  rate: number;
-  dueDate: string;
-  amount: number;
-  currentPaidAmount: number;
-};
 
 @Injectable()
 export class DebtManagerServiceImpl implements DebtManagerService {
@@ -15,24 +9,6 @@ export class DebtManagerServiceImpl implements DebtManagerService {
     private readonly prismaClient: PrismaClient,
     private readonly debtAggregateRepository: DebtAggregateRepository,
   ) {}
-
-  private calculateMonthlyPayment(debts: DebtDetails): number {
-    const { amount, rate, dueDate, currentPaidAmount } = debts;
-    const today = new Date();
-    const timeDiff = new Date(dueDate).getTime() - today.getTime();
-    const timeDiffInMonths = Math.ceil(timeDiff / (1000 * 60 * 60 * 24 * 30));
-
-    if (rate === 0) {
-      return timeDiffInMonths === 0
-        ? amount - currentPaidAmount
-        : (amount - currentPaidAmount) / timeDiffInMonths;
-    }
-
-    return (
-      ((amount - currentPaidAmount) * (rate / 100)) /
-      (1 - Math.pow(1 + rate / 100, -timeDiffInMonths))
-    );
-  }
 
   private async getMonthlyPaymentFromDebt(userId: string): Promise<number> {
     const debts = await this.debtAggregateRepository.findMany({
@@ -46,7 +22,7 @@ export class DebtManagerServiceImpl implements DebtManagerService {
     const monthlyPayment = debts.reduce((acc, debt) => {
       return (
         acc +
-        this.calculateMonthlyPayment({
+        calculateMonthlyPayment({
           rate: debt.rate,
           dueDate: debt.dueDate.toISOString(),
           amount: debt.amount.value,
@@ -83,7 +59,15 @@ export class DebtManagerServiceImpl implements DebtManagerService {
     }
 
     const monthlyPayment = metadata.debts?.reduce((acc, debt) => {
-      return acc + this.calculateMonthlyPayment(debt);
+      return (
+        acc +
+        calculateMonthlyPayment({
+          rate: debt.rate,
+          dueDate: debt.dueDate,
+          amount: debt.amount,
+          currentPaidAmount: debt.currentPaidAmount,
+        })
+      );
     }, 0);
 
     return monthlyPayment || 0;

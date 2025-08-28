@@ -1,4 +1,5 @@
 import { PrismaClient } from '@/common/prisma';
+import { FinancialStage } from '@/common/types';
 import {
   OnboardingProfileRepository,
   UserFinancialInfoService,
@@ -54,5 +55,17 @@ export class UserFinancialInfoServiceImpl implements UserFinancialInfoService {
       .reduce((acc, transaction) => acc + transaction, 0);
 
     return (freeToSpend * getWeekOfMonth(today)) / 4 - spendingThisMonth;
+  }
+
+  async getUserFinancialStage(userId: string): Promise<FinancialStage> {
+    const user = await this.prismaClient.public_users.findFirst({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user.financial_stage as FinancialStage;
   }
 }

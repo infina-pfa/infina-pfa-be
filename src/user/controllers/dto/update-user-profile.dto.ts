@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Currency, Language } from '@/common/types/user';
-import { FinancialStage } from '@/user/domain/entities/user.entity';
+import { Currency, FinancialStage, Language } from '@/common/types/user';
 import {
   IsEnum,
   IsNotEmpty,

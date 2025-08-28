@@ -1,7 +1,7 @@
-import { Currency, Language } from '@/common/types/user';
+import { Currency, FinancialStage, Language } from '@/common/types/user';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateUserProfileDto } from '../../controllers/dto/update-user-profile.dto';
-import { FinancialStage, UserEntity } from '../../domain/entities/user.entity';
+import { UserEntity } from '../../domain/entities/user.entity';
 import { UserErrorFactory } from '../../domain/errors';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import {

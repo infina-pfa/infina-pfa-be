@@ -7,13 +7,19 @@ export enum BudgetingStyle {
   GOAL_FOCUSED = 'goal_focused',
 }
 
+export enum DebtType {
+  BAD_DEBT = 'bad_debt',
+  GOOD_DEBT = 'good_debt',
+}
+
 export type DebtDetails = {
   lender: string;
   purpose: string;
   rate: number;
-  dueDate: Date;
+  dueDate: string;
   amount: number;
   currentPaidAmount: number;
+  type: DebtType;
 };
 
 export type Metadata = {

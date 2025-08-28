@@ -167,27 +167,6 @@ describe('BudgetEntity', () => {
       });
     });
 
-    it('should throw error when amount is zero', () => {
-      const amount = new CurrencyVO(0, Currency.USD);
-      const props: Omit<BudgetEntityProps, 'id'> = {
-        name: 'Zero Amount Budget',
-        amount,
-        userId: 'user-zero',
-        category: BudgetCategory.FLEXIBLE,
-        color: '#000000',
-        icon: 'zero',
-        month: 7,
-        year: 2024,
-        deletedAt: null,
-        createdAt: mockDate,
-        updatedAt: mockDate,
-      };
-
-      expect(() => BudgetEntity.create(props)).toThrow(
-        BudgetErrorFactory.budgetInvalidAmount(),
-      );
-    });
-
     it('should throw error when amount is negative', () => {
       const amount = new CurrencyVO(-100, Currency.USD);
       const props: Omit<BudgetEntityProps, 'id'> = {
