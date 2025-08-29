@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BaseUseCase } from '@/common/base/use-case/base.use-case';
-import { OnboardingErrorFactory, OnboardingProfileRepository } from '../domain';
+import {
+  OnboardingErrorFactory,
+  OnboardingMessageRepository,
+  OnboardingProfileRepository,
+} from '../domain';
 
 export type StartOverUseCaseInput = {
   userId: string;
@@ -10,6 +14,7 @@ export type StartOverUseCaseInput = {
 export class StartOverUseCase extends BaseUseCase<StartOverUseCaseInput, void> {
   constructor(
     private readonly onboardingProfileRepository: OnboardingProfileRepository,
+    private readonly onboardingMessageRepository: OnboardingMessageRepository,
   ) {
     super();
   }
@@ -24,5 +29,8 @@ export class StartOverUseCase extends BaseUseCase<StartOverUseCaseInput, void> {
 
     profile.resetProfile();
     await this.onboardingProfileRepository.update(profile);
+    await this.onboardingMessageRepository.deleteMany({
+      userId: input.userId,
+    });
   }
 }

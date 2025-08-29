@@ -81,4 +81,11 @@ export abstract class PrismaRepository<E extends BaseEntity<BaseProps>>
     });
     return entities.length;
   }
+
+  public async deleteMany(props: Partial<E['props']>): Promise<number> {
+    const result = await this.prisma.deleteMany({
+      where: camelCaseToSnakeCase(props),
+    });
+    return result.count;
+  }
 }

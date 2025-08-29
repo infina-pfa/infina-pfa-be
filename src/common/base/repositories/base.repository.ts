@@ -29,4 +29,6 @@ export abstract class BaseRepository<E extends BaseEntity<BaseProps>> {
     props: Partial<E['props']>,
     entities: E[],
   ): Promise<number>;
+
+  abstract deleteMany(props: Partial<E['props']>): Promise<number>;
 }
