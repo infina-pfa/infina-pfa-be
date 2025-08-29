@@ -4,8 +4,9 @@ import { CreateOnboardingMessageUseCase } from './create-onboarding-message.use-
 import { CreateOnboardingProfileUseCase } from './create-onboarding-profile.use-case';
 import { GetOnboardingMessagesUseCase } from './get-onboarding-messages.use-case';
 import { GetOnboardingProfileUseCase } from './get-onboarding-profile.use-case';
-import { UpdateOnboardingProfileUseCase } from './update-onboarding-profile.use-case';
 import { MonthlyResetPyfMetadataUseCase } from './monthly-reset-pyf-metadata.use-case';
+import { StartOverUseCase } from './start-over.use-case';
+import { UpdateOnboardingProfileUseCase } from './update-onboarding-profile.use-case';
 
 export const onboardingUseCases: Provider[] = [
   CreateOnboardingProfileUseCase,
@@ -15,6 +16,7 @@ export const onboardingUseCases: Provider[] = [
   GetOnboardingMessagesUseCase,
   CompleteOnboardingUseCase,
   MonthlyResetPyfMetadataUseCase,
+  StartOverUseCase,
 ];
 
 export {
@@ -23,6 +25,7 @@ export {
   CreateOnboardingProfileUseCase,
   GetOnboardingMessagesUseCase,
   GetOnboardingProfileUseCase,
-  UpdateOnboardingProfileUseCase,
   MonthlyResetPyfMetadataUseCase,
+  StartOverUseCase,
+  UpdateOnboardingProfileUseCase,
 };

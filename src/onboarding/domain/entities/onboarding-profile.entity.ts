@@ -1,6 +1,7 @@
 import { BaseEntity, BaseProps, CurrencyVO } from '@/common/base';
 import { OptionalProps } from '@/common/utils';
 import { OnboardingErrorFactory } from '../errors';
+import { v4 as uuidv4 } from 'uuid';
 
 export enum BudgetingStyle {
   DETAIL_TRACKER = 'detail_tracker',
@@ -20,6 +21,7 @@ export type DebtDetails = {
   amount: number;
   currentPaidAmount: number;
   type: DebtType;
+  sessionId: string;
 };
 
 export type Metadata = {
@@ -47,6 +49,7 @@ export interface OnboardingProfileEntityProps extends BaseProps {
   pyfAmount: CurrencyVO | null;
   budgetingStyle: BudgetingStyle | null;
   pyfMetadata: PyfMetadata | null;
+  sessionId: string;
 }
 
 export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityProps> {
@@ -63,6 +66,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
       | 'pyfAmount'
       | 'budgetingStyle'
       | 'pyfMetadata'
+      | 'sessionId'
     >,
     id?: string,
   ): OnboardingProfileEntity {
@@ -79,6 +83,7 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
         pyfMetadata: props.pyfMetadata ?? null,
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? new Date(),
+        sessionId: props.sessionId ?? uuidv4(),
       },
       id,
     );
@@ -182,8 +187,24 @@ export class OnboardingProfileEntity extends BaseEntity<OnboardingProfileEntityP
     this.updated();
   }
 
+  public resetProfile(): void {
+    this._props.metadata = null;
+    this._props.expense = null;
+    this._props.income = null;
+    this._props.pyfAmount = null;
+    this._props.budgetingStyle = null;
+    this._props.pyfMetadata = null;
+    this._props.completedAt = null;
+    this._props.sessionId = uuidv4();
+    this.updated();
+  }
+
   public delete(): void {
     this._props.deletedAt = new Date();
     this.updated();
+  }
+
+  public get sessionId(): string {
+    return this.props.sessionId;
   }
 }

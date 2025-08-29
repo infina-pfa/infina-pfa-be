@@ -4,6 +4,7 @@ import {
 } from '@/common/internal-services';
 import {
   OnboardingAiAdvisorService,
+  OnboardingErrorFactory,
   OnboardingMessageEntity,
   OnboardingMessageRepository,
   OnboardingMessageSender,
@@ -40,13 +41,19 @@ export class OnboardingAiAdvisorServiceImpl
       content: message,
     });
 
+    const profile = await this.onboardingProfileRepository.findOne({ userId });
+
+    if (!profile) {
+      throw OnboardingErrorFactory.profileNotFound();
+    }
+
     await this.onboardingMessageRepository.create(userMessage);
 
     const stream = await this.aiInternalService.stream(
       userId,
       {
         message,
-        conversationId: `onboarding-${userId}`,
+        conversationId: `onboarding-${profile.sessionId}`,
         flowType: AiStreamFlowType.ONBOARDING,
       },
       callbacks,

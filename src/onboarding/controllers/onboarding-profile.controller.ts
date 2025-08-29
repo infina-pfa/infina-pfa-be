@@ -12,6 +12,7 @@ import {
   CompleteOnboardingUseCase,
   CreateOnboardingProfileUseCase,
   GetOnboardingProfileUseCase,
+  StartOverUseCase,
   UpdateOnboardingProfileUseCase,
 } from '../use-cases';
 import {
@@ -30,7 +31,20 @@ export class OnboardingProfileController {
     private readonly updateOnboardingProfileUseCase: UpdateOnboardingProfileUseCase,
     private readonly getOnboardingProfileUseCase: GetOnboardingProfileUseCase,
     private readonly completeOnboardingUseCase: CompleteOnboardingUseCase,
+    private readonly startOverUseCase: StartOverUseCase,
   ) {}
+
+  @Post('start-over')
+  @ApiOperation({ summary: 'Start over onboarding' })
+  @ApiResponse({
+    status: 201,
+    description: 'Onboarding started over successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Onboarding profile not found' })
+  async startOver(@CurrentUser() user: AuthUser): Promise<void> {
+    await this.startOverUseCase.execute({ userId: user.id });
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new onboarding profile' })

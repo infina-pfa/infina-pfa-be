@@ -14,9 +14,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserFinancialInfoService } from '../domain';
 import {
   GetOnboardingProfileUseCase,
   MonthlyResetPyfMetadataUseCase,
+  StartOverUseCase,
   UpdateOnboardingProfileUseCase,
 } from '../use-cases';
 import {
@@ -24,7 +26,6 @@ import {
   OnboardingProfileResponseDto,
   UpdateOnboardingProfileInternalDto,
 } from './dto';
-import { UserFinancialInfoService } from '../domain';
 
 @ApiTags('Onboarding Profiles')
 @ApiBearerAuth('x-api-key')
@@ -36,6 +37,7 @@ export class OnboardingProfileInternalController {
     private readonly getOnboardingProfileUseCase: GetOnboardingProfileUseCase,
     private readonly userFinancialInfoService: UserFinancialInfoService,
     private readonly monthlyResetPyfMetadataUseCase: MonthlyResetPyfMetadataUseCase,
+    private readonly startOverUseCase: StartOverUseCase,
   ) {}
 
   @Post('monthly-reset-pyf-metadata')
@@ -43,6 +45,18 @@ export class OnboardingProfileInternalController {
   @ApiResponse({ status: 201, description: 'Pyf metadata reset successfully' })
   async monthlyResetPyfMetadata(): Promise<void> {
     await this.monthlyResetPyfMetadataUseCase.execute();
+  }
+
+  @Post('start-over')
+  @ApiOperation({ summary: 'Start over onboarding' })
+  @ApiResponse({
+    status: 201,
+    description: 'Onboarding started over successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Onboarding profile not found' })
+  async startOver(@Query('userId') userId: string): Promise<void> {
+    await this.startOverUseCase.execute({ userId });
   }
 
   @Get()

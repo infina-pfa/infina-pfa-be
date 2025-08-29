@@ -12,6 +12,7 @@ import { CurrencyVO } from '../../base/value-objects';
 import { PrismaClient } from '../prisma-client';
 import { PrismaRepository } from './prisma.repository';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class OnboardingProfilePrismaRepository
@@ -39,6 +40,7 @@ export class OnboardingProfilePrismaRepository
       updated_at: props.updatedAt,
       deleted_at: props.deletedAt,
       pyf_metadata: props.pyfMetadata,
+      session_id: props.sessionId,
     };
   }
 
@@ -58,6 +60,7 @@ export class OnboardingProfilePrismaRepository
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
         deletedAt: data.deleted_at ? new Date(data.deleted_at) : null,
+        sessionId: data.session_id ?? uuidv4(),
       },
       data.id,
     );
